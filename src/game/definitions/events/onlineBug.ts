@@ -6,7 +6,11 @@ export const onlineBug: GameEvent = {
   description: '生产环境出现了紧急BUG，当前玩家必须立即修复，本回合无法行动。',
   hooks: {
     onTurnStart: (state) => {
-      // Stun the current player
+      state.addStatusEffect(state.activePlayer, {
+        id: 'stunned',
+        name: '眩晕',
+        duration: 1,
+      });
       state.logEvent(
         `线上BUG！${state.activePlayer.name} 必须立即修复，本回合无法行动！`,
       );

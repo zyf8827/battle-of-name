@@ -6,7 +6,11 @@ export const keyboardFailure: GameEvent = {
   description: '你的键盘突然失灵了，本回合无法使用物品。',
   hooks: {
     onTurnStart: (state) => {
-      // Prevent item usage for the current player
+      state.addStatusEffect(state.activePlayer, {
+        id: 'item_disabled',
+        name: '物品禁用',
+        duration: 1,
+      });
       state.logEvent(`键盘失灵！${state.activePlayer.name} 本回合无法使用物品！`);
     },
   },

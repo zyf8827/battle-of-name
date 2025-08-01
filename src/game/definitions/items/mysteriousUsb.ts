@@ -28,7 +28,9 @@ export const mysteriousUsb: Item = {
         id: 'study_material_buff',
         name: '学习资料',
         duration: 2, // 持续到自己的下个回合结束
-        // (需要一个钩子来让下次攻击必定暴击)
+        modifiers: {
+          critRate: 1, // 暴击率设置为100%
+        },
       });
     }
   },

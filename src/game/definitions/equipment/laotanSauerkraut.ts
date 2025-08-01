@@ -10,8 +10,12 @@ export const laotanSauerkraut: Equipment = {
   },
   hooks: {
     onAfterAttack: (self, target, state) => {
-      // Apply a poison effect
       state.logEvent(`${target.name} 闻到了老坛酸菜的味道，中毒了！`);
+      state.addStatusEffect(target, {
+        id: 'poisoned',
+        name: '中毒',
+        duration: 3, // 持续3回合
+      });
     },
   },
 };

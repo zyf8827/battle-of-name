@@ -7,7 +7,14 @@ export const koiPossession: GameEvent = {
   hooks: {
     onTurnStart: (state) => {
       const player = state.activePlayer;
-      // Apply a temporary crit rate boost
+      state.addStatusEffect(player, {
+        id: 'koi_possession_buff',
+        name: '锦鲤附体',
+        duration: 3,
+        modifiers: {
+          critRate: 0.5,
+        },
+      });
       state.logEvent(`锦鲤附体！${player.name} 的暴击率大幅提升！`);
     },
   },

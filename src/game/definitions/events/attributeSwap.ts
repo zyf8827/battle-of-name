@@ -1,4 +1,4 @@
-import type { GameEvent } from '../../types';
+import type { GameEvent, CharacterStats } from '../../types';
 
 export const attributeSwap: GameEvent = {
   id: 'attributeSwap',

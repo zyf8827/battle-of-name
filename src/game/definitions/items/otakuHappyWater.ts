@@ -18,8 +18,7 @@ export const otakuHappyWater: Item = {
       name: '心满意足',
       duration: 2, // 持续到自己的下个回合结束
       modifiers: {
-        // 我们还没有速度属性，暂时用降低防御力来模拟
-        def: 0.8, // 防御力降低20%
+        speed: 0.5, // 速度降低50%
       },
     });
   },

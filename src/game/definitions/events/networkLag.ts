@@ -1,28 +1,28 @@
 import type { GameEvent } from '../../types';
 
-export const gameSlowDown: GameEvent = {
-  id: 'gameSlowDown',
-  name: '游戏减速 ⏪',
-  description: '游戏速度减慢了，所有人的速度都降低了50%。',
+export const networkLag: GameEvent = {
+  id: 'networkLag',
+  name: '网络延迟 🌐',
+  description: '双方速度大幅下降。',
   hooks: {
     onTurnStart: (state) => {
       state.addStatusEffect(state.player1, {
-        id: 'game_slow_down',
-        name: '游戏减速',
+        id: 'network_lag_debuff',
+        name: '网络延迟',
         duration: 1,
         modifiers: {
           speed: 0.5,
         },
       });
       state.addStatusEffect(state.player2, {
-        id: 'game_slow_down',
-        name: '游戏减速',
+        id: 'network_lag_debuff',
+        name: '网络延迟',
         duration: 1,
         modifiers: {
           speed: 0.5,
         },
       });
-      state.logEvent('游戏减速！');
+      state.logEvent('网络延迟！双方速度大幅下降！');
     },
   },
 };

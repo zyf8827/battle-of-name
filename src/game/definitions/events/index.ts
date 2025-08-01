@@ -8,9 +8,8 @@ import { inspiration } from './inspiration';
 import { systemMaintenance } from './systemMaintenance';
 import { networkAcceleration } from './networkAcceleration';
 import { goodFortune } from './goodFortune';
-import { mysteriousCode } from './mysteriousCode';
 import { koiPossession } from './koiPossession';
-import {bossApproval } from './bossApproval';
+import { bossApproval } from './bossApproval';
 import { versionUpdate } from './versionUpdate';
 import { foundWallet } from './foundWallet';
 import { requirementChange } from './requirementChange';
@@ -23,36 +22,24 @@ import { phoneOutOfBattery } from './phoneOutOfBattery';
 import { foodDeliveryLate } from './foodDeliveryLate';
 import { upstairsRenovation } from './upstairsRenovation';
 import { relativeInspection } from './relativeInspection';
-import { parallelUniverse } from './parallelUniverse';
-import { timeLoop } from './timeLoop';
-import { roleSwap } from './roleSwap';
-import { ruleChange } from './ruleChange';
 import { allSilence } from './allSilence';
-import { weatherChange } from './weatherChange';
-import { terrainChange } from './terrainChange';
-import { randomTeleport } from './randomTeleport';
-import { thirdPartyJoins } from './thirdPartyJoins';
-import { audienceVote } from './audienceVote';
-import { memoryConfusion } from './memoryConfusion';
-import { languageConfusion } from './languageConfusion';
 import { itemSwap } from './itemSwap';
 import { attributeSwap } from './attributeSwap';
-import { skillSwap } from './skillSwap';
-import { factionSwap } from './factionSwap';
 import { gameSpeedUp } from './gameSpeedUp';
 import { gameSlowDown } from './gameSlowDown';
 import { gravityIncrease } from './gravityIncrease';
 import { gravityDecrease } from './gravityDecrease';
 import { magneticFieldDisorder } from './magneticFieldDisorder';
-import { spatialDistortion } from './spatialDistortion';
-import { visualInversion } from './visualInversion';
-import { auditoryInversion } from './auditoryInversion';
-import { tactileInversion } from './tactileInversion';
-import { gustatoryInversion } from './gustatoryInversion';
-import { olfactoryInversion } from './olfactoryInversion';
-import { fourthWallBreak } from './fourthWallBreak';
-import { developerAppearance } from './developerAppearance';
-import { easterEgg } from './easterEgg';
+import { suddenPowerOutage } from './suddenPowerOutage';
+import { dataCorruption } from './dataCorruption';
+import { systemCrash } from './systemCrash';
+import { luckyStar } from './luckyStar';
+import { unluckyStar } from './unluckyStar';
+import { timeWarp } from './timeWarp';
+import { glitch } from './glitch';
+import { inspirationBurst } from './inspirationBurst';
+import { networkLag } from './networkLag';
+import { serverOverload } from './serverOverload';
 
 export const events: GameEvent[] = [
   cosmicRay,
@@ -63,7 +50,6 @@ export const events: GameEvent[] = [
   systemMaintenance,
   networkAcceleration,
   goodFortune,
-  mysteriousCode,
   koiPossession,
   bossApproval,
   versionUpdate,
@@ -78,34 +64,22 @@ export const events: GameEvent[] = [
   foodDeliveryLate,
   upstairsRenovation,
   relativeInspection,
-  parallelUniverse,
-  timeLoop,
-  roleSwap,
-  ruleChange,
   allSilence,
-  weatherChange,
-  terrainChange,
-  randomTeleport,
-  thirdPartyJoins,
-  audienceVote,
-  memoryConfusion,
-  languageConfusion,
   itemSwap,
   attributeSwap,
-  skillSwap,
-  factionSwap,
   gameSpeedUp,
   gameSlowDown,
   gravityIncrease,
   gravityDecrease,
   magneticFieldDisorder,
-  spatialDistortion,
-  visualInversion,
-  auditoryInversion,
-  tactileInversion,
-  gustatoryInversion,
-  olfactoryInversion,
-  fourthWallBreak,
-  developerAppearance,
-  easterEgg,
+  suddenPowerOutage,
+  dataCorruption,
+  systemCrash,
+  luckyStar,
+  unluckyStar,
+  timeWarp,
+  glitch,
+  inspirationBurst,
+  networkLag,
+  serverOverload,
 ];

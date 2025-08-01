@@ -7,8 +7,15 @@ export const inspiration: GameEvent = {
   hooks: {
     onTurnStart: (state) => {
       const player = state.activePlayer;
-      player.stats.critRate += 0.5;
-      player.stats.critDamage += 0.5;
+      state.addStatusEffect(player, {
+        id: 'inspiration_buff',
+        name: '灵感迸发',
+        duration: 1,
+        modifiers: {
+          critRate: 0.5,
+          critDmg: 0.5,
+        },
+      });
       state.logEvent(`灵感迸发！${player.name} 的下一次攻击将造成巨大伤害！`);
     },
   },

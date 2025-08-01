@@ -8,9 +8,14 @@ export interface StatusEffect {
   modifiers?: {
     atk?: number;
     def?: number;
+    speed?: number;
+    critRate?: number;
+    critDmg?: number;
   };
   hooks?: {
     onBeforeAttack?: (self: Character, target: Character, state: BattleState) => boolean | void;
+    onTurnEnd?: (self: Character, state: BattleState) => void;
+    onDeath?: (self: Character, state: BattleState) => boolean; // Return true to prevent death
   };
 }
 
@@ -39,6 +44,10 @@ export type EquipmentType = 'weapon' | 'armor' | 'accessory';
 export interface Equipment extends Attribute {
   type: EquipmentType;
   stats: Partial<CharacterStats>;
+  hooks?: {
+    onTurnEnd?: (self: Character, state: BattleState) => void;
+    onAfterAttack?: (self: Character, target: Character, state: BattleState) => void;
+  };
 }
 
 export interface Character {
@@ -72,6 +81,7 @@ export interface BattleState {
       totalDamageDealt: number;
     };
   };
+  lastAction?: { type: 'attack' | 'useItem'; item?: Item; };
 }
 
 export interface Career {

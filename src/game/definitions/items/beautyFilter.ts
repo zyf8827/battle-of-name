@@ -5,7 +5,21 @@ export const beautyFilter: Item = {
   name: '美颜滤镜 🤳',
   description: '提升自己的魅力，使敌人有20%的几率被迷住，无法行动。',
   use: (self, state) => {
-    // Apply a charm effect
-    state.logEvent(`${self.name} 打开了美颜滤镜，变得更加动人了。`);
+    if (state.checkProbability('beautyFilter-charm', 0.2)) {
+      state.addStatusEffect(state.opponent, {
+        id: 'charmed',
+        name: '魅惑',
+        duration: 1,
+        hooks: {
+          onBeforeAttack: (char, target, battleState) => {
+            battleState.logEvent(`${char.name} 被魅惑了，无法行动！`);
+            return true; // Cancel attack
+          },
+        },
+      });
+      state.logEvent(`${self.name} 打开了美颜滤镜，${state.opponent.name} 被迷住了！`);
+    } else {
+      state.logEvent(`${self.name} 打开了美颜滤镜，变得更加动人了。`);
+    }
   },
 };
