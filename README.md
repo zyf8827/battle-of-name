@@ -1,5 +1,51 @@
-# Vue 3 + TypeScript + Vite
+# 姓名大作战
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+这是一个简单的回合制格斗游戏，角色的属性和战斗中的随机事件都与他们的名字息息相关。
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## 游戏特色
+
+-   **名字决定命运**：每个角色的初始属性（生命值、攻击、防御、速度、暴击率、暴击伤害）、职业和初始道具都由其名字唯一确定。输入相同的名字，总会生成完全相同的角色。
+-   **动态随机战斗**：
+    -   **每次战斗都是新的开始**：即使是相同的两个角色对战，每次战斗的初始随机种子也会包含当前时间戳，确保每次对战的结果都充满不确定性。
+    -   **回合内独立判定**：战斗中的所有随机事件（如技能触发、暴击、道具使用、事件效果等）在每个回合都会独立进行随机判定。通过为每个概率检查生成一个独立的随机数，避免了“随机数序列”导致的事件关联性，让战斗过程更加公平和不可预测。
+    -   **速度决定先手**：战斗开始时，速度更快的角色将获得先手。如果速度相同，则通过随机判定决定。
+-   **丰富的角色机制**：
+    -   **职业（Career）**：每个角色拥有独特的职业，提供基础属性加成和在战斗不同阶段（回合开始、攻击前、攻击后、回合结束）触发的特殊技能。
+    -   **状态效果（StatusEffect）**：角色可以获得临时状态，影响属性或行为（例如“眩晕”会阻止行动）。
+    -   **装备（Equipment）**：角色可以穿戴武器、护甲和饰品，提供属性加成。
+    -   **道具（Item）**：角色可以使用一次性道具，在战斗中提供各种效果。
+
+## 技术栈
+
+-   **前端**: Vue.js 3 (使用组合式 API 和 `<script setup>`)
+-   **构建工具**: Vite
+-   **样式**: Tailwind CSS
+-   **语言**: TypeScript
+
+## 核心游戏引擎 (`battleEngine.ts`)
+
+战斗引擎实现为回合制系统，管理整个战斗流程：
+1.  **初始化**：创建包含玩家角色、战斗日志和随机数生成器的 `BattleState`。
+2.  **战斗循环**：只要双方生命值大于0，战斗就会持续。
+3.  **回合结构**：每个回合包括事件阶段、行动阶段（使用道具或攻击）、回合结束阶段。
+4.  **属性计算**：综合基础属性、装备和状态效果计算最终属性。
+5.  **战斗结算**：根据攻击力、防御力、暴击率和暴击伤害计算伤害。
+6.  **胜利条件**：一方生命值归零时，另一方获胜。
+
+## 运行项目
+
+1.  **安装依赖**：
+    ```bash
+    npm install
+    ```
+2.  **启动开发服务器**：
+    ```bash
+    npm run dev
+    ```
+    游戏将在浏览器中打开。
+
+3.  **构建生产版本**：
+    ```bash
+    npm run build
+    ```
+    构建后的文件将输出到 `dist` 目录。
