@@ -1,5 +1,5 @@
 
-import { Item } from '../../types';
+import type { Item } from '../../types';
 import { otakuHappyWater } from './otakuHappyWater';
 import { mysteriousUsb } from './mysteriousUsb';
 import { spicyStrip } from './spicyStrip';

@@ -1,5 +1,5 @@
 
-import { Career } from '../../types';
+import type { Career } from '../../types';
 
 export const programmer: Career = {
   id: 'programmer',

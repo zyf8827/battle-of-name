@@ -1,5 +1,5 @@
 
-import { Item } from '../../types';
+import type { Item } from '../../types';
 
 export const mysteriousUsb: Item = {
   id: 'mysteriousUsb',

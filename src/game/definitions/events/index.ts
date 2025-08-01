@@ -1,5 +1,5 @@
 
-import { GameEvent } from '../../types';
+import type { GameEvent } from '../../types';
 import { cosmicRay } from './cosmicRay';
 import { jojoPose } from './jojoPose';
 import { equipmentEvent } from './equipmentEvent';

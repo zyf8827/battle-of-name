@@ -1,5 +1,5 @@
 
-import { Career } from '../../types';
+import type { Career } from '../../types';
 import { programmer } from './programmer';
 import { masterOfLoafing } from './masterOfLoafing';
 import { keyboardWarrior } from './keyboardWarrior';

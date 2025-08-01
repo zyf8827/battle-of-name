@@ -1,4 +1,4 @@
-import { allItems } from '../items';
+import { items } from '../items';
 import type { GameEvent } from '../../types';
 
 export const foundWallet: GameEvent = {
@@ -7,7 +7,7 @@ export const foundWallet: GameEvent = {
   description: '你在路边捡到了一个钱包，里面有一个随机道具。',
   hooks: {
     onTurnStart: (state) => {
-      const randomItem = allItems[Math.floor(state.rng() * allItems.length)];
+      const randomItem = items[Math.floor(state.rng() * items.length)];
       state.activePlayer.items.push(randomItem);
       state.logEvent(`你捡到了一个钱包，获得了道具【${randomItem.name}】！`);
     },

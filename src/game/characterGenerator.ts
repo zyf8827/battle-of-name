@@ -1,6 +1,6 @@
 
 import seedrandom from 'seedrandom';
-import { Character, Career, Item } from './types';
+import type { Character, Career, Item } from './types';
 import { careers } from './definitions/careers';
 import { items } from './definitions/items';
 

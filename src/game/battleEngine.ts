@@ -1,4 +1,4 @@
-import { Character, BattleState, StatusEffect } from './types';
+import type { Character, BattleState, StatusEffect } from './types';
 import { createCharacter } from './characterGenerator';
 import { events } from './definitions/events/index';
 import seedrandom from 'seedrandom';

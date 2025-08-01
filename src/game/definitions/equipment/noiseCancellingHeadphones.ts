@@ -8,3 +8,4 @@ export const noiseCancellingHeadphones: Equipment = {
   stats: {
     defense: 5,
   },
+};

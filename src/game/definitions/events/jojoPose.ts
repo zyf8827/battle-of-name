@@ -1,5 +1,5 @@
 
-import { GameEvent } from '../../types';
+import type { GameEvent } from '../../types';
 
 export const jojoPose: GameEvent = {
   id: 'jojoPose',
