@@ -72,7 +72,7 @@ export interface BattleState {
   activePlayer: Character;
   opponent: Character;
   log: string[];
-  rng: seedrandom;
+  rng: () => number;
   addStatusEffect: (target: Character, effect: StatusEffect) => void;
   logEvent: (message: string) => void;
   checkProbability: (key: string, probability: number) => boolean;
