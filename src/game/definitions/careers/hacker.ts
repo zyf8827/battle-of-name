@@ -10,7 +10,7 @@ export const hacker: Career = {
   hooks: {
     onBeforeAttack: (self, target, state) => {
       if (state.checkProbability('hacker-debuff', 0.3)) {
-        target.stats.def = Math.max(0, target.stats.def - 3);
+        target.stats.defense = Math.max(0, target.stats.defense - 3);
         state.logEvent(
           `${self.name} 找到了 ${target.name} 的一个漏洞，使其防御力下降了！`,
         );

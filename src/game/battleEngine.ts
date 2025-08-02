@@ -106,6 +106,7 @@ export function startBattle(state: BattleState): { winner: Character; loser: Cha
         const isStunned = state.activePlayer.statusEffects.some(e => e.id === 'stunned');
         const hasPeaceDoveEffect = state.activePlayer.statusEffects.some(e => e.id === 'peace_dove_effect');
         const isSilenced = state.activePlayer.statusEffects.some(e => e.id === 'silenced');
+        let actionTaken = false;
 
         if (isStunned) {
             // Check for Noise Cancelling Headphones immunity
@@ -199,7 +200,7 @@ export function startBattle(state: BattleState): { winner: Character; loser: Cha
                 }
 
                 if (!attackCancelled) {
-                    attackCancelled = state.opponent.career.hooks?.onBeforeAttack?.(state.opponent, state.activePlayer, state);
+                    attackCancelled = !!state.opponent.career.hooks?.onBeforeAttack?.(state.opponent, state.activePlayer, state);
                     if (!attackCancelled) {
                         for (const effect of state.opponent.statusEffects) {
                             if (effect.hooks?.onBeforeAttack?.(state.opponent, state.activePlayer, state)) {

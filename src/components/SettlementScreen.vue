@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Character } from '../game/types';
+import type { Character } from '../game/types';
 
 const props = defineProps<{ 
   winner: Character 

@@ -11,7 +11,7 @@ import { ref, nextTick } from 'vue';
 import StartScreen from './components/StartScreen.vue';
 import BattleScreen from './components/BattleScreen.vue';
 import SettlementScreen from './components/SettlementScreen.vue';
-import { Character } from './game/types';
+import type { Character } from './game/types';
 import { createBattleState, startBattle as runBattle } from './game/battleEngine';
 
 type GameState = 'start' | 'battle' | 'settlement';

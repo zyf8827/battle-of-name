@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { Character } from '../game/types';
+import type { Character } from '../game/types';
 
 defineProps<{ 
   player1: Character, 

@@ -1,5 +1,5 @@
 
-import type { Random } from 'seedrandom';
+import seedrandom from 'seedrandom';
 
 export interface StatusEffect {
   id: string;
@@ -72,7 +72,7 @@ export interface BattleState {
   activePlayer: Character;
   opponent: Character;
   log: string[];
-  rng: Random;
+  rng: seedrandom;
   addStatusEffect: (target: Character, effect: StatusEffect) => void;
   logEvent: (message: string) => void;
   checkProbability: (key: string, probability: number) => boolean;

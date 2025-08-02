@@ -13,7 +13,7 @@ export const productManager: Career = {
     onTurnStart: (self, state) => {
       if (state.checkProbability('productManager-debuff', 0.2)) {
         // 20% chance to change the rules
-        state.opponent.stats.def -= 1;
+        state.opponent.stats.defense -= 1;
         state.logEvent(
           `${self.name} 提出了一个新需求，${state.opponent.name} 的防御力下降了！`,
         );
