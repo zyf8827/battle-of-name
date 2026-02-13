@@ -32,7 +32,9 @@
  *    - 行动执行（攻击/技能）
  *    - TurnEnd 钩子
  * 5. RoundEnd: 回合结束钩子 + 全局事件池触发
- * 6. Duration Tick: 所有 duration > 0 的修饰器 -1，移除过期的
+ * 6. Duration Tick:
+ *    - 单位修饰器：在各自 TurnEnd 时结算（即使该单位被控跳过行动）
+ *    - 环境修饰器：在 RoundEnd 统一结算
  *
  * === 关键数据结构 ===
  *
@@ -1283,20 +1285,16 @@ export function runBattle(
     }
   }
 
-  function tickDurations(): void {
-    const tick = (list: Modifier[]) => {
-      for (let index = list.length - 1; index >= 0; index -= 1) {
-        const modifier = list[index];
-        if (typeof modifier.duration === 'number' && modifier.duration > 0) {
-          modifier.duration -= 1;
-          if (modifier.duration <= 0) {
-            list.splice(index, 1);
-          }
+  function tickModifierDurations(list: Modifier[]): void {
+    for (let index = list.length - 1; index >= 0; index -= 1) {
+      const modifier = list[index];
+      if (typeof modifier.duration === 'number' && modifier.duration > 0) {
+        modifier.duration -= 1;
+        if (modifier.duration <= 0) {
+          list.splice(index, 1);
         }
       }
-    };
-    for (const unit of units) tick(unit.modifiers);
-    tick(envModifiers);
+    }
   }
 
   function decrementCooldowns(): void {
@@ -1416,11 +1414,13 @@ export function runBattle(
           triggerPool(rule.poolId, acting.id, 0);
         }
       }
+
+      tickModifierDurations(acting.modifiers);
     }
 
     // 4. 回合结束 (RoundEnd)
     triggerRoundEnd();
-    tickDurations(); // 结算 Buff/Debuff 持续时间
+    tickModifierDurations(envModifiers); // 环境修饰器按回合结算持续时间
 
     for (const rule of scheduler.getRules('RoundEnd')) {
       if (rng.bool(rule.chance, { domain: 'EVENT', luk: Math.max(...units.map((unit) => unit.stats.LUK)) }, `scheduler:${rule.poolId}:end`)) {

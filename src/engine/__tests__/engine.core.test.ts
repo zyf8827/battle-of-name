@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { defaultBattleContentAdapter } from '../../content/battleContentAdapter';
+import type { BattleContentAdapter } from '../contentAdapter';
 import { runBattle } from '../engine';
+import type { Modifier, Unit } from '../types';
 
 describe('engine core robustness', () => {
   it('is deterministic for same input and same seed', () => {
@@ -56,5 +58,97 @@ describe('engine core robustness', () => {
     const afterSerialized = JSON.stringify(after);
 
     expect(afterSerialized).toBe(beforeSerialized);
+  });
+});
+
+function createTestAdapter(params: {
+  agiA: number;
+  agiB: number;
+  shouldStun: (ctx: { actor: Unit; enemy: Unit; round: number }) => boolean;
+}): BattleContentAdapter {
+  const makeStun = (): Modifier => ({
+    id: 'test.stun',
+    source: 'BUFF',
+    name: '眩晕',
+    duration: 1,
+    tags: ['control', 'debuff'],
+    stacking: { stackKey: 'test.stun', policy: 'REFRESH_DURATION' },
+  });
+
+  return {
+    bootstrap: () => ({
+      units: [
+        {
+          id: 'A',
+          name: 'A',
+          stats: { STR: 10, AGI: params.agiA, VIT: 10, LUK: 0 },
+          state: { hp: 100, maxHp: 100, shield: 0, cd: {} },
+          modifiers: [],
+        },
+        {
+          id: 'B',
+          name: 'B',
+          stats: { STR: 10, AGI: params.agiB, VIT: 10, LUK: 0 },
+          state: { hp: 100, maxHp: 100, shield: 0, cd: {} },
+          modifiers: [],
+        },
+      ],
+      envModifiers: [],
+      eventPools: {},
+      consumablePoolIds: [],
+      equipmentPoolIds: [],
+      scheduleRules: [],
+      narrate: () => ({ text: 'noop', key: 'noop' }),
+      logText: (key) => key,
+      createModifierById: () => makeStun(),
+      getConsumableById: () => undefined,
+      executeTurnAction: ({ actor, enemy, runtime, round }) => {
+        if (!params.shouldStun({ actor, enemy, round })) {
+          return;
+        }
+        runtime.event.process(
+          runtime.event.make({
+            type: 'APPLY_BUFF',
+            sourceId: actor.id,
+            targetId: enemy.id,
+            depth: 0,
+            payload: {
+              modifier: makeStun(),
+              tags: ['control', 'debuff'],
+            },
+          }),
+        );
+      },
+      executeTurnConsumable: () => false,
+      resolveControlSource: ({ actor }) => actor.modifiers.find((modifier) => modifier.tags?.includes('control')),
+    }),
+  };
+}
+
+describe('duration ticking on control effects', () => {
+  it('early actor stun makes late actor skip in same round only', () => {
+    const adapter = createTestAdapter({
+      agiA: 20,
+      agiB: 10,
+      shouldStun: ({ actor, round }) => actor.id === 'A' && round === 1,
+    });
+
+    const result = runBattle({ name1: 'A', name2: 'B', seed: 'turn-duration-1' }, adapter, { maxRounds: 2 });
+    const skipLogs = result.logs.filter((log) => log.text === 'controlSkip').map((log) => ({ round: log.round, actorId: log.actorId }));
+
+    expect(skipLogs).toEqual([{ round: 1, actorId: 'B' }]);
+  });
+
+  it('late actor stun makes early actor skip on next round turn', () => {
+    const adapter = createTestAdapter({
+      agiA: 20,
+      agiB: 10,
+      shouldStun: ({ actor, round }) => actor.id === 'B' && round === 1,
+    });
+
+    const result = runBattle({ name1: 'A', name2: 'B', seed: 'turn-duration-2' }, adapter, { maxRounds: 2 });
+    const skipLogs = result.logs.filter((log) => log.text === 'controlSkip').map((log) => ({ round: log.round, actorId: log.actorId }));
+
+    expect(skipLogs).toEqual([{ round: 2, actorId: 'A' }]);
   });
 });
