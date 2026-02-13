@@ -1,3 +1,47 @@
+/**
+ * 战斗引擎 - 核心实现
+ *
+ * 本模块实现完整的回合制自动战斗引擎，遵循以下设计原则：
+ *
+ * 1. **确定性 (Determinism)**: 相同的输入（姓名 + 种子）→ 相同的战斗结果
+ *    - 使用 seedrandom 实现基于种子的 RNG
+ *    - 所有随机调用都记录在回放轨迹中
+ *    - 修饰器触发顺序固定（priority → appliedOrder → id）
+ *
+ * 2. **事件驱动 (Event-Driven)**: 所有战斗行为通过事件表达
+ *    - 三阶段管道：拦截 (Intercept) → 结算 (Resolve) → 反应 (React)
+ *    - 支持递归衍生事件（如反弹伤害、吸血）
+ *    - 事件可被修饰器修改或取消
+ *
+ * 3. **修饰器优先 (Modifier-First)**: 所有游戏效果统一为修饰器
+ *    - 装备、天赋、Buff、环境效果都实现为 Modifier
+ *    - DSL 支持 80% 的效果（无需编写代码）
+ *    - 自定义钩子覆盖剩余 20% 的复杂场景
+ *
+ * === 主流程 ===
+ *
+ * runBattle(input, contentAdapter) → BattleOutcome
+ *
+ * 战斗主循环（见文件末尾 while 循环）：
+ * 1. RoundStart: 回合开始钩子 + 全局事件池触发
+ * 2. Cooldown Tick: 所有冷却时间 -1
+ * 3. 行动队列: 按 AGI 排序（稳定排序）
+ * 4. Turn 循环（对每个存活单位）：
+ *    - TurnStart 钩子
+ *    - 控制检查（眩晕等）
+ *    - 行动执行（攻击/技能）
+ *    - TurnEnd 钩子
+ * 5. RoundEnd: 回合结束钩子 + 全局事件池触发
+ * 6. Duration Tick: 所有 duration > 0 的修饰器 -1，移除过期的
+ *
+ * === 关键数据结构 ===
+ *
+ * - Unit: 战斗单位（玩家/敌人/环境）
+ * - Modifier: 修饰器（装备/Buff/天赋/环境）
+ * - CombatEvent: 战斗事件（攻击/治疗/应用修饰器等）
+ * - EngineRuntime: 提供给修饰器的运行时 API
+ */
+
 import type { BattleContentAdapter, BattleSystemLogKey, EffectHandlerContext } from './contentAdapter';
 import { deepCloneKeepFns } from './clone';
 import { ENGINE_VERSION } from './replay';

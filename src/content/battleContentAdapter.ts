@@ -1,3 +1,26 @@
+/**
+ * 默认战斗内容适配器
+ *
+ * 本模块实现 `BattleContentAdapter` 接口，负责：
+ *
+ * 1. **姓名 → 属性映射**：通过哈希算法将姓名转换为角色属性
+ * 2. **初始装备生成**：根据姓名和种子生成随机装备/消耗品
+ * 3. **文本模板解析**：提供战斗日志的文本渲染
+ * 4. **效果处理器注册**：注册内置的 DSL 效果处理器
+ * 5. **默认执行器**：提供默认的行动/消耗品/控制解析逻辑
+ *
+ * === 确定性设计 ===
+ *
+ * - 属性生成：仅依赖姓名（相同姓名 = 相同属性）
+ * - 职业选择：仅依赖姓名（相同姓名 = 相同职业）
+ * - 装备/道具：依赖姓名 + 种子（增加随机性）
+ *
+ * 这确保了：
+ * - 相同姓名的基础属性永远一致
+ * - 相同姓名 + 相同种子的装备/道具永远一致
+ * - 不同种子下可以有不同开局
+ */
+
 import type { BattleContentAdapter } from '../engine/contentAdapter';
 import { deepCloneKeepFns } from '../engine/clone';
 import type { BaseStats, Unit } from '../engine/types';
@@ -16,6 +39,16 @@ import { createModifierById } from './modifiers';
 import { createNarrationResolver } from './narration';
 import { renderTextTemplate } from './base/text';
 
+/**
+ * 文本模板标准化
+ *
+ * 将 `TextTemplate` 转换为统一的数组格式：
+ * - `undefined` → `[]`
+ * - `string` → `[string]`
+ * - `string[]` → `string[]` (不变)
+ *
+ * 用途：统一处理随机选择（从数组中随机选一个）
+ */
 function asTemplateArray(template: TextTemplate | undefined): string[] {
   if (!template) return [];
   return Array.isArray(template) ? template : [template];
@@ -105,7 +138,30 @@ function buildGearFromNameAndSeed(name: string, seed: string): Pick<Loadout, 'eq
   };
 }
 
+/**
+ * 构建战斗单位
+ *
+ * 综合所有生成逻辑，创建完整的单位对象：
+ *
+ * **步骤**：
+ * 1. 从姓名生成身份（职业）
+ * 2. 从姓名 + 种子生成装备和消耗品
+ * 3. 查找职业规格，获取职业基础属性和天赋
+ * 4. 从姓名生成种子属性（STR/AGI/VIT/LUK）
+ * 5. 合并属性：classBase + seededStats
+ * 6. 构建单位对象：
+ *    - 基础信息（id, name, classId/className）
+ *    - 属性（stats）
+ *    - 初始状态（hp: 0, 后续由引擎计算 maxHp）
+ *    - 初始消耗品（consumables）
+ *    - 修饰器（装备 + 天赋）
+ *
+ * **确定性**：
+ * - 相同 name → 相同 stats + classId
+ * - 相同 name + seed → 相同 equipmentIds + consumables
+ */
 function buildUnit(id: string, name: string, seed: string): Unit {
+  // 1-2. 生成身份和装备
   const identity = buildIdentityFromName(name);
   const gear = buildGearFromNameAndSeed(name, seed);
   const loadout: Loadout = {
@@ -113,6 +169,8 @@ function buildUnit(id: string, name: string, seed: string): Unit {
     equipmentIds: gear.equipmentIds,
     consumables: gear.consumables,
   };
+
+  // 3-4. 计算属性
   const classSpec = loadout.classId ? classList.find((item) => item.id === loadout.classId) : undefined;
   const classBase = classSpec?.baseStats ?? { STR: 0, AGI: 0, VIT: 0, LUK: 0 };
   const seededStats = statsFromName(name);
@@ -123,6 +181,7 @@ function buildUnit(id: string, name: string, seed: string): Unit {
     LUK: classBase.LUK + seededStats.LUK,
   };
 
+  // 5-6. 构建单位对象
   return {
     id,
     name,
