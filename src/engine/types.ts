@@ -278,11 +278,55 @@ export type ModifierTextOverrides = {
  * { kind: 'SHIELD', value: { type: 'FLAT', value: 10 }, target: 'SELF' }
  * { kind: 'APPLY_MODIFIER', modifierId: 'buff.burning', target: 'TARGET' }
  */
-export type EffectSpec = {
-  kind: string;                           // 效果类型
-  target?: EventEffectTarget;              // 目标选择器
-  [key: string]: unknown;                 // 其他参数（动态）
-};
+
+/**
+ * 内置效果类型的具体定义（编译期类型安全）
+ * 这些类型定义了每种效果所需的参数
+ */
+export type BuiltinEffectSpec =
+  | { kind: 'APPLY_MODIFIER'; target?: EventEffectTarget; modifierId?: string; modifier?: Modifier; duration?: number; textOverrides?: Modifier['texts'] }
+  | { kind: 'TRIGGER_EVENT_POOL'; poolId: string }
+  | { kind: 'SHIELD'; target?: EventEffectTarget; value: ValueExpr[]; tags: CombatTag[] }
+  | { kind: 'LIFESTEAL'; ratio: number; tags: CombatTag[] }
+  | { kind: 'DISPEL'; target: TargetSelector; mode: 'BUFF' | 'DEBUFF' | 'ANY'; byTag?: CombatTag; max?: number }
+  | { kind: 'MITIGATE'; when: EventWhen; multiplier: number; min?: number }
+  | { kind: 'DIRECT_DAMAGE'; target: EventEffectTarget; value: number; tags?: CombatTag[] }
+  | { kind: 'DIRECT_HEAL'; target: EventEffectTarget; value: number; tags?: CombatTag[] }
+  | { kind: 'GRANT_CONSUMABLE'; target: EventEffectTarget; consumableId: string }
+  | { kind: 'GRANT_RANDOM_CONSUMABLE'; target: EventEffectTarget }
+  | { kind: 'LOSE_RANDOM_CONSUMABLE'; target: EventEffectTarget; count?: number }
+  | { kind: 'GRANT_EQUIPMENT'; target: EventEffectTarget; equipment: Modifier }
+  | { kind: 'GRANT_RANDOM_EQUIPMENT'; target: EventEffectTarget; slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY' }
+  | { kind: 'LOSE_RANDOM_EQUIPMENT'; target: EventEffectTarget; slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY' };
+
+/**
+ * 所有内置效果的 kind 类型
+ */
+export type BuiltinEffectKind = BuiltinEffectSpec['kind'];
+
+/**
+ * 类型安全的效果规格
+ *
+ * 使用条件类型实现编译期类型检查：
+ * - 如果 kind 是内置效果类型，则使用对应的严格类型定义
+ * - 如果 kind 是未知类型，则保留开放结构以支持扩展
+ *
+ * 示例：
+ * ```typescript
+ * // ✅ 编译通过：参数匹配
+ * const shield: EffectSpec<'SHIELD'> = { kind: 'SHIELD', value: [...], tags: [...] }
+ *
+ * // ❌ 编译报错：缺少必需参数
+ * const badShield: EffectSpec<'SHIELD'> = { kind: 'SHIELD' }
+ *
+ * // ✅ 扩展效果：使用开放结构
+ * const custom: EffectSpec<'CUSTOM_EFFECT'> = { kind: 'CUSTOM_EFFECT', customParam: 123 }
+ * ```
+ */
+export type EffectSpec<K extends string = BuiltinEffectKind> =
+  K extends BuiltinEffectKind
+    ? Extract<BuiltinEffectSpec, { kind: K }>  // 内置效果：严格类型
+    : { kind: K; target?: EventEffectTarget; [key: string]: unknown };  // 扩展效果：开放结构
 
 /**
  * 修饰器规格定义
@@ -473,6 +517,53 @@ export type EngineLimits = {
   maxEventsPerRound: number;                          // 每回合最大事件数
   maxDerivedEventsPerEvent: number;                   // 单事件最大衍生数
   maxTriggersPerModifierPerRound: number;             // 单修饰器每回合最大触发次数
+};
+
+/**
+ * 战斗平衡参数
+ *
+ * 控制数值计算的基准值：
+ * - hpBase: 基础生命值（无VIT加成时）
+ * - hpPerVit: 每点VIT增加的生命值
+ */
+export type BattleBalanceParams = {
+  hpBase: number;     // 基础生命值
+  hpPerVit: number;   // 每点VIT的生命值加成
+};
+
+/**
+ * 战斗配置
+ *
+ * 允许自定义战斗引擎的核心参数：
+ * - balance: 数值平衡参数
+ * - limits: 引擎限制参数
+ * - maxRounds: 最大回合数（超时判负）
+ */
+export type BattleConfig = {
+  balance?: Partial<BattleBalanceParams>;
+  limits?: Partial<EngineLimits>;
+  maxRounds?: number;
+};
+
+/**
+ * 默认战斗配置常量
+ */
+export const DEFAULT_BATTLE_CONFIG: Readonly<{
+  balance: BattleBalanceParams;
+  limits: EngineLimits;
+  maxRounds: number;
+}> = {
+  balance: {
+    hpBase: 102,
+    hpPerVit: 11,
+  },
+  limits: {
+    maxEventDepth: 8,
+    maxEventsPerRound: 256,
+    maxDerivedEventsPerEvent: 12,
+    maxTriggersPerModifierPerRound: 32,
+  },
+  maxRounds: 100,
 };
 
 /**

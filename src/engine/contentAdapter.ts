@@ -49,9 +49,9 @@ export type BattleLogTextResolver = (
   rngValue: number,
 ) => string;
 
-export type EffectHandlerContext = {
+export type EffectHandlerContext<K extends string = string> = {
   owner: Unit;
-  effect: EffectSpec;
+  effect: EffectSpec<K>;
   event: CombatEvent | null;
   trigger: TriggerSpec;
   phase: 'INTERCEPT' | 'REACTION';
@@ -61,8 +61,8 @@ export type EffectHandlerContext = {
   parentId?: string;
 };
 
-export type EffectHandler = (ctx: EffectHandlerContext) => CombatEvent | null | void;
-export type EffectHandlerRegistry = Partial<Record<EffectSpec['kind'], EffectHandler>>;
+export type EffectHandler<K extends string = string> = (ctx: EffectHandlerContext<K>) => CombatEvent | null | void;
+export type EffectHandlerRegistry = Partial<Record<string, EffectHandler>>;
 
 export type TurnActionContext = {
   actor: Unit;

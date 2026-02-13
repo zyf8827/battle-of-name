@@ -57,10 +57,10 @@ import {
 import { EventScheduler } from './scheduler';
 import type {
   BaseStats,
+  BattleConfig,
   BattleOutcome,
   CombatEvent,
   EffectSpec,
-  EngineLimits,
   EngineRuntime,
   EventWhen,
   InteractionContext,
@@ -70,18 +70,7 @@ import type {
   Unit,
   ValueExpr,
 } from './types';
-
-const limits: EngineLimits = {
-  maxEventDepth: 8,
-  maxEventsPerRound: 256,
-  maxDerivedEventsPerEvent: 12,
-  maxTriggersPerModifierPerRound: 32,
-};
-
-const BALANCE = {
-  hpBase: 102,
-  hpPerVit: 11,
-};
+import { DEFAULT_BATTLE_CONFIG } from './types';
 
 const NUMERIC_LIMITS = {
   minChance: 0,
@@ -144,8 +133,18 @@ function cloneUnit(unit: Unit): Unit {
 export function runBattle(
   input: { name1: string; name2: string; seed: string },
   contentAdapter: BattleContentAdapter,
+  config?: BattleConfig,
 ): BattleOutcome {
   const { name1, name2, seed } = input;
+
+  // 合并默认配置和用户配置
+  const finalConfig = {
+    balance: { ...DEFAULT_BATTLE_CONFIG.balance, ...config?.balance },
+    limits: { ...DEFAULT_BATTLE_CONFIG.limits, ...config?.limits },
+    maxRounds: config?.maxRounds ?? DEFAULT_BATTLE_CONFIG.maxRounds,
+  };
+  const BALANCE = finalConfig.balance;
+  const limits = finalConfig.limits;
   // const debugEnabled = (() => {
   //   const raw = (globalThis as Record<string, unknown>).__BATTLE_DEBUG__;
   //   return raw === true || raw === 'true' || raw === 1;
@@ -383,6 +382,7 @@ export function runBattle(
       }
       case 'REFRESH_DURATION':
         exists.duration = cloned.duration;
+        exists.stacks = 1;  // 显式重置层数为1
         return;
       case 'STACK':
         exists.stacks = Math.min((exists.stacks ?? 1) + 1, cloned.stacking?.maxStacks ?? Number.MAX_SAFE_INTEGER);
@@ -1329,7 +1329,7 @@ export function runBattle(
 
   // === 战斗主循环 ===
   // 持续直到只剩一个存活单位或达到最大回合数
-  while (units.filter(unitAlive).length > 1 && round < 50) {
+  while (units.filter(unitAlive).length > 1 && round < finalConfig.maxRounds) {
     round += 1;
     turn = 0;
     roundEventCount = 0;
