@@ -41,7 +41,7 @@ if (!hasTalent) {
 // Ensure victim has equipment
 const victimEquipment = victimUnit.modifiers.filter((m) => m.source === 'EQUIP');
 console.log(`Victim has ${victimEquipment.length} equipment(s):`);
-victimEquipment.forEach((eq) => console.log(`  - ${eq.name}`));
+victimEquipment.forEach((eq) => console.log(`  - ${eq.name ?? 'Unknown equipment'}`));
 
 if (victimEquipment.length === 0) {
   console.log('\nAdding test equipment to victim...');

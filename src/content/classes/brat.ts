@@ -82,8 +82,11 @@ const disassemble: Modifier = {
               actor: owner,
               target,
             });
-            // 移除消耗品
-            target.state.consumables = consumables.filter((id) => id !== dropped);
+            // 移除消耗品（只移除第一个匹配项）
+            const droppedIndex = consumables.indexOf(dropped);
+            target.state.consumables = consumables.filter(
+              (id, idx) => id !== dropped || idx !== droppedIndex,
+            );
           }
         }
       }
