@@ -27,7 +27,7 @@ import type { BaseStats, Unit } from '../engine/types';
 import seedrandom from 'seedrandom';
 
 import type { TextTemplate } from './base/text';
-import { DEFAULT_CLASS_WEIGHT, classList } from './classes';
+import { classList } from './classes';
 import { DEFAULT_CONSUMABLE_WEIGHT, getConsumableById, consumableIds } from './consumables';
 import {
   DEFAULT_EQUIPMENT_WEIGHT,
@@ -218,19 +218,13 @@ function uniquePush(target: string[], value: string): void {
 
 // 身份生成：只依赖名字，不依赖对局种子
 // 保证同一个名字总是同一个职业
-//
-// 所有职业（包括无职业）概率均等：
-// - 如果有 N 个职业，则总共有 N+1 个选项（N 个职业 + 1 个无职业）
-// - 每个选项的概率都是 1/(N+1)
 function buildIdentityFromName(name: string): Pick<Loadout, 'classId'> {
   const rng = seedrandom(`identity::${name}`);
 
-  // 构建选项数组：所有职业 + null（代表无职业）
-  const options = [...classList, null] as const;
-  // 均等概率随机选择
-  const picked = chooseOne(rng, options);
+  // 直接从职业列表中随机选择
+  const picked = chooseOne(rng, classList);
 
-  return { classId: picked?.id };
+  return { classId: picked.id };
 }
 
 // 装备生成：依赖名字 + 种子

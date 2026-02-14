@@ -18,6 +18,7 @@ import quitter from './quitter';
 import vibeGroup from './vibeGroup';
 import livingEtc from './livingEtc';
 import flaker from './flaker';
+import flexibleEmployment from './flexibleEmployment';
 
 export const classList: CharacterClass[] = [
   brawler,
@@ -37,6 +38,7 @@ export const classList: CharacterClass[] = [
   vibeGroup,
   livingEtc,
   flaker,
+  flexibleEmployment,
 ];
 
 export const classes: Record<string, CharacterClass> = Object.fromEntries(
