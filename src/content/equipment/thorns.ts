@@ -25,9 +25,11 @@ const thorns: EquipmentLike = {
       if (event.type !== 'ATTACK' || event.targetId !== ctx.owner.id) {
         return [];
       }
+      // 去重：如果是反射伤害，已经被反弹过就不再反弹
       if (
         event.payload.tags.includes('reflect') ||
-        event.payload.tags.includes('miss')
+        event.payload.tags.includes('miss') ||
+        event.payload.tags.includes('true_damage') // 原始攻击也跳过
       ) {
         return [];
       }
