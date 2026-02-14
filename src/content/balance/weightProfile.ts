@@ -86,14 +86,11 @@ export const CURRENT_WEIGHT_PROFILE: BalanceWeightProfile = {
   },
   scheduleChanceMultiplier: {
     'pool.round.global@RoundStart': 0.95,
-    'pool.turn.personal@TurnStart': 0.96,
+    'pool.turn.personal@TurnStart': 1,
   },
 };
 
-export function resolveWeight(
-  weights: Partial<Record<string, number>>,
-  id: string,
-): number {
+export function resolveWeight(weights: Partial<Record<string, number>>, id: string): number {
   const value = weights[id];
   if (typeof value !== 'number' || !Number.isFinite(value)) return 1;
   return Math.min(3, Math.max(0.2, value));

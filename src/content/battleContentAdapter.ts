@@ -28,11 +28,7 @@ import seedrandom from 'seedrandom';
 
 import type { TextTemplate } from './base/text';
 import { DEFAULT_CLASS_WEIGHT, classList } from './classes';
-import {
-  DEFAULT_CONSUMABLE_WEIGHT,
-  getConsumableById,
-  consumableIds,
-} from './consumables';
+import { DEFAULT_CONSUMABLE_WEIGHT, getConsumableById, consumableIds } from './consumables';
 import {
   DEFAULT_EQUIPMENT_WEIGHT,
   cloneEquipment,
@@ -70,8 +66,7 @@ function nameHash(input: string): number {
   let hash = 2166136261;
   for (let index = 0; index < input.length; index += 1) {
     hash ^= input.charCodeAt(index);
-    hash +=
-      (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
   }
   return Math.abs(hash >>> 0);
 }
@@ -89,8 +84,7 @@ function statsFromName(name: string): BaseStats {
     return 57 + Math.floor(rng() * 8);
   };
 
-  const clampStat = (value: number): number =>
-    Math.max(4, Math.min(26, Math.floor(value)));
+  const clampStat = (value: number): number => Math.max(4, Math.min(26, Math.floor(value)));
 
   const allocBalanced = (budget: number): BaseStats => {
     const values = [
@@ -199,12 +193,8 @@ function chooseOneWeighted<T>(
   return values[values.length - 1];
 }
 
-function sanitizeBuiltinWeight(
-  value: number | undefined,
-  fallback: number,
-): number {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0)
-    return fallback;
+function sanitizeBuiltinWeight(value: number | undefined, fallback: number): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return fallback;
   return Math.min(3, Math.max(0.2, value));
 }
 
@@ -257,10 +247,7 @@ function buildGearFromNameAndSeed(
 
   const allEquipments = equipmentIds
     .map((id) => getEquipmentById(id))
-    .filter(
-      (item): item is NonNullable<ReturnType<typeof getEquipmentById>> =>
-        !!item,
-    );
+    .filter((item): item is NonNullable<ReturnType<typeof getEquipmentById>> => !!item);
   const bySlot: Record<
     'WEAPON' | 'ARMOR' | 'ACCESSORY',
     NonNullable<ReturnType<typeof getEquipmentById>>[]
@@ -309,10 +296,7 @@ function buildGearFromNameAndSeed(
   }
 
   // 随机初始道具
-  if (
-    rng() < CURRENT_WEIGHT_PROFILE.initialConsumableChance &&
-    consumableIds.length > 0
-  ) {
+  if (rng() < CURRENT_WEIGHT_PROFILE.initialConsumableChance && consumableIds.length > 0) {
     const picked = chooseOneWeighted(rng, consumableIds, (id) => {
       const consumable = getConsumableById(id);
       return resolveProfileOrBuiltinWeight(
@@ -413,9 +397,7 @@ const systemTextFallback: Record<string, TextTemplate> = {
   pickupConsumable: ['{targetName} 捡到道具：{itemName} 🎒。'],
   dropConsumable: ['{targetName} 背包已满，丢弃了：{itemName} 🗑️。'],
   pickupEquipment: ['{targetName} 捡到装备：{equipmentName} 🗡️。'],
-  replaceEquipment: [
-    '{targetName} 用 {equipmentName} 替换了 {oldEquipmentName} 🔄。',
-  ],
+  replaceEquipment: ['{targetName} 用 {equipmentName} 替换了 {oldEquipmentName} 🔄。'],
   dropEquipment: ['{targetName} 在突发事件里丢失了装备：{equipmentName} 💸。'],
   useConsumable: ['{unitName} 使用了道具：{itemName} 🧪。'],
   death: ['{targetName} 已被击败 💀。'],
@@ -440,11 +422,7 @@ function renderSystemLog(
     if (sourceType === 'event' && sourceId) {
       const eventEntry = getEventEntryById(sourceId);
       if (eventEntry?.texts?.trigger) {
-        return renderTextTemplate(
-          eventEntry.texts.trigger,
-          variables,
-          rngValue,
-        );
+        return renderTextTemplate(eventEntry.texts.trigger, variables, rngValue);
       }
     }
   }
@@ -481,11 +459,7 @@ function renderSystemLog(
     if (eventId) {
       const eventEntry = getEventEntryById(eventId);
       if (eventEntry?.texts?.trigger) {
-        return renderTextTemplate(
-          eventEntry.texts.trigger,
-          variables,
-          rngValue,
-        );
+        return renderTextTemplate(eventEntry.texts.trigger, variables, rngValue);
       }
     }
   }
@@ -536,18 +510,14 @@ function renderSystemLog(
     const equipmentId = String(variables.equipmentId ?? '');
     const oldEquipmentId = String(variables.oldEquipmentId ?? '');
     const equipment = equipmentId ? getEquipmentById(equipmentId) : undefined;
-    const oldEquipment = oldEquipmentId
-      ? getEquipmentById(oldEquipmentId)
-      : undefined;
+    const oldEquipment = oldEquipmentId ? getEquipmentById(oldEquipmentId) : undefined;
     return renderTextTemplate(
       systemTextFallback[key] ?? '{targetName} 调整了装备。',
       {
         ...variables,
-        equipmentName:
-          equipment?.name ?? String(variables.equipmentName ?? equipmentId),
+        equipmentName: equipment?.name ?? String(variables.equipmentName ?? equipmentId),
         oldEquipmentName:
-          oldEquipment?.name ??
-          String(variables.oldEquipmentName ?? oldEquipmentId),
+          oldEquipment?.name ?? String(variables.oldEquipmentName ?? oldEquipmentId),
       },
       rngValue,
     );
@@ -681,7 +651,7 @@ export const defaultBattleContentAdapter: BattleContentAdapter = {
           window: 'RoundStart',
           poolId: 'pool.round.global',
           chance:
-            0.28 *
+            0.3 *
             resolveWeight(
               CURRENT_WEIGHT_PROFILE.scheduleChanceMultiplier,
               'pool.round.global@RoundStart',
@@ -692,7 +662,7 @@ export const defaultBattleContentAdapter: BattleContentAdapter = {
           window: 'TurnStart',
           poolId: 'pool.turn.personal',
           chance:
-            0.16 *
+            0.4 *
             resolveWeight(
               CURRENT_WEIGHT_PROFILE.scheduleChanceMultiplier,
               'pool.turn.personal@TurnStart',
@@ -701,8 +671,7 @@ export const defaultBattleContentAdapter: BattleContentAdapter = {
         { window: 'TurnEnd', poolId: 'pool.turn.personal', chance: 0 },
       ],
       narrate,
-      logText: (key, variables, rngValue) =>
-        renderSystemLog(key, variables, rngValue, unitMap),
+      logText: (key, variables, rngValue) => renderSystemLog(key, variables, rngValue, unitMap),
       createModifierById,
       getEquipmentById: (id: string) => {
         const equipment = getEquipmentById(id);
