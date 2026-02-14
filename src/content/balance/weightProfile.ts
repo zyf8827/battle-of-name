@@ -51,10 +51,6 @@ export const CURRENT_WEIGHT_PROFILE: BalanceWeightProfile = {
     'consumable.leave_request': 1.06,
   },
   eventWeights: {
-    'event.elevator_fart': 1.05,
-    'event.moment_like': 1.05,
-    'event.toilet_boss': 1.05,
-    'event.cold_shower': 1.05,
     // 新增装备相关事件
     'event.express_delivery': 1.15,
     'event.colleague_gift': 1.12,
@@ -77,5 +73,5 @@ export const CURRENT_WEIGHT_PROFILE: BalanceWeightProfile = {
 export function resolveWeight(weights: Partial<Record<string, number>>, id: string): number {
   const value = weights[id];
   if (typeof value !== 'number' || !Number.isFinite(value)) return 1;
-  return Math.min(3, Math.max(0.2, value));
+  return Math.min(10, Math.max(0, value));
 }

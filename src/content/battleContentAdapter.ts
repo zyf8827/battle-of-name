@@ -194,8 +194,8 @@ function chooseOneWeighted<T>(
 }
 
 function sanitizeBuiltinWeight(value: number | undefined, fallback: number): number {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return fallback;
-  return Math.min(3, Math.max(0.2, value));
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
+  return Math.max(0, value);
 }
 
 function resolveProfileOrBuiltinWeight(
@@ -204,10 +204,9 @@ function resolveProfileOrBuiltinWeight(
   builtinWeight: number | undefined,
   defaultWeight: number,
 ): number {
-  if (typeof weights[id] === 'number' && Number.isFinite(weights[id])) {
-    return resolveWeight(weights, id);
-  }
-  return sanitizeBuiltinWeight(builtinWeight, defaultWeight);
+  const multiplier = resolveWeight(weights, id);
+  const base = sanitizeBuiltinWeight(builtinWeight, defaultWeight);
+  return multiplier * base;
 }
 
 function uniquePush(target: string[], value: string): void {
@@ -593,14 +592,12 @@ export const defaultBattleContentAdapter: BattleContentAdapter = {
           entries: pool.entries.map((entry) => ({
             ...entry,
             weight: Math.max(
-              1,
-              Math.round(
-                resolveProfileOrBuiltinWeight(
-                  CURRENT_WEIGHT_PROFILE.eventWeights,
-                  entry.id,
-                  entry.weight,
-                  DEFAULT_EVENT_POOL_ENTRY_WEIGHT,
-                ),
+              0,
+              resolveProfileOrBuiltinWeight(
+                CURRENT_WEIGHT_PROFILE.eventWeights,
+                entry.id,
+                entry.weight,
+                DEFAULT_EVENT_POOL_ENTRY_WEIGHT,
               ),
             ),
           })),
@@ -616,7 +613,7 @@ export const defaultBattleContentAdapter: BattleContentAdapter = {
         consumable?.weight,
         DEFAULT_CONSUMABLE_WEIGHT,
       );
-      const copies = Math.max(1, Math.min(6, Math.round(weight * 2)));
+      const copies = Math.max(1, Math.round(weight * 10));
       return Array.from({ length: copies }, () => id);
     });
 
@@ -628,7 +625,7 @@ export const defaultBattleContentAdapter: BattleContentAdapter = {
         equipment?.weight,
         DEFAULT_EQUIPMENT_WEIGHT,
       );
-      const copies = Math.max(1, Math.min(6, Math.round(weight * 2)));
+      const copies = Math.max(1, Math.round(weight * 10));
       return Array.from({ length: copies }, () => id);
     });
 

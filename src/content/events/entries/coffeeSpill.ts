@@ -3,7 +3,7 @@ import type { EventPoolEntry } from '../../../engine/types';
 const coffeeSpill: EventPoolEntry = {
   id: 'event.coffee_spill',
   name: '咖啡泼键盘 ☕',
-  weight: 8,
+  weight: 6,
   effects: [
     {
       kind: 'APPLY_MODIFIER',
@@ -12,17 +12,18 @@ const coffeeSpill: EventPoolEntry = {
         id: 'debuff.panic_clean',
         source: 'ENV',
         name: '手忙脚乱 😰',
-        description: '疯狂擦拭键盘中',
+        description: '疯狂擦拭键盘中，且设备由于短路开始乱跳',
         tags: ['debuff', 'control', 'env'],
-        duration: 1,
+        statBonus: { AGI: -5 },
+        duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 惊叫着跳了起来，手忙脚乱地开始拯救进水的按键 🧻',
+        apply: '{targetName} 惊叫着跳了起来，手忙脚乱地开始拯救进水的按键，操作完全脱落 🧻',
       },
     },
   ],
   texts: {
-    trigger: '手滑了！一整杯浓缩咖啡呈完美的抛物线落向了键盘 ☕',
+    trigger: '手滑了！一整杯加糖拿铁呈完美的抛物线精准覆盖了整个键盘 ☕',
   },
 };
 

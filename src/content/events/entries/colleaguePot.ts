@@ -3,7 +3,7 @@ import type { EventPoolEntry } from '../../../engine/types';
 const colleaguePot: EventPoolEntry = {
   id: 'event.colleague_pot',
   name: '同事的甩锅 🍳',
-  weight: 12,
+  weight: 10,
   effects: [
     {
       kind: 'APPLY_MODIFIER',
@@ -11,14 +11,14 @@ const colleaguePot: EventPoolEntry = {
       modifier: {
         id: 'debuff.pot_holder',
         source: 'ENV',
-        name: '背锅侠 🥷',
-        description: '一口黑锅从天而降',
+        name: '资深背锅侠 🥷',
+        description: '一口万年黑锅从天而降，压得喘不过气',
         tags: ['debuff', 'env'],
-        statBonus: { LUK: -3, STR: -2 },
-        duration: 2,
+        statBonus: { LUK: -5, STR: -5 },
+        duration: 3,
       },
       textOverrides: {
-        apply: '{targetName} 感觉头顶阴影笼罩，一口厚重的黑锅稳稳落在了肩上 🌚',
+        apply: '{targetName} 感觉头顶阴影笼罩，一口厚重无比的黑锅稳稳落在了肩上，甚至听到了骨头碎裂的声音 🌚',
       },
     },
   ],
