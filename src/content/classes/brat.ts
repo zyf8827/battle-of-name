@@ -26,12 +26,64 @@ const disassemble: Modifier = {
     onPostAction: (event, { engine, owner, target }) => {
       if (event.sourceId !== owner.id || event.type !== 'ATTACK') return [];
 
+      // 弄坏对手装备
       if (engine.rng.bool(0.1, { domain: 'COMBAT', luk: owner.stats.LUK })) {
-        engine.state.loseRandomEquipment(target);
+        const equipments = target.modifiers.filter((m) => m.source === 'EQUIP');
+        if (equipments.length > 0) {
+          // 随机选择一件装备
+          const index = engine.rng.range(0, equipments.length - 1, 'talent.brat.disassemble.equip');
+          const dropped = equipments[index];
+          if (dropped) {
+            // 移除装备
+            engine.state.removeModifiersByMatcher(target, (m) => m.id === dropped.id, 1);
+            // 手动记录日志，包含 sourceName 和 targetName
+            engine.log.system({
+              key: 'dropEquipment',
+              variables: {
+                sourceName: owner.name,
+                sourceId: owner.id,
+                targetName: target.name,
+                targetId: target.id,
+                equipmentId: dropped.id,
+                equipmentName: dropped.name,
+              },
+              tags: ['equip'],
+              actor: owner,
+              target,
+            });
+          }
+        }
       }
+
+      // 弄坏对手道具
       if (engine.rng.bool(0.1, { domain: 'COMBAT', luk: owner.stats.LUK })) {
-        engine.state.loseRandomConsumable(target);
+        const consumables = target.state.consumables ?? [];
+        if (consumables.length > 0) {
+          // 随机选择一个道具
+          const index = engine.rng.range(0, consumables.length - 1, 'talent.brat.disassemble.consumable');
+          const dropped = consumables[index];
+          if (dropped) {
+            // 移除道具
+            target.state.consumables = consumables.filter((c) => c !== dropped);
+            // 手动记录日志，包含 sourceName 和 targetName
+            engine.log.system({
+              key: 'dropConsumable',
+              variables: {
+                sourceName: owner.name,
+                sourceId: owner.id,
+                targetName: target.name,
+                targetId: target.id,
+                itemId: dropped,
+                itemName: dropped,
+              },
+              tags: ['env'],
+              actor: owner,
+              target,
+            });
+          }
+        }
       }
+
       return [];
     },
   },
