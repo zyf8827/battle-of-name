@@ -8,15 +8,6 @@ const notFound: Modifier = {
   description: '找不到对象。大幅提升闪避。',
   duration: 2,
   tags: ['buff'],
-  triggers: [
-    {
-      trigger: { on: 'PIPELINE_INCOMING', when: { role: 'TARGET', eventType: 'ATTACK' } },
-      effects: [
-        // 50% 概率完全闪避
-        // DSL 不支持 condition，用 hook
-      ]
-    }
-  ],
   hooks: {
     onIncoming: (event, { engine, owner }) => {
       if (event.type !== 'ATTACK') return event;

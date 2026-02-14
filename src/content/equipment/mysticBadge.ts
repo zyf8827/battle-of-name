@@ -16,7 +16,7 @@ const mysticBadge: EquipmentLike = {
       trigger: { on: 'TURN_START' },
       effects: [
         { kind: 'GRANT_RANDOM_CONSUMABLE', target: 'SELF' },
-        { kind: 'SHIELD', value: [{ type: 'FLAT', value: 2 }], tags: ['shield', 'equip'] },
+        { kind: 'SHIELD', value: [{ type: 'FLAT', value: 3 }], tags: ['shield', 'equip'] },
       ],
     },
   ],
