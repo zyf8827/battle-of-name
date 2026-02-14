@@ -11,6 +11,8 @@ import annivRed from './annivRed';
 import trafficRed from './trafficRed';
 import snackParty from './snackParty';
 import forcedCheckup from './forcedCheckup';
+import bonusCut from './bonusCut';
+import bossAway from './bossAway';
 
 // Personal (Turn)
 import mondayMorning from './mondayMorning';
@@ -71,6 +73,11 @@ import afternoonTea from './afternoonTea';
 import expiredItem from './expiredItem';
 import vendingMachine from './vendingMachine';
 import fridgeSharing from './fridgeSharing';
+import layoffPackage from './layoffPackage';
+import loveBrain from './loveBrain';
+import stockCrash from './stockCrash';
+import clientExit from './clientExit';
+import waterOnKeyboard from './waterOnKeyboard';
 
 export const roundEventEntries: EventPoolEntry[] = [
   trafficJam,
@@ -83,6 +90,8 @@ export const roundEventEntries: EventPoolEntry[] = [
   trafficRed,
   snackParty,
   forcedCheckup,
+  bonusCut,
+  bossAway,
 ];
 
 export const turnEventEntries: EventPoolEntry[] = [
@@ -144,6 +153,11 @@ export const turnEventEntries: EventPoolEntry[] = [
   expiredItem,
   vendingMachine,
   fridgeSharing,
+  layoffPackage,
+  loveBrain,
+  stockCrash,
+  clientExit,
+  waterOnKeyboard,
 ];
 
 export const eventEntries: EventPoolEntry[] = [...roundEventEntries, ...turnEventEntries];
