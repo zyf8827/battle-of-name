@@ -72,7 +72,7 @@ import type {
   Unit,
   ValueExpr,
 } from './types';
-import { DEFAULT_BATTLE_CONFIG } from './types';
+import { DEFAULT_BATTLE_CONFIG, DEFAULT_EVENT_POOL_ENTRY_WEIGHT } from './types';
 
 const NUMERIC_LIMITS = {
   minChance: 0,
@@ -105,6 +105,13 @@ function sortModifiers(modifiers: Modifier[]): Modifier[] {
 
 function unitAlive(unit: Unit): boolean {
   return unit.state.hp > 0;
+}
+
+function calcInitialMaxHp(vit: number, hpBase: number, hpPerVit: number): number {
+  const safeVit = Math.max(1, Math.floor(Number.isFinite(vit) ? vit : 1));
+  const linear = hpBase + safeVit * hpPerVit;
+  const survivalBonus = Math.floor(Math.sqrt(safeVit) * hpPerVit * 0.55) + Math.floor(hpBase * 0.2);
+  return Math.min(NUMERIC_LIMITS.maxHp, Math.max(1, linear + survivalBonus));
 }
 
 function whenMatched(when: EventWhen | undefined, event: CombatEvent, role: 'SOURCE' | 'TARGET'): boolean {
@@ -147,13 +154,26 @@ export function runBattle(
   };
   const BALANCE = finalConfig.balance;
   const limits = finalConfig.limits;
-  // const debugEnabled = (() => {
-  //   const raw = (globalThis as Record<string, unknown>).__BATTLE_DEBUG__;
-  //   return raw === true || raw === 'true' || raw === 1;
-  // })();
+  const debugEnabled = config?.diagnostics?.debugLog ?? (() => {
+    const raw = (globalThis as Record<string, unknown>).__BATTLE_DEBUG__;
+    return raw === true || raw === 'true' || raw === 1;
+  })();
+  const collectDiagnostics = config?.diagnostics?.collectSummary ?? true;
   const debugLog = (scope: string, payload: Record<string, unknown>) => {
-    // if (!debugEnabled) return;
+    if (!debugEnabled) return;
     console.info('[battle-debug]', scope, payload);
+  };
+  const diagnostics: NonNullable<BattleOutcome['summary']['diagnostics']> = {
+    eventsProcessed: 0,
+    eventsSkipped: {
+      dedup: 0,
+      depthOrBudget: 0,
+      sourceDead: 0,
+      targetDead: 0,
+    },
+    poolsTriggered: {},
+    poolEntriesTriggered: {},
+    effectsTriggered: {},
   };
   const envUnit = createEnvUnit();
   const rng = createRng(seed);
@@ -191,7 +211,7 @@ export function runBattle(
 
   for (const unit of units) {
     if (unit.state.maxHp <= 0) {
-      unit.state.maxHp = BALANCE.hpBase + unit.stats.VIT * BALANCE.hpPerVit;
+      unit.state.maxHp = calcInitialMaxHp(unit.stats.VIT, BALANCE.hpBase, BALANCE.hpPerVit);
     }
     if (unit.state.hp <= 0) {
       unit.state.hp = unit.state.maxHp;
@@ -762,6 +782,7 @@ export function runBattle(
       return currentEvent;
     }
     for (const effect of effects) {
+      diagnostics.effectsTriggered[effect.kind] = (diagnostics.effectsTriggered[effect.kind] ?? 0) + 1;
       const handler = effectHandlers[effect.kind];
       if (!handler) {
         throw new Error(`No handler for effect kind: ${effect.kind}`);
@@ -874,10 +895,12 @@ export function runBattle(
   function triggerPool(poolId: string, ownerId: string, depth: number, parentId?: string): void {
     const pool = eventPools[poolId];
     if (!pool || pool.entries.length === 0) return;
-    const picked = rng.weightedPick(pool.entries, (entry) => entry.weight, `pool:${poolId}`);
+    const picked = rng.weightedPick(pool.entries, (entry) => entry.weight ?? DEFAULT_EVENT_POOL_ENTRY_WEIGHT, `pool:${poolId}`);
     if (!picked) return;
 
     const owner = getUnit(ownerId);
+    diagnostics.poolsTriggered[poolId] = (diagnostics.poolsTriggered[poolId] ?? 0) + 1;
+    diagnostics.poolEntriesTriggered[picked.id] = (diagnostics.poolEntriesTriggered[picked.id] ?? 0) + 1;
     pushLog({
       round,
       turn,
@@ -1166,6 +1189,7 @@ export function runBattle(
   function processEvent(event: CombatEvent): void {
     // 1. 深度和数量限制，防止无限递归 (如: 反伤触发反伤)
     if (event.depth > limits.maxEventDepth || roundEventCount >= limits.maxEventsPerRound) {
+      diagnostics.eventsSkipped.depthOrBudget += 1;
       debugLog('event.skipped.limit', {
         eventId: event.id,
         type: event.type,
@@ -1178,6 +1202,7 @@ export function runBattle(
     // 2. 事件去重，防止完全相同的事件被重复处理
     const dedupKey = `${event.parentId ?? event.id}:${event.type}:${event.sourceId}:${event.targetId}:${event.payload.tags.join('|')}:${event.payload.value ?? ''}`;
     if (dedup.has(dedupKey)) {
+      diagnostics.eventsSkipped.dedup += 1;
       debugLog('event.skipped.dedup', {
         eventId: event.id,
         type: event.type,
@@ -1204,10 +1229,12 @@ export function runBattle(
     
     // 3. 死亡检查 (死人无法行动，除非是复活等特殊事件)
     if (!unitAlive(source) && event.type !== 'DEATH') {
+      diagnostics.eventsSkipped.sourceDead += 1;
       debugLog('event.skipped.source-dead', { eventId: event.id, sourceId: source.id, type: event.type });
       return;
     }
     if (!unitAlive(target) && !['HEAL', 'DEATH'].includes(event.type)) {
+      diagnostics.eventsSkipped.targetDead += 1;
       debugLog('event.skipped.target-dead', { eventId: event.id, targetId: target.id, type: event.type });
       return;
     }
@@ -1251,6 +1278,7 @@ export function runBattle(
     // 7. 结算阶段 (Resolve)
     // 事件最终生效，执行伤害扣除、治疗回血等实质性操作
     roundEventCount += 1;
+    diagnostics.eventsProcessed += 1;
     resolveEvent(current);
 
     // 8. 衍生事件处理 (Derived)
@@ -1439,6 +1467,7 @@ export function runBattle(
     summary: {
       totalRounds: round,
       totalDamageByUnit,
+      diagnostics: collectDiagnostics ? diagnostics : undefined,
     },
     replay: {
       engineVersion: ENGINE_VERSION,

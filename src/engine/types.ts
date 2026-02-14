@@ -464,10 +464,12 @@ export type InteractionContext = TriggerContext & {
  * - effects: 效果列表
  * - texts: 文本模板
  */
+export const DEFAULT_EVENT_POOL_ENTRY_WEIGHT = 10;
+
 export type EventPoolEntry = {
   id: string;                             // 唯一标识
   name: string;                           // 显示名称
-  weight: number;                         // 权重
+  weight?: number;                        // 权重（未配置时使用默认权重）
   effects: EffectSpec[];                  // 效果列表
   texts?: {                              // 文本模板
     trigger?: TextTemplate;
@@ -543,6 +545,10 @@ export type BattleConfig = {
   balance?: Partial<BattleBalanceParams>;
   limits?: Partial<EngineLimits>;
   maxRounds?: number;
+  diagnostics?: {
+    debugLog?: boolean;
+    collectSummary?: boolean;
+  };
 };
 
 /**
@@ -654,6 +660,18 @@ export type BattleOutcome = {
   summary: {                                                       // 统计摘要
     totalRounds: number;                                           // 总回合数
     totalDamageByUnit: Record<string, number>;                      // 各单位总伤害
+    diagnostics?: {
+      eventsProcessed: number;
+      eventsSkipped: {
+        dedup: number;
+        depthOrBudget: number;
+        sourceDead: number;
+        targetDead: number;
+      };
+      poolsTriggered: Record<string, number>;
+      poolEntriesTriggered: Record<string, number>;
+      effectsTriggered: Record<string, number>;
+    };
   };
 };
 
