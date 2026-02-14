@@ -245,6 +245,21 @@ pnpm test:watch
 pnpm test:coverage
 ```
 
+### 平衡性仿真 (Balance Simulation)
+
+项目内置了批量仿真工具，用于在大数据量下验证游戏的平衡性数值。该脚本会模拟数千场随机对战，并输出胜率、战斗时长分布及调整建议。
+
+```bash
+# 运行默认仿真 (5000 场)
+npx tsx scripts/balance-sim.ts
+
+# 自定义场次和种子
+npx tsx scripts/balance-sim.ts --total=1000 --seed=test-v1
+```
+
+**调优流程：**
+仿真脚本会在输出的 JSON 末尾提供 `recommendations`。如果某个职业胜率过高，建议将其在 `src/content/balance/weightProfile.ts` 中的出现权重调低，或直接修改该职业的数值。
+
 ---
 
 ## 📊 项目状态

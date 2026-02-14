@@ -19,8 +19,20 @@ npm run test         # Run all tests with vitest
 npm run test:watch   # Run tests in watch mode
 
 # Balance Simulation
-npx tsx scripts/balance-sim.ts    # Run batch simulation to verify balance metrics
+npx tsx scripts/balance-sim.ts                      # Run batch simulation with default settings (5000 games)
+npx tsx scripts/balance-sim.ts --total=1000          # Run with custom game count
+npx tsx scripts/balance-sim.ts --seed=my-test-seed   # Run with specific seed
 ```
+
+### Balance Testing & Tuning
+
+The `scripts/balance-sim.ts` tool runs thousands of automated battles between randomly generated characters to collect statistical data.
+
+**Tuning Workflow**:
+1. Add/Modify content.
+2. Run simulation: `npx tsx scripts/balance-sim.ts --total=2000 > sim_result.json`.
+3. Check `recommendations` in the output JSON. It suggests weight multipliers for `weightProfile.ts` based on win rates and game length correlations.
+4. Apply suggested multipliers to `src/content/balance/weightProfile.ts` to stabilize the meta.
 
 ## Architecture
 
@@ -148,12 +160,6 @@ Battle logs use template variables like `{sourceName}`, `{targetName}`, `{damage
 Variables available depend on context (see `docs/CONTENT_SPEC.md` Section 4.4).
 
 ### Balance Guidelines
-
-Target metrics (from `docs/CONTENT_SPEC.md` Section 9):
-- **Average rounds**: 11.5 ~ 13.0
-- **P50 rounds**: 10 ~ 13
-- **Fast battles** (≤6 rounds): < 2%
-- **Long battles** (>16 rounds): < 15%
 
 After adding content:
 1. Run `npm run test`

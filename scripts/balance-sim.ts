@@ -86,6 +86,21 @@ function bottomWinrate(
     .slice(0, limit);
 }
 
+function allWinrate(
+  map: Map<string, Counter>,
+  minGameCount: number,
+): Array<{ id: string; games: number; winRate: number; avgRounds: number }> {
+  return [...map.entries()]
+    .filter(([, stat]) => stat.games >= minGameCount)
+    .map(([id, stat]) => ({
+      id,
+      games: stat.games,
+      winRate: Number((stat.wins / stat.games).toFixed(4)),
+      avgRounds: Number((stat.roundSum / stat.games).toFixed(2)),
+    }))
+    .sort((a, b) => b.winRate - a.winRate || b.games - a.games);
+}
+
 function weightSuggestionByWinrate(
   map: Map<string, Counter>,
   baselineWinrate: number,
@@ -271,10 +286,13 @@ const result = {
   histTop20: [...roundHist.entries()].sort((a, b) => a[0] - b[0]).filter(([round]) => round <= 20),
   topClassWinrate: topWinrate(classStats, minSamples),
   lowClassWinrate: bottomWinrate(classStats, minSamples),
+  allClassWinrate: allWinrate(classStats, minSamples),
   topEquipmentWinrate: topWinrate(equipStats, minSamples),
   lowEquipmentWinrate: bottomWinrate(equipStats, minSamples),
+  allEquipmentWinrate: allWinrate(equipStats, minSamples),
   topConsumableWinrate: topWinrate(consumableStats, consumableMinSample),
   lowConsumableWinrate: bottomWinrate(consumableStats, consumableMinSample),
+  allConsumableWinrate: allWinrate(consumableStats, consumableMinSample),
   eventCorrelationTop: [...eventStats.entries()]
     .filter(([, stat]) => stat.gamesTriggered >= Math.max(100, Math.floor(minSamples * 0.7)))
     .map(([id, stat]) => ({

@@ -2,11 +2,11 @@ import type { TurnActionExecutor } from '../../engine/contentAdapter';
 import type { CombatTag } from '../../engine/types';
 
 const BALANCE = {
-  attackScale: 1.7,
+  attackScale: 1.9,
   enragePerRound: 0.04,
   maxEnrageBonus: 0.6,
-  critChance: 0.17,
-  critMultiplier: 1.5,
+  critChance: 0.19,
+  critMultiplier: 1.6,
 };
 
 export const defaultTurnActionExecutor: TurnActionExecutor = ({
