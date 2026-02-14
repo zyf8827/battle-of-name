@@ -15,7 +15,7 @@ export type BalanceWeightProfile = {
 };
 
 export const CURRENT_WEIGHT_PROFILE: BalanceWeightProfile = {
-  classPickChance: 0.85,
+  classPickChance: 0.95,
   classWeights: {
     'class.ddl_warrior': 0.86,
     'class.civil_servant': 0.86,

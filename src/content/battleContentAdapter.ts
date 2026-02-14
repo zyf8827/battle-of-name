@@ -69,13 +69,85 @@ function nameHash(input: string): number {
 // 核心逻辑：从名字生成基础属性
 // 保证同一个名字永远生成相同的 STR/AGI/VIT/LUK 分布
 function statsFromName(name: string): BaseStats {
-  const hash = nameHash(name);
-  return {
-    STR: 8 + (hash % 10),           // 基础力量
-    AGI: 8 + ((hash >>> 5) % 10),   // 基础敏捷 (位移取不同段的哈希值)
-    VIT: 8 + ((hash >>> 10) % 10),  // 基础体质
-    LUK: 8 + ((hash >>> 15) % 10),  // 基础幸运
+  const rng = seedrandom(`panel::${nameHash(name)}::${name}`);
+
+  const chooseBudget = (): number => {
+    const roll = rng();
+    if (roll < 0.18) return 24 + Math.floor(rng() * 9);
+    if (roll < 0.78) return 33 + Math.floor(rng() * 12);
+    if (roll < 0.95) return 45 + Math.floor(rng() * 12);
+    return 57 + Math.floor(rng() * 8);
   };
+
+  const clampStat = (value: number): number => Math.max(4, Math.min(26, Math.floor(value)));
+
+  const allocBalanced = (budget: number): BaseStats => {
+    const values = [Math.floor(budget / 4), Math.floor(budget / 4), Math.floor(budget / 4), Math.floor(budget / 4)];
+    let remain = budget - values.reduce((sum, item) => sum + item, 0);
+    while (remain > 0) {
+      values[Math.floor(rng() * 4)] += 1;
+      remain -= 1;
+    }
+    return {
+      STR: clampStat(values[0]),
+      AGI: clampStat(values[1]),
+      VIT: clampStat(values[2]),
+      LUK: clampStat(values[3]),
+    };
+  };
+
+  const allocSkewed = (budget: number): BaseStats => {
+    const primary = Math.floor(rng() * 4);
+    const secondary = (primary + 1 + Math.floor(rng() * 3)) % 4;
+    const values = [4, 4, 4, 4];
+    let remain = Math.max(0, budget - 16);
+    const primaryTarget = Math.floor(remain * (0.42 + rng() * 0.2));
+    const secondaryTarget = Math.floor(remain * (0.18 + rng() * 0.16));
+    values[primary] += primaryTarget;
+    values[secondary] += secondaryTarget;
+    remain -= primaryTarget + secondaryTarget;
+    while (remain > 0) {
+      values[Math.floor(rng() * 4)] += 1;
+      remain -= 1;
+    }
+    return {
+      STR: clampStat(values[0]),
+      AGI: clampStat(values[1]),
+      VIT: clampStat(values[2]),
+      LUK: clampStat(values[3]),
+    };
+  };
+
+  const allocPolarized = (budget: number): BaseStats => {
+    const primary = Math.floor(rng() * 4);
+    const dump = (primary + 1 + Math.floor(rng() * 3)) % 4;
+    const values = [4, 4, 4, 4];
+    let remain = Math.max(0, budget - 16);
+    const primaryTarget = Math.floor(remain * (0.58 + rng() * 0.2));
+    values[primary] += primaryTarget;
+    remain -= primaryTarget;
+    const dumpKeep = Math.min(2, remain);
+    values[dump] += dumpKeep;
+    remain -= dumpKeep;
+    while (remain > 0) {
+      const index = Math.floor(rng() * 4);
+      if (index === dump && rng() < 0.7) continue;
+      values[index] += 1;
+      remain -= 1;
+    }
+    return {
+      STR: clampStat(values[0]),
+      AGI: clampStat(values[1]),
+      VIT: clampStat(values[2]),
+      LUK: clampStat(values[3]),
+    };
+  };
+
+  const budget = chooseBudget();
+  const styleRoll = rng();
+  if (styleRoll < 0.5) return allocBalanced(budget);
+  if (styleRoll < 0.82) return allocSkewed(budget);
+  return allocPolarized(budget);
 }
 
 type Loadout = {
