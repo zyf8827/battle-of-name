@@ -218,21 +218,19 @@ function uniquePush(target: string[], value: string): void {
 
 // 身份生成：只依赖名字，不依赖对局种子
 // 保证同一个名字总是同一个职业
+//
+// 所有职业（包括无职业）概率均等：
+// - 如果有 N 个职业，则总共有 N+1 个选项（N 个职业 + 1 个无职业）
+// - 每个选项的概率都是 1/(N+1)
 function buildIdentityFromName(name: string): Pick<Loadout, 'classId'> {
   const rng = seedrandom(`identity::${name}`);
-  const classId =
-    rng() < CURRENT_WEIGHT_PROFILE.classPickChance && classList.length > 0
-      ? chooseOneWeighted(rng, classList, (item) =>
-          resolveProfileOrBuiltinWeight(
-            CURRENT_WEIGHT_PROFILE.classWeights,
-            item.id,
-            item.weight,
-            DEFAULT_CLASS_WEIGHT,
-          ),
-        )?.id
-      : undefined;
 
-  return { classId };
+  // 构建选项数组：所有职业 + null（代表无职业）
+  const options = [...classList, null] as const;
+  // 均等概率随机选择
+  const picked = chooseOne(rng, options);
+
+  return { classId: picked?.id };
 }
 
 // 装备生成：依赖名字 + 种子

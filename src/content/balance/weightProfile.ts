@@ -1,6 +1,4 @@
 export type BalanceWeightProfile = {
-  classPickChance: number;
-  classWeights: Partial<Record<string, number>>;
   initialEquipmentSlotChance: {
     WEAPON: number;
     ARMOR: number;
@@ -15,20 +13,6 @@ export type BalanceWeightProfile = {
 };
 
 export const CURRENT_WEIGHT_PROFILE: BalanceWeightProfile = {
-  classPickChance: 0.95,
-  classWeights: {
-    'class.ddl_warrior': 0.86,
-    'class.civil_servant': 0.86,
-    'class.simp': 0.88,
-    'class.living_etc': 0.86,
-    'class.repeater': 0.9,
-    'class.driving_instructor': 0.9,
-    'class.brat': 1.16,
-    'class.flaker': 1.1,
-    'class.vibe_group': 1.1,
-    'class.party_a': 1.06,
-    'class.tony': 1.06,
-  },
   initialEquipmentSlotChance: {
     WEAPON: 0.62,
     ARMOR: 0.58,
