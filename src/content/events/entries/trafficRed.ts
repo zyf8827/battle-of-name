@@ -18,8 +18,7 @@ const trafficRed: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 被困在十字路口中心，体验着什么是现实版的“寸步难行” 🛑',
+        apply: '{targetName} 被困在十字路口中心，体验着什么是现实版的“寸步难行” 🛑',
       },
     },
   ],

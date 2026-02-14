@@ -1,11 +1,5 @@
 import type { EffectHandlerRegistry } from '../../engine/contentAdapter';
-import type {
-  CombatTag,
-  EventWhen,
-  Modifier,
-  TargetSelector,
-  ValueExpr,
-} from '../../engine/types';
+import type { CombatTag, EventWhen, Modifier, TargetSelector, ValueExpr } from '../../engine/types';
 
 type ApplyModifierEffect = {
   kind: 'APPLY_MODIFIER';
@@ -79,10 +73,7 @@ export const standardEffectHandlers: EffectHandlerRegistry = {
   APPLY_MODIFIER: (ctx) => {
     if (ctx.effect.kind !== 'APPLY_MODIFIER') return;
     const effect = ctx.effect as ApplyModifierEffect;
-    const targets = ctx.runtime.state.resolveTargets(
-      ctx.owner,
-      effect.target ?? 'ALL',
-    );
+    const targets = ctx.runtime.state.resolveTargets(ctx.owner, effect.target ?? 'ALL');
     for (const target of targets) {
       ctx.runtime.state.applyModifierEffect(ctx.owner, target, effect);
     }
@@ -107,19 +98,12 @@ export const standardEffectHandlers: EffectHandlerRegistry = {
     const amount = ctx.runtime.calc.nonNegativeInt(
       effect.value.reduce(
         (sum, valueExpr) =>
-          sum +
-          ctx.runtime.rule.evaluateValueExpr(
-            ctx.owner,
-            ctx.event ?? undefined,
-            valueExpr,
-          ),
+          sum + ctx.runtime.rule.evaluateValueExpr(ctx.owner, ctx.event ?? undefined, valueExpr),
         0,
       ),
     );
     if (amount <= 0) return;
-    ctx.owner.state.shield = ctx.runtime.calc.safeShield(
-      ctx.owner.state.shield + amount,
-    );
+    ctx.owner.state.shield = ctx.runtime.calc.safeShield(ctx.owner.state.shield + amount);
     ctx.runtime.log.system({
       key: 'gainShield',
       variables: {
@@ -144,10 +128,7 @@ export const standardEffectHandlers: EffectHandlerRegistry = {
     const effect = ctx.effect as LifeStealEffect;
     if (!ctx.event) return;
     // 根据造成伤害的比例计算治疗量
-    const amount = ctx.runtime.calc.scale(
-      ctx.event.payload.value ?? 0,
-      effect.ratio,
-    );
+    const amount = ctx.runtime.calc.scale(ctx.event.payload.value ?? 0, effect.ratio);
     if (amount <= 0) return;
     ctx.runtime.event.emitDirectHeal(
       ctx.owner,
@@ -163,11 +144,7 @@ export const standardEffectHandlers: EffectHandlerRegistry = {
     if (ctx.effect.kind !== 'DISPEL') return;
     const effect = ctx.effect as DispelEffect;
     if (!ctx.event) return;
-    const target = ctx.runtime.state.resolveTargetFromEvent(
-      ctx.owner,
-      effect.target,
-      ctx.event,
-    );
+    const target = ctx.runtime.state.resolveTargetFromEvent(ctx.owner, effect.target, ctx.event);
     const removed = ctx.runtime.state.removeModifiersByMatcher(
       target,
       (modifier) => {
@@ -175,8 +152,7 @@ export const standardEffectHandlers: EffectHandlerRegistry = {
         const isDebuff = modifier.tags?.includes('debuff') ?? false;
         if (effect.mode === 'BUFF' && !isBuff) return false;
         if (effect.mode === 'DEBUFF' && !isDebuff) return false;
-        if (effect.byTag && !(modifier.tags?.includes(effect.byTag) ?? false))
-          return false;
+        if (effect.byTag && !(modifier.tags?.includes(effect.byTag) ?? false)) return false;
         return true;
       },
       effect.max ?? 1,
@@ -208,10 +184,7 @@ export const standardEffectHandlers: EffectHandlerRegistry = {
       return ctx.event;
     }
     const value = ctx.runtime.calc.nonNegativeInt(
-      Math.max(
-        effect.min ?? 0,
-        (ctx.event.payload.value ?? 0) * effect.multiplier,
-      ),
+      Math.max(effect.min ?? 0, (ctx.event.payload.value ?? 0) * effect.multiplier),
     );
     // 返回修改后的事件
     return { ...ctx.event, payload: { ...ctx.event.payload, value } };

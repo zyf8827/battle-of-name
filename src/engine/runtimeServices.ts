@@ -62,10 +62,7 @@ export function grantConsumableWithPolicy(
       });
     }
   }
-  target.state.consumables = [
-    ...(target.state.consumables ?? []),
-    consumableId,
-  ];
+  target.state.consumables = [...(target.state.consumables ?? []), consumableId];
   deps.log({
     key: 'pickupConsumable',
     variables: {
@@ -105,10 +102,7 @@ export function loseConsumableByIdWithPolicy(
   return true;
 }
 
-export function loseRandomConsumableWithPolicy(
-  deps: RuntimeServiceDeps,
-  target: Unit,
-): void {
+export function loseRandomConsumableWithPolicy(deps: RuntimeServiceDeps, target: Unit): void {
   const items = [...(target.state.consumables ?? [])];
   const dropped = deps.pickRandomFrom(items, 'event.dropConsumable.random');
   if (!dropped) return;
@@ -140,8 +134,7 @@ export function grantEquipmentWithPolicy(
 
   if (slot) {
     const index = target.modifiers.findIndex(
-      (modifier) =>
-        modifier.source === 'EQUIP' && equipmentSlotOf(modifier) === slot,
+      (modifier) => modifier.source === 'EQUIP' && equipmentSlotOf(modifier) === slot,
     );
     if (index >= 0) {
       replaced = target.modifiers[index];

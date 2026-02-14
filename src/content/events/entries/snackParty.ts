@@ -18,8 +18,7 @@ const snackParty: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 凭借多年抢饭的经验，成功在人群中捞到了最后一包薯片 😋',
+        apply: '{targetName} 凭借多年抢饭的经验，成功在人群中捞到了最后一包薯片 😋',
       },
     },
     {

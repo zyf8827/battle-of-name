@@ -83,8 +83,6 @@ export class EventScheduler {
    * ```
    */
   getRules(window: TriggerWindow): SchedulerRule[] {
-    return this.rules.filter(
-      (rule) => rule.window === window && this.pools[rule.poolId],
-    );
+    return this.rules.filter((rule) => rule.window === window && this.pools[rule.poolId]);
   }
 }

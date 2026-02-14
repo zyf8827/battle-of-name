@@ -102,8 +102,7 @@ let battleCounter = 0;
  *
  * 种子使用的字符：数字 + 小写字母 + 大写字母（62 个字符）
  */
-const SEED_ALPHABET =
-  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const SEED_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 /**
  * 默认种子长度
@@ -133,18 +132,13 @@ function createSeedFromNumbers(values: number[], length: number): string {
   let seed = '';
 
   // 主循环：使用输入的数值
-  for (
-    let index = 0;
-    index < values.length && seed.length < length;
-    index += 1
-  ) {
+  for (let index = 0; index < values.length && seed.length < length; index += 1) {
     seed += SEED_ALPHABET[values[index] % SEED_ALPHABET.length];
   }
 
   // Fallback 循环：如果数值用完但长度不够
   while (seed.length < length) {
-    const fallbackValue =
-      (Date.now() + battleCounter + seed.length * 17) % SEED_ALPHABET.length;
+    const fallbackValue = (Date.now() + battleCounter + seed.length * 17) % SEED_ALPHABET.length;
     seed += SEED_ALPHABET[fallbackValue];
   }
 
@@ -191,9 +185,7 @@ function createBattleSeed(nameA: string, nameB: string): string {
 
   // 策略 2: Fallback 确定性算法
   const fallbackBase = `${nameA.trim()}|${nameB.trim()}|${Date.now()}|${battleCounter}`;
-  const values = Array.from(fallbackBase).map(
-    (char, index) => char.charCodeAt(0) + index * 13,
-  );
+  const values = Array.from(fallbackBase).map((char, index) => char.charCodeAt(0) + index * 13);
   return createSeedFromNumbers(values, DEFAULT_SEED_LENGTH);
 }
 
@@ -274,8 +266,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
     // 生成或使用覆盖种子
     const normalizedSeed =
-      seedOverride?.trim() ||
-      createBattleSeed(normalizedNameA, normalizedNameB);
+      seedOverride?.trim() || createBattleSeed(normalizedNameA, normalizedNameB);
 
     // 执行战斗
     const result = runBattle(
@@ -326,12 +317,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     if (!result) return;
 
     const next = Math.min(cursor + 1, result.logs.length);
-    const nextPhase =
-      next >= result.logs.length
-        ? 'finished'
-        : phase === 'idle'
-          ? 'paused'
-          : phase;
+    const nextPhase = next >= result.logs.length ? 'finished' : phase === 'idle' ? 'paused' : phase;
 
     set({ cursor: next, phase: nextPhase });
   },

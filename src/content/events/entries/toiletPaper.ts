@@ -18,8 +18,7 @@ const toiletPaper: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 慷慨地递过去一叠纸，完成了一次充满禅意的跨隔间交流 💚',
+        apply: '{targetName} 慷慨地递过去一叠纸，完成了一次充满禅意的跨隔间交流 💚',
       },
     },
   ],

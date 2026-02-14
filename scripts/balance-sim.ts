@@ -33,12 +33,7 @@ function makeRandomName(rng: seedrandom.PRNG): string {
   return value;
 }
 
-function upsert(
-  map: Map<string, Counter>,
-  key: string,
-  won: boolean,
-  rounds: number,
-): void {
+function upsert(map: Map<string, Counter>, key: string, won: boolean, rounds: number): void {
   const prev = map.get(key) ?? { games: 0, wins: 0, roundSum: 0 };
   prev.games += 1;
   if (won) prev.wins += 1;
@@ -46,11 +41,7 @@ function upsert(
   map.set(key, prev);
 }
 
-function percentileFromHist(
-  hist: Map<number, number>,
-  totalGames: number,
-  ratio: number,
-): number {
+function percentileFromHist(hist: Map<number, number>, totalGames: number, ratio: number): number {
   const sorted = [...hist.entries()].sort((a, b) => a[0] - b[0]);
   const target = totalGames * ratio;
   let cumulative = 0;
@@ -178,16 +169,12 @@ for (let gameIndex = 0; gameIndex < total; gameIndex += 1) {
     name2,
     seed,
   });
-  const result = runBattle(
-    { name1, name2, seed },
-    defaultBattleContentAdapter,
-    {
-      diagnostics: {
-        debugLog: false,
-        collectSummary: true,
-      },
+  const result = runBattle({ name1, name2, seed }, defaultBattleContentAdapter, {
+    diagnostics: {
+      debugLog: false,
+      collectSummary: true,
     },
-  );
+  });
 
   const rounds = result.summary.totalRounds;
   const winnerId = result.winnerId;
@@ -222,9 +209,7 @@ for (let gameIndex = 0; gameIndex < total; gameIndex += 1) {
       effectTriggered.set(kind, (effectTriggered.get(kind) ?? 0) + count);
     }
 
-    for (const [eventId, count] of Object.entries(
-      diagnostics.poolEntriesTriggered,
-    )) {
+    for (const [eventId, count] of Object.entries(diagnostics.poolEntriesTriggered)) {
       if (count <= 0) continue;
       const prev = eventStats.get(eventId) ?? {
         gamesTriggered: 0,
@@ -248,11 +233,7 @@ const overallFastRate = fastGames / total;
 const overallLongRate = longGames / total;
 const baselineWinrate = 0.5;
 
-const classWeightAdjustments = weightSuggestionByWinrate(
-  classStats,
-  baselineWinrate,
-  minSamples,
-);
+const classWeightAdjustments = weightSuggestionByWinrate(classStats, baselineWinrate, minSamples);
 const equipmentWeightAdjustments = weightSuggestionByWinrate(
   equipStats,
   baselineWinrate,
@@ -287,9 +268,7 @@ const result = {
     mid8to12Pct: Number(((midGames / total) * 100).toFixed(2)),
     longPct: Number((overallLongRate * 100).toFixed(2)),
   },
-  histTop20: [...roundHist.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .filter(([round]) => round <= 20),
+  histTop20: [...roundHist.entries()].sort((a, b) => a[0] - b[0]).filter(([round]) => round <= 20),
   topClassWinrate: topWinrate(classStats, minSamples),
   lowClassWinrate: bottomWinrate(classStats, minSamples),
   topEquipmentWinrate: topWinrate(equipStats, minSamples),
@@ -297,10 +276,7 @@ const result = {
   topConsumableWinrate: topWinrate(consumableStats, consumableMinSample),
   lowConsumableWinrate: bottomWinrate(consumableStats, consumableMinSample),
   eventCorrelationTop: [...eventStats.entries()]
-    .filter(
-      ([, stat]) =>
-        stat.gamesTriggered >= Math.max(100, Math.floor(minSamples * 0.7)),
-    )
+    .filter(([, stat]) => stat.gamesTriggered >= Math.max(100, Math.floor(minSamples * 0.7)))
     .map(([id, stat]) => ({
       id,
       gamesTriggered: stat.gamesTriggered,
@@ -316,8 +292,7 @@ const result = {
     consumableWeights: consumableWeightAdjustments,
     eventWeights: eventWeightAdjustments,
     scheduleHint: {
-      roundStartGlobalMultiplier:
-        overallFastRate > 0.02 ? 0.95 : overallLongRate > 0.15 ? 1.05 : 1,
+      roundStartGlobalMultiplier: overallFastRate > 0.02 ? 0.95 : overallLongRate > 0.15 ? 1.05 : 1,
       turnStartPersonalMultiplier:
         overallLongRate > 0.15 ? 1.06 : overallFastRate > 0.02 ? 0.96 : 1,
     },

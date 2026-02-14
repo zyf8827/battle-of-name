@@ -3,9 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { defaultBattleContentAdapter } from '../battleContentAdapter';
 
 function identitySignature(
-  unit: ReturnType<
-    typeof defaultBattleContentAdapter.bootstrap
-  >['units'][number],
+  unit: ReturnType<typeof defaultBattleContentAdapter.bootstrap>['units'][number],
 ): string {
   const nonEquipModifiers = unit.modifiers
     .filter((modifier) => modifier.source !== 'EQUIP')
@@ -15,9 +13,7 @@ function identitySignature(
 }
 
 function gearSignature(
-  unit: ReturnType<
-    typeof defaultBattleContentAdapter.bootstrap
-  >['units'][number],
+  unit: ReturnType<typeof defaultBattleContentAdapter.bootstrap>['units'][number],
 ): string {
   const equips = unit.modifiers
     .filter((modifier) => modifier.source === 'EQUIP')

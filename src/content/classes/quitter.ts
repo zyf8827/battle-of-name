@@ -19,19 +19,15 @@ const tacticalSleep: Modifier = {
         // 我们可以给 owner 加个标记，或者把这个天赋替换成已失效版本
         // 简单做法：给自己施加一个“已触发”标记，如果已有标记则不触发
 
-        const used = owner.modifiers.some(
-          (m) => m.id === 'debuff.quitter_used',
-        );
+        const used = owner.modifiers.some((m) => m.id === 'debuff.quitter_used');
         if (used) return event;
 
         // 触发锁血：伤害置为 0
         // 同时触发回血
-        engine.event.emitDirectHeal(
-          owner,
-          owner,
-          Math.floor(owner.state.maxHp * 0.2),
-          ['heal', 'talent'],
-        );
+        engine.event.emitDirectHeal(owner, owner, Math.floor(owner.state.maxHp * 0.2), [
+          'heal',
+          'talent',
+        ]);
 
         // 标记已使用
         engine.state.applyModifierEffect(owner, owner, {

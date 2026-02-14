@@ -18,8 +18,7 @@ const queueJump: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 顶着后面排队大妈杀人般的目光，强行缩短了等待时间 👺',
+        apply: '{targetName} 顶着后面排队大妈杀人般的目光，强行缩短了等待时间 👺',
       },
     },
   ],

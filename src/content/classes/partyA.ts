@@ -37,9 +37,7 @@ const colorfulBlack: Modifier = {
     },
   ],
   texts: {
-    trigger: [
-      '{sourceName} 提出了“五彩斑斓的黑”，{targetName} 陷入了逻辑死循环 🤯。',
-    ],
+    trigger: ['{sourceName} 提出了“五彩斑斓的黑”，{targetName} 陷入了逻辑死循环 🤯。'],
   },
 };
 

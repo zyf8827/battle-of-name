@@ -18,8 +18,7 @@ const toiletBoss: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply:
-          '{targetName} 盯着那双昂贵的皮鞋，瞬间连大气都不敢喘，感觉心脏都要停跳了 😱',
+        apply: '{targetName} 盯着那双昂贵的皮鞋，瞬间连大气都不敢喘，感觉心脏都要停跳了 😱',
       },
     },
     {

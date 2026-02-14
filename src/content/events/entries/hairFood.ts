@@ -24,8 +24,7 @@ const hairFood: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 胃部一阵剧烈翻腾，当场决定这辈子再也不点这家店了 🤮',
+        apply: '{targetName} 胃部一阵剧烈翻腾，当场决定这辈子再也不点这家店了 🤮',
       },
     },
   ],

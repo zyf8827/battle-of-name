@@ -24,8 +24,7 @@ const redPenny: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 看着屏幕上弹出的“0.01元”，感觉自尊受到了极大的侮辱 😒',
+        apply: '{targetName} 看着屏幕上弹出的“0.01元”，感觉自尊受到了极大的侮辱 😒',
       },
     },
   ],

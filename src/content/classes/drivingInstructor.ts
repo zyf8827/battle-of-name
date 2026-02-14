@@ -37,9 +37,7 @@ const emotionalDamage: Modifier = {
     },
   ],
   texts: {
-    trigger: [
-      '{sourceName} 开始了阴阳怪气：“方向盘上挂个肉包子狗都比你会开！” 🐶',
-    ],
+    trigger: ['{sourceName} 开始了阴阳怪气：“方向盘上挂个肉包子狗都比你会开！” 🐶'],
   },
 };
 

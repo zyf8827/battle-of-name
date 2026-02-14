@@ -146,10 +146,7 @@ export const turnEventEntries: EventPoolEntry[] = [
   fridgeSharing,
 ];
 
-export const eventEntries: EventPoolEntry[] = [
-  ...roundEventEntries,
-  ...turnEventEntries,
-];
+export const eventEntries: EventPoolEntry[] = [...roundEventEntries, ...turnEventEntries];
 
 const eventEntryCatalog: Record<string, EventPoolEntry> = Object.fromEntries(
   eventEntries.map((item) => [item.id, item]),

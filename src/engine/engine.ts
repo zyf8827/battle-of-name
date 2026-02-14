@@ -76,10 +76,7 @@ import type {
   Unit,
   ValueExpr,
 } from './types';
-import {
-  DEFAULT_BATTLE_CONFIG,
-  DEFAULT_EVENT_POOL_ENTRY_WEIGHT,
-} from './types';
+import { DEFAULT_BATTLE_CONFIG, DEFAULT_EVENT_POOL_ENTRY_WEIGHT } from './types';
 
 const NUMERIC_LIMITS = {
   minChance: 0,
@@ -114,15 +111,10 @@ function unitAlive(unit: Unit): boolean {
   return unit.state.hp > 0;
 }
 
-function calcInitialMaxHp(
-  vit: number,
-  hpBase: number,
-  hpPerVit: number,
-): number {
+function calcInitialMaxHp(vit: number, hpBase: number, hpPerVit: number): number {
   const safeVit = Math.max(1, Math.floor(Number.isFinite(vit) ? vit : 1));
   const linear = hpBase + Math.floor(safeVit * hpPerVit * 1.08);
-  const survivalBonus =
-    Math.floor(Math.sqrt(safeVit) * hpPerVit * 0.55) + Math.floor(hpBase * 0.2);
+  const survivalBonus = Math.floor(Math.sqrt(safeVit) * hpPerVit * 0.55) + Math.floor(hpBase * 0.2);
   return Math.min(NUMERIC_LIMITS.maxHp, Math.max(1, linear + survivalBonus));
 }
 
@@ -135,21 +127,14 @@ function whenMatched(
   if (when.role && when.role !== role) return false;
   if (when.eventType && when.eventType !== event.type) return false;
   if (when.hasTag && !event.payload.tags.includes(when.hasTag)) return false;
-  if (when.notHasTag && event.payload.tags.includes(when.notHasTag))
-    return false;
-  if (when.notHasTags?.some((tag) => event.payload.tags.includes(tag)))
-    return false;
+  if (when.notHasTag && event.payload.tags.includes(when.notHasTag)) return false;
+  if (when.notHasTags?.some((tag) => event.payload.tags.includes(tag))) return false;
   return true;
 }
 
-function evaluateValue(
-  unit: Unit,
-  event: CombatEvent | undefined,
-  value: ValueExpr,
-): number {
+function evaluateValue(unit: Unit, event: CombatEvent | undefined, value: ValueExpr): number {
   if (value.type === 'FLAT') return value.value;
-  if (value.type === 'SCALE')
-    return (unit.stats[value.stat] ?? 0) * value.ratio;
+  if (value.type === 'SCALE') return (unit.stats[value.stat] ?? 0) * value.ratio;
   return event?.payload.value ?? 0;
 }
 
@@ -203,9 +188,7 @@ export function runBattle(
   const envUnit = createEnvUnit();
   const rng = createRng(seed);
   const bootstrap = contentAdapter.bootstrap({ name1, name2, seed });
-  const units: Unit[] = bootstrap.units.map((unit) =>
-    cloneUnit(deepCloneKeepFns(unit)),
-  );
+  const units: Unit[] = bootstrap.units.map((unit) => cloneUnit(deepCloneKeepFns(unit)));
   const eventPools = bootstrap.eventPools;
   const consumablePoolIds = bootstrap.consumablePoolIds ?? [];
   const equipmentPoolIds = bootstrap.equipmentPoolIds ?? [];
@@ -227,9 +210,7 @@ export function runBattle(
     throw new Error('Battle content adapter must provide executeTurnAction');
   }
   if (!executeTurnConsumable) {
-    throw new Error(
-      'Battle content adapter must provide executeTurnConsumable',
-    );
+    throw new Error('Battle content adapter must provide executeTurnConsumable');
   }
   if (!resolveControlSource) {
     throw new Error('Battle content adapter must provide resolveControlSource');
@@ -240,19 +221,15 @@ export function runBattle(
 
   for (const unit of units) {
     if (unit.state.maxHp <= 0) {
-      unit.state.maxHp = calcInitialMaxHp(
-        unit.stats.VIT,
-        BALANCE.hpBase,
-        BALANCE.hpPerVit,
-      );
+      unit.state.maxHp = calcInitialMaxHp(unit.stats.VIT, BALANCE.hpBase, BALANCE.hpPerVit);
     }
     if (unit.state.hp <= 0) {
       unit.state.hp = unit.state.maxHp;
     }
   }
 
-  const envModifiers: Modifier[] = (bootstrap.envModifiers ?? []).map(
-    (modifier) => deepCloneKeepFns(modifier),
+  const envModifiers: Modifier[] = (bootstrap.envModifiers ?? []).map((modifier) =>
+    deepCloneKeepFns(modifier),
   );
   const logs: BattleOutcome['logs'] = [];
   const totalDamageByUnit: Record<string, number> = Object.fromEntries(
@@ -278,8 +255,7 @@ export function runBattle(
     return found;
   };
 
-  const getEnemy = (id: string): Unit =>
-    units.find((item) => item.id !== id) ?? units[0];
+  const getEnemy = (id: string): Unit => units.find((item) => item.id !== id) ?? units[0];
 
   // 核心数值计算库：处理战斗中的所有数学公式，确保数值在安全范围内
   const runtimeMath: EngineRuntime['calc'] = {
@@ -288,11 +264,7 @@ export function runBattle(
       if (max < min) return min;
       return Math.min(max, Math.max(min, value));
     },
-    toInt: (
-      value,
-      min = Number.MIN_SAFE_INTEGER,
-      max = Number.MAX_SAFE_INTEGER,
-    ) => {
+    toInt: (value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => {
       if (!Number.isFinite(value)) return min;
       return Math.min(max, Math.max(min, Math.floor(value)));
     },
@@ -305,10 +277,7 @@ export function runBattle(
       return Math.min(NUMERIC_LIMITS.maxStat, Math.max(1, Math.floor(value)));
     },
     safeHp: (value, maxHp) => {
-      const safeMaxHp = Math.min(
-        NUMERIC_LIMITS.maxHp,
-        Math.max(1, Math.floor(maxHp)),
-      );
+      const safeMaxHp = Math.min(NUMERIC_LIMITS.maxHp, Math.max(1, Math.floor(maxHp)));
       if (!Number.isFinite(value)) return safeMaxHp;
       return Math.min(safeMaxHp, Math.max(0, Math.floor(value)));
     },
@@ -344,14 +313,8 @@ export function runBattle(
     },
     // 护盾结算逻辑：优先扣除护盾，剩余伤害溢出到 HP
     splitDamageByShield: (incoming, shield) => {
-      const safeIncoming = Math.max(
-        0,
-        Math.floor(Number.isFinite(incoming) ? incoming : 0),
-      );
-      const safeShield = Math.max(
-        0,
-        Math.floor(Number.isFinite(shield) ? shield : 0),
-      );
+      const safeIncoming = Math.max(0, Math.floor(Number.isFinite(incoming) ? incoming : 0));
+      const safeShield = Math.max(0, Math.floor(Number.isFinite(shield) ? shield : 0));
       const shieldBlocked = Math.min(safeShield, safeIncoming);
       const hpDamage = safeIncoming - shieldBlocked;
       return {
@@ -363,10 +326,7 @@ export function runBattle(
     },
     hpAfterDamage: (hp, damage) => {
       const safeHp = Math.max(0, Math.floor(Number.isFinite(hp) ? hp : 0));
-      const safeDamage = Math.max(
-        0,
-        Math.floor(Number.isFinite(damage) ? damage : 0),
-      );
+      const safeDamage = Math.max(0, Math.floor(Number.isFinite(damage) ? damage : 0));
       return Math.max(0, safeHp - safeDamage);
     },
     hpAfterHeal: (hp, maxHp, amount) => {
@@ -375,10 +335,7 @@ export function runBattle(
         NUMERIC_LIMITS.maxHp,
         Math.max(1, Math.floor(Number.isFinite(maxHp) ? maxHp : 1)),
       );
-      const safeAmount = Math.max(
-        0,
-        Math.floor(Number.isFinite(amount) ? amount : 0),
-      );
+      const safeAmount = Math.max(0, Math.floor(Number.isFinite(amount) ? amount : 0));
       return Math.min(safeMaxHp, safeHp + safeAmount);
     },
   };
@@ -398,16 +355,13 @@ export function runBattle(
     parentId: partial.parentId,
   });
 
-  const sortedUnitModifiers = (unit: Unit): Modifier[] =>
-    sortModifiers(unit.modifiers);
+  const sortedUnitModifiers = (unit: Unit): Modifier[] => sortModifiers(unit.modifiers);
   const sortedEnvModifiers = (): Modifier[] => sortModifiers(envModifiers);
 
   const createSnapshot = (): Snapshot => ({
     round,
     units: units.map(cloneUnit),
-    envModifiers: sortedEnvModifiers().map((modifier) =>
-      deepCloneKeepFns(modifier),
-    ),
+    envModifiers: sortedEnvModifiers().map((modifier) => deepCloneKeepFns(modifier)),
   });
 
   const pushLog = ({
@@ -477,10 +431,7 @@ export function runBattle(
           (exists.stacks ?? 1) + 1,
           cloned.stacking?.maxStacks ?? Number.MAX_SAFE_INTEGER,
         );
-        exists.duration = Math.max(
-          exists.duration ?? -1,
-          cloned.duration ?? -1,
-        );
+        exists.duration = Math.max(exists.duration ?? -1, cloned.duration ?? -1);
         return;
       default:
         return;
@@ -509,15 +460,11 @@ export function runBattle(
   }
 
   function pickRandomConsumableId(): string | undefined {
-    const candidates = consumablePoolIds.filter(
-      (id) => !!getConsumableById(id),
-    );
+    const candidates = consumablePoolIds.filter((id) => !!getConsumableById(id));
     return pickRandomFrom(candidates, 'runtime.state.grantRandomConsumable');
   }
 
-  function pickRandomEquipment(
-    slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY',
-  ): Modifier | undefined {
+  function pickRandomEquipment(slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY'): Modifier | undefined {
     const candidates = equipmentPoolIds
       .map((id) => getEquipmentById(id))
       .filter((item): item is Modifier => !!item)
@@ -535,12 +482,8 @@ export function runBattle(
     mode: 'gain' | 'lose',
   ): 'consumable' | 'equipment' | undefined {
     if (mode === 'gain') {
-      const hasConsumablePool = consumablePoolIds.some(
-        (id) => !!getConsumableById(id),
-      );
-      const hasEquipmentPool = equipmentPoolIds.some(
-        (id) => !!getEquipmentById(id),
-      );
+      const hasConsumablePool = consumablePoolIds.some((id) => !!getConsumableById(id));
+      const hasEquipmentPool = equipmentPoolIds.some((id) => !!getEquipmentById(id));
       const kinds: Array<'consumable' | 'equipment'> = [
         ...(hasConsumablePool ? (['consumable'] as const) : []),
         ...(hasEquipmentPool ? (['equipment'] as const) : []),
@@ -548,9 +491,7 @@ export function runBattle(
       return pickRandomFrom(kinds, 'runtime.state.randomItemKind.gain');
     }
 
-    const hasAnyEquipOwned = target.modifiers.some(
-      (modifier) => modifier.source === 'EQUIP',
-    );
+    const hasAnyEquipOwned = target.modifiers.some((modifier) => modifier.source === 'EQUIP');
     const hasAnyConsumableOwned = (target.state.consumables ?? []).length > 0;
     const kinds: Array<'consumable' | 'equipment'> = [
       ...(hasAnyConsumableOwned ? (['consumable'] as const) : []),
@@ -641,8 +582,7 @@ export function runBattle(
     stackKey?: string,
     max?: number,
   ): number => {
-    const list =
-      targetId === 'ENV' ? envModifiers : getUnit(targetId).modifiers;
+    const list = targetId === 'ENV' ? envModifiers : getUnit(targetId).modifiers;
     return removeModifierFromArray(
       list,
       (modifier) => {
@@ -734,8 +674,7 @@ export function runBattle(
       },
     },
     state: {
-      resolveTargets: (owner, selector) =>
-        resolveEffectTargets(owner, selector),
+      resolveTargets: (owner, selector) => resolveEffectTargets(owner, selector),
       resolveTargetFromEvent: (owner, selector, event) =>
         resolveTargetFromEvent(selector, owner, event),
       applyModifierEffect,
@@ -771,14 +710,12 @@ export function runBattle(
         const kind = pickRandomItemKind(target, 'gain');
         if (kind === 'consumable') {
           const picked = pickRandomConsumableId();
-          if (picked)
-            grantConsumableWithPolicy(runtimeServiceDeps, target, picked);
+          if (picked) grantConsumableWithPolicy(runtimeServiceDeps, target, picked);
           return;
         }
         if (kind === 'equipment') {
           const picked = pickRandomEquipment();
-          if (picked)
-            grantEquipmentWithPolicy(runtimeServiceDeps, target, picked);
+          if (picked) grantEquipmentWithPolicy(runtimeServiceDeps, target, picked);
         }
       },
       loseRandomItem: (target) => {
@@ -816,17 +753,13 @@ export function runBattle(
     const modifier = 'modifier' in effect ? effect.modifier : undefined;
     const modifierId = 'modifierId' in effect ? effect.modifierId : undefined;
     const duration = 'duration' in effect ? effect.duration : undefined;
-    const textOverrides =
-      'textOverrides' in effect ? effect.textOverrides : undefined;
+    const textOverrides = 'textOverrides' in effect ? effect.textOverrides : undefined;
 
     let created: Modifier;
     if (modifier && typeof modifier === 'object') {
       created = deepCloneKeepFns(modifier as Modifier);
     } else if (typeof modifierId === 'string') {
-      created = createModifierById(
-        modifierId,
-        typeof duration === 'number' ? duration : undefined,
-      );
+      created = createModifierById(modifierId, typeof duration === 'number' ? duration : undefined);
     } else {
       throw new Error('APPLY_MODIFIER requires modifier or modifierId');
     }
@@ -841,18 +774,15 @@ export function runBattle(
       ...(textOverrides as Modifier['texts']),
       triggerByTag: {
         ...(created.texts?.triggerByTag ?? {}),
-        ...(((textOverrides as Modifier['texts'])?.triggerByTag ??
-          {}) as NonNullable<Modifier['texts']>['triggerByTag']),
+        ...(((textOverrides as Modifier['texts'])?.triggerByTag ?? {}) as NonNullable<
+          Modifier['texts']
+        >['triggerByTag']),
       },
     };
     return created;
   }
 
-  function applyModifierEffect(
-    source: Unit,
-    target: Unit,
-    effect: EffectSpec,
-  ): void {
+  function applyModifierEffect(source: Unit, target: Unit, effect: EffectSpec): void {
     const modifier = buildModifierFromEffect(effect);
     applyModifier(target.id, modifier);
     pushLog({
@@ -910,8 +840,7 @@ export function runBattle(
     phase: 'INTERCEPT' | 'REACTION',
   ): CombatEvent | null {
     let currentEvent = event;
-    const role: 'SOURCE' | 'TARGET' =
-      owner.id === currentEvent?.sourceId ? 'SOURCE' : 'TARGET';
+    const role: 'SOURCE' | 'TARGET' = owner.id === currentEvent?.sourceId ? 'SOURCE' : 'TARGET';
     if (
       currentEvent &&
       'when' in trigger &&
@@ -964,8 +893,7 @@ export function runBattle(
     phase: 'INTERCEPT' | 'REACTION',
   ): CombatEvent | null {
     let currentEvent = event;
-    const pool =
-      owner.id === 'ENV' ? sortedEnvModifiers() : sortedUnitModifiers(owner);
+    const pool = owner.id === 'ENV' ? sortedEnvModifiers() : sortedUnitModifiers(owner);
     for (const modifier of pool) {
       const key = `${round}:${owner.id}:${modifier.id}:${triggerOn}`;
       const count = triggerCount.get(key) ?? 0;
@@ -986,13 +914,7 @@ export function runBattle(
             eventId: currentEvent?.id,
             eventType: currentEvent?.type,
           });
-          currentEvent = fireEffects(
-            owner,
-            spec.trigger,
-            spec.effects,
-            currentEvent,
-            phase,
-          );
+          currentEvent = fireEffects(owner, spec.trigger, spec.effects, currentEvent, phase);
         }
         if (
           triggerOn === 'POST_ACTION' &&
@@ -1012,13 +934,7 @@ export function runBattle(
             eventId: currentEvent.id,
             eventType: currentEvent.type,
           });
-          currentEvent = fireEffects(
-            owner,
-            spec.trigger,
-            spec.effects,
-            currentEvent,
-            phase,
-          );
+          currentEvent = fireEffects(owner, spec.trigger, spec.effects, currentEvent, phase);
         }
         if (
           triggerOn === 'POST_ACTION' &&
@@ -1038,13 +954,7 @@ export function runBattle(
             eventId: currentEvent.id,
             eventType: currentEvent.type,
           });
-          currentEvent = fireEffects(
-            owner,
-            spec.trigger,
-            spec.effects,
-            currentEvent,
-            phase,
-          );
+          currentEvent = fireEffects(owner, spec.trigger, spec.effects, currentEvent, phase);
         }
       }
     }
@@ -1075,12 +985,7 @@ export function runBattle(
     );
   }
 
-  function triggerPool(
-    poolId: string,
-    ownerId: string,
-    depth: number,
-    parentId?: string,
-  ): void {
+  function triggerPool(poolId: string, ownerId: string, depth: number, parentId?: string): void {
     const pool = eventPools[poolId];
     if (!pool || pool.entries.length === 0) return;
     const picked = rng.weightedPick(
@@ -1091,8 +996,7 @@ export function runBattle(
     if (!picked) return;
 
     const owner = getUnit(ownerId);
-    diagnostics.poolsTriggered[poolId] =
-      (diagnostics.poolsTriggered[poolId] ?? 0) + 1;
+    diagnostics.poolsTriggered[poolId] = (diagnostics.poolsTriggered[poolId] ?? 0) + 1;
     diagnostics.poolEntriesTriggered[picked.id] =
       (diagnostics.poolEntriesTriggered[picked.id] ?? 0) + 1;
     pushLog({
@@ -1169,18 +1073,14 @@ export function runBattle(
       const hpBefore = target.state.hp;
       const shieldBefore = target.state.shield;
       if (value > 0) {
-        const split = runtimeMath.splitDamageByShield(
-          value,
-          target.state.shield,
-        );
+        const split = runtimeMath.splitDamageByShield(value, target.state.shield);
         target.state.shield = runtimeMath.safeShield(split.shieldAfter);
         actualDamage = split.hpDamage;
         target.state.hp = runtimeMath.safeHp(
           runtimeMath.hpAfterDamage(target.state.hp, actualDamage),
           target.state.maxHp,
         );
-        totalDamageByUnit[source.id] =
-          (totalDamageByUnit[source.id] ?? 0) + actualDamage;
+        totalDamageByUnit[source.id] = (totalDamageByUnit[source.id] ?? 0) + actualDamage;
       }
       debugLog('event.resolved.attack', {
         eventId: event.id,
@@ -1235,11 +1135,7 @@ export function runBattle(
     if (event.type === 'HEAL') {
       const amount = runtimeMath.nonNegativeInt(event.payload.value ?? 0);
       const hpBefore = target.state.hp;
-      target.state.hp = runtimeMath.hpAfterHeal(
-        target.state.hp,
-        target.state.maxHp,
-        amount,
-      );
+      target.state.hp = runtimeMath.hpAfterHeal(target.state.hp, target.state.maxHp, amount);
       const healLogKey: BattleSystemLogKey = event.payload.tags.includes('env')
         ? 'eventHeal'
         : 'heal';
@@ -1394,10 +1290,7 @@ export function runBattle(
       };
       // 执行 onPostAction 钩子，收集返回值作为新事件
       const hooksDerived = modifier.hooks?.onPostAction?.(event, ctx) ?? [];
-      for (const child of hooksDerived.slice(
-        0,
-        limits.maxDerivedEventsPerEvent,
-      )) {
+      for (const child of hooksDerived.slice(0, limits.maxDerivedEventsPerEvent)) {
         derived.push({
           ...child,
           parentId: event.id,
@@ -1408,10 +1301,8 @@ export function runBattle(
     };
 
     // 遍历所有相关单位的 Modifier
-    for (const modifier of sortedUnitModifiers(source))
-      runReactor(source, modifier);
-    for (const modifier of sortedUnitModifiers(target))
-      runReactor(target, modifier);
+    for (const modifier of sortedUnitModifiers(source)) runReactor(source, modifier);
+    for (const modifier of sortedUnitModifiers(target)) runReactor(target, modifier);
     for (const modifier of sortedEnvModifiers()) runReactor(envUnit, modifier);
 
     // 触发 POST_ACTION 类型的触发器 (通常用于处理 Buff 移除等无衍生事件的副作用)
@@ -1426,10 +1317,7 @@ export function runBattle(
   // 负责事件的生命周期：创建 -> 拦截/修改(Intercept) -> 结算(Resolve) -> 衍生(Derived)
   function processEvent(event: CombatEvent): void {
     // 1. 深度和数量限制，防止无限递归 (如: 反伤触发反伤)
-    if (
-      event.depth > limits.maxEventDepth ||
-      roundEventCount >= limits.maxEventsPerRound
-    ) {
+    if (event.depth > limits.maxEventDepth || roundEventCount >= limits.maxEventsPerRound) {
       diagnostics.eventsSkipped.depthOrBudget += 1;
       debugLog('event.skipped.limit', {
         eventId: event.id,
@@ -1507,19 +1395,9 @@ export function runBattle(
       current = modifier.hooks?.onIncoming?.(current, ctx) ?? current;
       if (!current) return;
     }
-    current = runModifierTriggers(
-      envUnit,
-      'PIPELINE_OUTGOING',
-      current,
-      'INTERCEPT',
-    );
+    current = runModifierTriggers(envUnit, 'PIPELINE_OUTGOING', current, 'INTERCEPT');
     if (!current) return;
-    current = runModifierTriggers(
-      envUnit,
-      'PIPELINE_INCOMING',
-      current,
-      'INTERCEPT',
-    );
+    current = runModifierTriggers(envUnit, 'PIPELINE_INCOMING', current, 'INTERCEPT');
     if (!current) return;
 
     // 5. 发起者 (Source) 拦截阶段 (Outgoing)
@@ -1534,12 +1412,7 @@ export function runBattle(
       current = modifier.hooks?.onOutgoing?.(current, ctx) ?? current;
       if (!current) return;
     }
-    current = runModifierTriggers(
-      source,
-      'PIPELINE_OUTGOING',
-      current,
-      'INTERCEPT',
-    );
+    current = runModifierTriggers(source, 'PIPELINE_OUTGOING', current, 'INTERCEPT');
     if (!current) return;
 
     // 6. 目标 (Target) 拦截阶段 (Incoming)
@@ -1554,12 +1427,7 @@ export function runBattle(
       current = modifier.hooks?.onIncoming?.(current, ctx) ?? current;
       if (!current) return;
     }
-    current = runModifierTriggers(
-      target,
-      'PIPELINE_INCOMING',
-      current,
-      'INTERCEPT',
-    );
+    current = runModifierTriggers(target, 'PIPELINE_INCOMING', current, 'INTERCEPT');
     if (!current) return;
 
     // 7. 结算阶段 (Resolve)
@@ -1615,10 +1483,7 @@ export function runBattle(
   function decrementCooldowns(): void {
     for (const unit of units) {
       Object.keys(unit.state.cd).forEach((skillId) => {
-        unit.state.cd[skillId] = runtimeMath.nonNegativeInt(
-          (unit.state.cd[skillId] ?? 0) - 1,
-          999,
-        );
+        unit.state.cd[skillId] = runtimeMath.nonNegativeInt((unit.state.cd[skillId] ?? 0) - 1, 999);
       });
     }
   }
@@ -1682,8 +1547,7 @@ export function runBattle(
 
     // 2. 确定行动顺序 (基于 AGI 敏捷属性)
     const queue = units.filter(unitAlive).sort((left, right) => {
-      const agiDiff =
-        getEffectiveStat(right, 'AGI') - getEffectiveStat(left, 'AGI');
+      const agiDiff = getEffectiveStat(right, 'AGI') - getEffectiveStat(left, 'AGI');
       if (agiDiff !== 0) return agiDiff;
       return left.id.localeCompare(right.id);
     });
@@ -1785,8 +1649,7 @@ export function runBattle(
     }
   }
   const alive = units.filter(unitAlive);
-  const winner =
-    alive[0] ?? units.sort((left, right) => right.state.hp - left.state.hp)[0];
+  const winner = alive[0] ?? units.sort((left, right) => right.state.hp - left.state.hp)[0];
 
   return {
     seed,

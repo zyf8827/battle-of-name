@@ -24,10 +24,7 @@ const finalSpoiler: Modifier = {
       });
 
       // 移除这个天赋本身，确保只触发一次 (变为白板)
-      engine.state.removeModifiersByMatcher(
-        owner,
-        (m) => m.id === 'class.spoiler.final_spoiler',
-      );
+      engine.state.removeModifiersByMatcher(owner, (m) => m.id === 'class.spoiler.final_spoiler');
     },
   },
   texts: {

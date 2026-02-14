@@ -18,8 +18,7 @@ const momentLeak: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply:
-          '{targetName} 感到一股透心凉的寒意从脊梁骨升起，职业生涯仿佛看到了尽头 💀',
+        apply: '{targetName} 感到一股透心凉的寒意从脊梁骨升起，职业生涯仿佛看到了尽头 💀',
       },
     },
   ],

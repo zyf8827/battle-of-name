@@ -18,8 +18,7 @@ const interviewEx: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 的大脑瞬间一片空白，脚趾已经开始在鞋里抠三室一厅 😱',
+        apply: '{targetName} 的大脑瞬间一片空白，脚趾已经开始在鞋里抠三室一厅 😱',
       },
     },
     {

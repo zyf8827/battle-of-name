@@ -18,8 +18,7 @@ const trafficJam: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 看着不断跳动的计价器和纹丝不动的窗外，心态彻底爆炸 🤬',
+        apply: '{targetName} 看着不断跳动的计价器和纹丝不动的窗外，心态彻底爆炸 🤬',
       },
     },
   ],

@@ -1,14 +1,8 @@
 export type TextTemplate = string | string[];
 
-export type TextVariables = Record<
-  string,
-  string | number | boolean | null | undefined
->;
+export type TextVariables = Record<string, string | number | boolean | null | undefined>;
 
-export function pickTextTemplate(
-  template: TextTemplate,
-  rngValue: number,
-): string {
+export function pickTextTemplate(template: TextTemplate, rngValue: number): string {
   if (typeof template === 'string') {
     return template;
   }

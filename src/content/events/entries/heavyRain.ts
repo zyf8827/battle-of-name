@@ -18,8 +18,7 @@ const heavyRain: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 顶着公文包在雨中狂奔，鞋子里传来了咕唧咕唧的水声 💦',
+        apply: '{targetName} 顶着公文包在雨中狂奔，鞋子里传来了咕唧咕唧的水声 💦',
       },
     },
   ],

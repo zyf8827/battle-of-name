@@ -210,11 +210,7 @@ export function createRng(seed: string): RNG {
      * // c: 50.0% 概率 (30/60)
      * ```
      */
-    weightedPick<T>(
-      options: T[],
-      weights: (item: T) => number,
-      label = 'weightedPick',
-    ): T {
+    weightedPick<T>(options: T[], weights: (item: T) => number, label = 'weightedPick'): T {
       // 归一化权重（确保非负）
       const normalized = options.map((item) => Math.max(0, weights(item)));
 

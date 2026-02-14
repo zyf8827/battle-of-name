@@ -18,8 +18,7 @@ const wechatSport: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 看着满屏点赞，虽然腿快断了，但虚荣心得到了极大的满足 👑',
+        apply: '{targetName} 看着满屏点赞，虽然腿快断了，但虚荣心得到了极大的满足 👑',
       },
     },
   ],

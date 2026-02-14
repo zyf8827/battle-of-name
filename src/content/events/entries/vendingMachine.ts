@@ -27,8 +27,7 @@ const vendingMachine: EventPoolEntry = {
     },
   ],
   texts: {
-    trigger:
-      '自动售货机在吞掉硬币后发出了奇怪的咯吱声，随后像喷泉一样往外吐东西 🤖',
+    trigger: '自动售货机在吞掉硬币后发出了奇怪的咯吱声，随后像喷泉一样往外吐东西 🤖',
   },
 };
 

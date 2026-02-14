@@ -18,8 +18,7 @@ const recallOk: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 长舒一口气，这种在社死边缘反复横跳的感觉真是太刺激了 ✨',
+        apply: '{targetName} 长舒一口气，这种在社死边缘反复横跳的感觉真是太刺激了 ✨',
       },
     },
   ],

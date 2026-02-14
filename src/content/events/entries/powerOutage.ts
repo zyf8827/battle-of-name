@@ -32,8 +32,7 @@ const powerOutage: EventPoolEntry = {
         ],
       },
       textOverrides: {
-        apply:
-          '{targetName} 绝望地发现还没保存的文档，在黑暗中发出了无声的哀号 🌚',
+        apply: '{targetName} 绝望地发现还没保存的文档，在黑暗中发出了无声的哀号 🌚',
       },
     },
   ],

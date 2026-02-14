@@ -18,8 +18,7 @@ const misIdol: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 还没反应过来，就被塞了一支笔签名，虚荣心瞬间爆棚 ✨',
+        apply: '{targetName} 还没反应过来，就被塞了一支笔签名，虚荣心瞬间爆棚 ✨',
       },
     },
   ],

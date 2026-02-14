@@ -18,8 +18,7 @@ const elevatorFart: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 试图装作若无其事，但同事精准的视线已经锁定了过来 💀',
+        apply: '{targetName} 试图装作若无其事，但同事精准的视线已经锁定了过来 💀',
       },
     },
   ],

@@ -96,9 +96,7 @@ export type ControlSourceResolverContext = {
   envModifiers: Modifier[];
 };
 
-export type ControlSourceResolver = (
-  ctx: ControlSourceResolverContext,
-) => Modifier | undefined;
+export type ControlSourceResolver = (ctx: ControlSourceResolverContext) => Modifier | undefined;
 
 export type BattleBootstrapResult = {
   units: Unit[];

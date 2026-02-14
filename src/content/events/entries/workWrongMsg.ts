@@ -23,8 +23,7 @@ const workWrongMsg: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply:
-          '{targetName} 疯狂长按气泡，却发现撤回选项已经无情消失，时间刚好过去两分零一秒 💀',
+        apply: '{targetName} 疯狂长按气泡，却发现撤回选项已经无情消失，时间刚好过去两分零一秒 💀',
       },
     },
   ],

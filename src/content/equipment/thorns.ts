@@ -33,10 +33,7 @@ const thorns: EquipmentLike = {
       ) {
         return [];
       }
-      const reflected = Math.max(
-        1,
-        Math.floor((event.payload.value ?? 0) * 0.3),
-      );
+      const reflected = Math.max(1, Math.floor((event.payload.value ?? 0) * 0.3));
       return [
         ctx.engine.event.make({
           type: 'ATTACK',

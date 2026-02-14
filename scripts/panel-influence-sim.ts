@@ -36,8 +36,7 @@ const chars =
 function randomName(rng: seedrandom.PRNG): string {
   const len = rng() < 0.62 ? 2 : rng() < 0.9 ? 3 : 4;
   let value = '';
-  for (let i = 0; i < len; i += 1)
-    value += chars[Math.floor(rng() * chars.length)];
+  for (let i = 0; i < len; i += 1) value += chars[Math.floor(rng() * chars.length)];
   return value;
 }
 
@@ -55,10 +54,7 @@ function tierOf(sum: number): Tier {
 function percentile(values: number[], ratio: number): number {
   if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
-  const index = Math.min(
-    sorted.length - 1,
-    Math.max(0, Math.floor((sorted.length - 1) * ratio)),
-  );
+  const index = Math.min(sorted.length - 1, Math.max(0, Math.floor((sorted.length - 1) * ratio)));
   return sorted[index];
 }
 
@@ -87,11 +83,9 @@ for (let i = 0; i < total; i += 1) {
     seed: battleSeed,
   });
   const battle = withBattle
-    ? runBattle(
-        { name1, name2, seed: battleSeed },
-        defaultBattleContentAdapter,
-        { diagnostics: { debugLog: false, collectSummary: false } },
-      )
+    ? runBattle({ name1, name2, seed: battleSeed }, defaultBattleContentAdapter, {
+        diagnostics: { debugLog: false, collectSummary: false },
+      })
     : undefined;
 
   for (const unit of bootstrap.units) {
@@ -110,16 +104,13 @@ for (let i = 0; i < total; i += 1) {
     };
 
     const panelSum = sumPanel(panel);
-    const classSum =
-      classBase.STR + classBase.AGI + classBase.VIT + classBase.LUK;
+    const classSum = classBase.STR + classBase.AGI + classBase.VIT + classBase.LUK;
     const ratio = classSum > 0 ? panelSum / classSum : undefined;
     const spread =
       Math.max(panel.STR, panel.AGI, panel.VIT, panel.LUK) -
       Math.min(panel.STR, panel.AGI, panel.VIT, panel.LUK);
     const share =
-      classSum > 0 && classSum + panelSum > 0
-        ? classSum / (classSum + panelSum)
-        : undefined;
+      classSum > 0 && classSum + panelSum > 0 ? classSum / (classSum + panelSum) : undefined;
 
     panelSums.push(panelSum);
     classSums.push(classSum);
@@ -179,44 +170,35 @@ const output = {
   },
   specialization: {
     avgSpread: Number(
-      (
-        specializationSpread.reduce((a, b) => a + b, 0) /
-        specializationSpread.length
-      ).toFixed(2),
+      (specializationSpread.reduce((a, b) => a + b, 0) / specializationSpread.length).toFixed(2),
     ),
     p50Spread: percentile(specializationSpread, 0.5),
     p90Spread: percentile(specializationSpread, 0.9),
     extremeSkewPct: Number(
       (
-        (specializationSpread.filter((s) => s >= 10).length /
-          specializationSpread.length) *
+        (specializationSpread.filter((s) => s >= 10).length / specializationSpread.length) *
         100
       ).toFixed(2),
     ),
   },
   tiers: Object.fromEntries(
-    (Object.entries(tierStats) as Array<[Tier, TierStat]>).map(
-      ([tier, stat]) => [
-        tier,
-        {
-          count: stat.count,
-          pct: Number(((stat.count / panelSums.length) * 100).toFixed(2)),
-          winRate:
-            withBattle && stat.count > 0
-              ? Number((stat.wins / stat.count).toFixed(4))
-              : undefined,
-          avgRounds:
-            withBattle && stat.count > 0
-              ? Number((stat.roundsSum / stat.count).toFixed(2))
-              : undefined,
-        },
-      ],
-    ),
+    (Object.entries(tierStats) as Array<[Tier, TierStat]>).map(([tier, stat]) => [
+      tier,
+      {
+        count: stat.count,
+        pct: Number(((stat.count / panelSums.length) * 100).toFixed(2)),
+        winRate:
+          withBattle && stat.count > 0 ? Number((stat.wins / stat.count).toFixed(4)) : undefined,
+        avgRounds:
+          withBattle && stat.count > 0
+            ? Number((stat.roundsSum / stat.count).toFixed(2))
+            : undefined,
+      },
+    ]),
   ),
   interpretationHint: {
     target: '希望基础面板与职业影响接近1:1',
-    goodRange:
-      'avgPanelToClass 建议在 0.9 ~ 1.2，且 weak/normal/strong/extreme 四档都应有样本',
+    goodRange: 'avgPanelToClass 建议在 0.9 ~ 1.2，且 weak/normal/strong/extreme 四档都应有样本',
   },
 };
 

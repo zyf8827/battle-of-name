@@ -18,8 +18,7 @@ const mondayMorning: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply:
-          '{targetName} 挣扎着坐起来，感觉身体虽然在刷牙，灵魂还在梦里摸鱼 👻',
+        apply: '{targetName} 挣扎着坐起来，感觉身体虽然在刷牙，灵魂还在梦里摸鱼 👻',
       },
     },
   ],

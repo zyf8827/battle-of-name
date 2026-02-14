@@ -18,8 +18,7 @@ const refundCoupon: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 摸着咕咕叫的肚子，在五元代金券中获得了一丝精神安慰 🍀',
+        apply: '{targetName} 摸着咕咕叫的肚子，在五元代金券中获得了一丝精神安慰 🍀',
       },
     },
     {

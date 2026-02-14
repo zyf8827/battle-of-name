@@ -12,9 +12,7 @@ describe('engine core robustness', () => {
     const resultB = runBattle(input, defaultBattleContentAdapter);
 
     expect(resultA.winnerId).toBe(resultB.winnerId);
-    expect(resultA.logs.map((log) => log.text)).toEqual(
-      resultB.logs.map((log) => log.text),
-    );
+    expect(resultA.logs.map((log) => log.text)).toEqual(resultB.logs.map((log) => log.text));
     expect(resultA.replay.rngTrace).toEqual(resultB.replay.rngTrace);
   });
 
@@ -30,9 +28,9 @@ describe('engine core robustness', () => {
       },
     };
 
-    expect(() =>
-      runBattle({ name1: '甲', name2: '乙', seed: 'bad-seed' }, badAdapter),
-    ).toThrow('Battle requires at least 2 units from content adapter');
+    expect(() => runBattle({ name1: '甲', name2: '乙', seed: 'bad-seed' }, badAdapter)).toThrow(
+      'Battle requires at least 2 units from content adapter',
+    );
   });
 
   it('ensures all hp values stay within [0, maxHp]', () => {
@@ -55,10 +53,7 @@ describe('engine core robustness', () => {
       { name1: '周七', name2: '吴八', seed: 'round-cap-seed' },
       defaultBattleContentAdapter,
     );
-    const maxRound = result.logs.reduce(
-      (max, log) => Math.max(max, log.round),
-      0,
-    );
+    const maxRound = result.logs.reduce((max, log) => Math.max(max, log.round), 0);
     expect(maxRound).toBeLessThanOrEqual(50);
   });
 
@@ -149,11 +144,9 @@ describe('duration ticking on control effects', () => {
       shouldStun: ({ actor, round }) => actor.id === 'A' && round === 1,
     });
 
-    const result = runBattle(
-      { name1: 'A', name2: 'B', seed: 'turn-duration-1' },
-      adapter,
-      { maxRounds: 2 },
-    );
+    const result = runBattle({ name1: 'A', name2: 'B', seed: 'turn-duration-1' }, adapter, {
+      maxRounds: 2,
+    });
     const skipLogs = result.logs
       .filter((log) => log.text === 'controlSkip')
       .map((log) => ({ round: log.round, actorId: log.actorId }));
@@ -168,11 +161,9 @@ describe('duration ticking on control effects', () => {
       shouldStun: ({ actor, round }) => actor.id === 'B' && round === 1,
     });
 
-    const result = runBattle(
-      { name1: 'A', name2: 'B', seed: 'turn-duration-2' },
-      adapter,
-      { maxRounds: 2 },
-    );
+    const result = runBattle({ name1: 'A', name2: 'B', seed: 'turn-duration-2' }, adapter, {
+      maxRounds: 2,
+    });
     const skipLogs = result.logs
       .filter((log) => log.text === 'controlSkip')
       .map((log) => ({ round: log.round, actorId: log.actorId }));

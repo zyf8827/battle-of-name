@@ -24,8 +24,7 @@ const soupSpill: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 低头看着身上刚买的浅色衬衫，感觉整个人都要裂开了 🤕',
+        apply: '{targetName} 低头看着身上刚买的浅色衬衫，感觉整个人都要裂开了 🤕',
       },
     },
   ],

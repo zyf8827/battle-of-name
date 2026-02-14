@@ -18,8 +18,7 @@ const viralSelf: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply:
-          '{targetName} 看着几万个赞和疯狂滚动的评论，彻底失去了睡眠的能力 😲',
+        apply: '{targetName} 看着几万个赞和疯狂滚动的评论，彻底失去了睡眠的能力 😲',
       },
     },
   ],

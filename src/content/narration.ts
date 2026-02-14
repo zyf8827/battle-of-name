@@ -36,9 +36,7 @@ export type NarrationTemplateResolver = (
   key: NarrationTemplateKey,
 ) => NarrationTemplateResolveResult | undefined;
 
-function buildTemplateMap(
-  overrides?: Partial<NarrationTemplateMap>,
-): NarrationTemplateMap {
+function buildTemplateMap(overrides?: Partial<NarrationTemplateMap>): NarrationTemplateMap {
   return {
     hit: overrides?.hit?.length ? overrides.hit : defaultTemplateMap.hit,
     crit: overrides?.crit?.length ? overrides.crit : defaultTemplateMap.crit,
@@ -71,23 +69,14 @@ export function createNarrationResolver(options?: {
   ): { text: string; key: string } => {
     const key = resolveTemplateKey(event.payload.tags);
     const resolved = options?.resolveTemplates?.(event, key);
-    const resolvedTemplates = Array.isArray(resolved)
-      ? resolved
-      : resolved?.templates;
-    const extraVariables = Array.isArray(resolved)
-      ? undefined
-      : resolved?.variables;
-    const templates = resolvedTemplates?.length
-      ? resolvedTemplates
-      : templateMap[key];
+    const resolvedTemplates = Array.isArray(resolved) ? resolved : resolved?.templates;
+    const extraVariables = Array.isArray(resolved) ? undefined : resolved?.variables;
+    const templates = resolvedTemplates?.length ? resolvedTemplates : templateMap[key];
     let index = Math.floor(rngValue * templates.length) % templates.length;
 
     if (templates.length > 1) {
       let loop = 0;
-      while (
-        recentKeys.includes(`${key}:${index}`) &&
-        loop < templates.length
-      ) {
+      while (recentKeys.includes(`${key}:${index}`) && loop < templates.length) {
         index = (index + 1) % templates.length;
         loop += 1;
       }

@@ -18,8 +18,7 @@ const snackThief: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply:
-          '{targetName} 趁着同事去厕所，飞速伸出罪恶之手，体验了一把禁断的美味 🍪',
+        apply: '{targetName} 趁着同事去厕所，飞速伸出罪恶之手，体验了一把禁断的美味 🍪',
       },
     },
     {

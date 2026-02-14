@@ -164,14 +164,8 @@ export interface ModifierHooks {
   onRoundEnd?: (ctx: TriggerContext) => void; // 回合结束
   onTurnStart?: (ctx: TriggerContext) => void; // 行动开始
   onTurnEnd?: (ctx: TriggerContext) => void; // 行动结束
-  onOutgoing?: (
-    event: CombatEvent,
-    ctx: InteractionContext,
-  ) => CombatEvent | null; // 事件发出前
-  onIncoming?: (
-    event: CombatEvent,
-    ctx: InteractionContext,
-  ) => CombatEvent | null; // 事件结算前
+  onOutgoing?: (event: CombatEvent, ctx: InteractionContext) => CombatEvent | null; // 事件发出前
+  onIncoming?: (event: CombatEvent, ctx: InteractionContext) => CombatEvent | null; // 事件结算前
   onPostAction?: (event: CombatEvent, ctx: InteractionContext) => CombatEvent[]; // 事件结算后
 }
 
@@ -373,10 +367,9 @@ export type BuiltinEffectKind = BuiltinEffectSpec['kind'];
  * const custom: EffectSpec<'CUSTOM_EFFECT'> = { kind: 'CUSTOM_EFFECT', customParam: 123 }
  * ```
  */
-export type EffectSpec<K extends string = BuiltinEffectKind> =
-  K extends BuiltinEffectKind
-    ? Extract<BuiltinEffectSpec, { kind: K }> // 内置效果：严格类型
-    : { kind: K; target?: EventEffectTarget; [key: string]: unknown }; // 扩展效果：开放结构
+export type EffectSpec<K extends string = BuiltinEffectKind> = K extends BuiltinEffectKind
+  ? Extract<BuiltinEffectSpec, { kind: K }> // 内置效果：严格类型
+  : { kind: K; target?: EventEffectTarget; [key: string]: unknown }; // 扩展效果：开放结构
 
 /**
  * 修饰器规格定义
@@ -746,16 +739,8 @@ export type BattleOutcome = {
 export interface RNG {
   next(label?: string): number; // [0, 1) 随机数
   range(min: number, max: number, label?: string): number; // [min, max] 随机整数
-  bool(
-    chance: number,
-    luck?: { domain: 'EVENT' | 'COMBAT'; luk: number },
-    label?: string,
-  ): boolean; // 概率判定
-  weightedPick<T>(
-    options: T[],
-    weights: (item: T) => number,
-    label?: string,
-  ): T; // 加权选择
+  bool(chance: number, luck?: { domain: 'EVENT' | 'COMBAT'; luk: number }, label?: string): boolean; // 概率判定
+  weightedPick<T>(options: T[], weights: (item: T) => number, label?: string): T; // 加权选择
   getTrace(): Array<{ n: number; label: string; value: number }>; // 获取轨迹
 }
 
@@ -865,11 +850,7 @@ export type EngineRuntime = {
   rng: RNG; // 随机数生成器
   calc: RuntimeMath; // 数学计算工具
   rule: {
-    evaluateValueExpr: (
-      unit: Unit,
-      event: CombatEvent | undefined,
-      value: ValueExpr,
-    ) => number; // 计算数值表达式
+    evaluateValueExpr: (unit: Unit, event: CombatEvent | undefined, value: ValueExpr) => number; // 计算数值表达式
     whenMatched: (
       when: EventWhen | undefined,
       event: CombatEvent,
@@ -883,12 +864,7 @@ export type EngineRuntime = {
       },
     ) => CombatEvent; // 创建事件
     process: (event: CombatEvent) => void; // 处理事件
-    triggerPool: (
-      poolId: string,
-      ownerId: string,
-      depth: number,
-      parentId?: string,
-    ) => void; // 触发事件池
+    triggerPool: (poolId: string, ownerId: string, depth: number, parentId?: string) => void; // 触发事件池
     emitDirectDamage: (
       owner: Unit,
       target: Unit,
@@ -908,16 +884,8 @@ export type EngineRuntime = {
   };
   state: {
     resolveTargets: (owner: Unit, selector: EventEffectTarget) => Unit[]; // 解析目标列表
-    resolveTargetFromEvent: (
-      owner: Unit,
-      selector: TargetSelector,
-      event: CombatEvent,
-    ) => Unit; // 从事件解析目标
-    applyModifierEffect: (
-      source: Unit,
-      target: Unit,
-      effect: EffectSpec,
-    ) => void; // 应用修饰器效果
+    resolveTargetFromEvent: (owner: Unit, selector: TargetSelector, event: CombatEvent) => Unit; // 从事件解析目标
+    applyModifierEffect: (source: Unit, target: Unit, effect: EffectSpec) => void; // 应用修饰器效果
     removeModifiersByMatcher: (
       target: Unit,
       matcher: (modifier: Modifier) => boolean,
@@ -928,14 +896,8 @@ export type EngineRuntime = {
     loseRandomConsumable: (target: Unit, count?: number) => void; // 失去随机消耗品
     loseConsumable: (target: Unit, consumableId: string) => boolean; // 移除消耗品
     grantEquipment: (target: Unit, equipment: Modifier) => void; // 给予装备
-    grantRandomEquipment: (
-      target: Unit,
-      slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY',
-    ) => void; // 给予随机装备
-    loseRandomEquipment: (
-      target: Unit,
-      slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY',
-    ) => void; // 移除随机装备
+    grantRandomEquipment: (target: Unit, slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY') => void; // 给予随机装备
+    loseRandomEquipment: (target: Unit, slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY') => void; // 移除随机装备
     loseEquipment: (target: Unit, equipmentId: string) => boolean; // 移除装备
     grantRandomItem: (target: Unit) => void; // 给予随机物品
     loseRandomItem: (target: Unit) => void; // 移除随机物品

@@ -4,10 +4,7 @@ import { deepCloneKeepFns } from '../../engine/clone';
 import shieldAtRoundStart from './buffs/shieldAtRoundStart';
 import physicalMitigationStance from './buffs/physicalMitigationStance';
 
-export const modifierList: Modifier[] = [
-  shieldAtRoundStart,
-  physicalMitigationStance,
-];
+export const modifierList: Modifier[] = [shieldAtRoundStart, physicalMitigationStance];
 
 export const modifierCatalog: Record<string, Modifier> = Object.fromEntries(
   modifierList.map((item) => [item.id, item]),

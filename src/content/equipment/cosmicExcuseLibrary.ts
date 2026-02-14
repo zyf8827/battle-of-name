@@ -14,9 +14,7 @@ const cosmicExcuseLibrary: EquipmentLike = {
   triggers: [
     {
       trigger: { on: 'TURN_START' },
-      effects: [
-        { kind: 'GRANT_RANDOM_EQUIPMENT', target: 'SELF', slot: 'ACCESSORY' },
-      ],
+      effects: [{ kind: 'GRANT_RANDOM_EQUIPMENT', target: 'SELF', slot: 'ACCESSORY' }],
     },
   ],
   texts: {
