@@ -7,11 +7,36 @@
 ![React](https://img.shields.io/badge/React-19.2-blue)
 ![Vite](https://img.shields.io/badge/Vite-7.3-646CFF)
 
-**基于姓名哈希的确定性回合制自动战斗游戏**
+**⚠️ 本项目为纯 AI AGENT 自动生成，主要用于测试 AI Agent 的代码生成、架构设计和工程化能力**
 
-[功能特性](#-核心特性) • [快速开始](#-快速开始) • [架构设计](#-架构设计) • [贡献指南](#-贡献指南)
+[功能特性](#-核心特性) • [快速开始](#-快速开始) • [架构设计](#-架构设计)
 
 </div>
+
+---
+
+## 🤖 关于本项目
+
+**姓名大作战** 是一个完全由 AI Agent（Claude Code）生成的回合制自动战斗游戏，核心目的包括：
+
+- **测试代码生成能力** - 验证 AI Agent 是否能生成完整可运行的前端项目
+- **验证架构设计** - 检验 AI Agent 对复杂系统（事件驱动、修饰器模式）的理解
+- **工程化实践** - 测试 AI Agent 在测试、构建、部署等工程环节的完整性
+- **平衡性调优** - 通过批量仿真工具验证 AI 的数值调优能力
+
+### AI 生成范围
+
+整个项目（除本段说明外）由 AI 独立完成，包括但不限于：
+
+- ✅ 核心战斗引擎（事件管道、修饰器系统、确定性 RNG）
+- ✅ React UI 组件和状态管理
+- ✅ 30+ 职业、30+ 装备、30+ 事件的完整内容体系
+- ✅ 平衡性仿真工具和数据分析脚本
+- ✅ 单元测试覆盖（Vitest）
+- ✅ CI/CD 自动部署（GitHub Actions）
+- ✅ 技术文档（GAME_ENGINE.md、GAME_DESIGN.md、CONTENT_SPEC.md）
+
+**本项目不代表人类的最佳实践，仅作为 AI Agent 能力验证的技术演示。**
 
 ---
 
@@ -131,27 +156,27 @@ npm run test:watch
 ### 核心设计原则
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      游戏引擎层                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │ RNG      │  │ Event    │  │ Modifier │  │ Combat   │   │
-│  │ (seeded)│──│ Pipeline │──│ System   │──│ Loop     │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    内容适配器接口                             │
-│              (BattleContentAdapter)                          │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      内容层                                  │
-│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐            │
-│  │Class │ │Equip │ │Event │ │Consum│ │Buff  │            │
-│  └──────┘ └──────┘ └──────┘ └──────┘ └──────┘            │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│                      游戏引擎层                      │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
+│  │   RNG    │  │  Event   │  │ Modifier │  │  Combat  │  │
+│  │ (seeded) │──│ Pipeline │──│  System  │──│   Loop   │  │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
+└──────────────────────────────────────────────────────┘
+                             │
+                             ▼
+┌──────────────────────────────────────────────────────┐
+│                    内容适配器接口                    │
+│              (BattleContentAdapter)                  │
+└──────────────────────────────────────────────────────┘
+                             │
+                             ▼
+┌──────────────────────────────────────────────────────┐
+│                      内容层                         │
+│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ │
+│  │Class │ │Equip │ │Event │ │Consum│ │ Buff  │ │
+│  └──────┘ └──────┘ └──────┘ └──────┘ └──────┘ │
+└──────────────────────────────────────────────────────┘
 ```
 
 ### 目录结构
@@ -170,7 +195,7 @@ src/
 │   ├── consumables/    # 消耗品定义
 │   ├── events/         # 随机事件池
 │   ├── modifiers/      # 可复用修饰器
-│   └── narration.ts   # 战斗文本模板
+│   └── narration.ts    # 战斗文本模板
 │
 ├── ui/                # React 组件
 ├── store/             # Zustand 状态管理
@@ -181,90 +206,6 @@ src/
 - [`docs/GAME_ENGINE.md`](docs/GAME_ENGINE.md) - 引擎技术规范
 - [`docs/GAME_DESIGN.md`](docs/GAME_DESIGN.md) - 游戏设计文档
 - [`docs/CONTENT_SPEC.md`](docs/CONTENT_SPEC.md) - 内容开发规范
-
----
-
-## 🔧 开发指南
-
-### 添加新内容
-
-#### 添加新职业
-
-创建 `src/content/classes/myClass.ts`:
-
-```typescript
-import type { CharacterClass } from '../base/characterClass';
-
-const myClass: CharacterClass = {
-  id: 'class.my_class',
-  name: '新职业',
-  description: '职业描述',
-  baseStats: { STR: 10, AGI: 10, VIT: 10, LUK: 10 },
-  talents: [/* 天赋修饰器数组 */],
-};
-
-export default myClass;
-```
-
-在 `src/content/classes/index.ts` 中注册：
-
-```typescript
-export const allClasses: CharacterClass[] = [
-  // ...
-  myClass,
-];
-```
-
-#### 添加新装备
-
-创建 `src/content/equipment/myEquipment.ts`:
-
-```typescript
-import type { EquipmentLike } from '../base/equipment';
-
-const myEquipment: EquipmentLike = {
-  id: 'equip.my_equipment',
-  source: 'EQUIP',
-  name: '新装备',
-  slot: 'WEAPON',
-  rarity: 'COMMON',
-  statBonus: { STR: 5 },
-  // 或使用 triggers + effects
-};
-
-export default myEquipment;
-```
-
-### 平衡性验证
-
-添加新内容后，运行平衡仿真验证战斗时长：
-
-```bash
-npx tsx scripts/balance-sim.ts
-```
-
-目标指标：
-- 平均回合数：11.5 ~ 13.0
-- 快局占比（≤6回合）：< 2%
-- 长局占比（>16回合）：< 15%
-
-### 调试模式
-
-在浏览器控制台启用详细日志：
-
-```javascript
-// 启用
-window.__BATTLE_DEBUG__ = true
-
-// 禁用
-window.__BATTLE_DEBUG__ = false
-```
-
-启用后，控制台将显示：
-- 事件处理流程
-- 触发器命中/未命中原因
-- 伤害/治疗计算详情
-- 修饰器去重信息
 
 ---
 
@@ -312,43 +253,7 @@ pnpm test:coverage
 - [x] 播放控制（暂停、单步、倍速）
 - [x] 单元测试覆盖
 - [x] 平衡仿真工具
-
-### 规划中功能 🚧
-
-- [ ] 更多职业和装备
-- [ ] 战斗回放功能
-- [ ] 成就系统
-
----
-
-## 🤝 贡献指南
-
-欢迎贡献！请遵循以下流程：
-
-1. **Fork** 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 **Pull Request**
-
-### 代码规范
-
-- 遵循现有代码风格
-- 所有新功能需要添加测试
-- 更新相关文档（README、docs/）
-- 运行 `pnpm test` 和 `pnpm build` 确保通过
-
-### 提交信息规范
-
-使用语义化提交信息：
-
-- `feat:` 新功能
-- `fix:` 修复 bug
-- `docs:` 文档更新
-- `style:` 代码格式调整（不影响功能）
-- `refactor:` 重构（不是新功能也不是修复）
-- `test:` 添加测试
-- `chore:` 构建过程或辅助工具变更
+- [x] CI/CD 自动部署到 GitHub Pages
 
 ---
 
@@ -368,18 +273,10 @@ pnpm test:coverage
 
 ---
 
-## 📞 联系方式
-
-- **作者**: zyf8827
-- **仓库**: https://github.com/zyf8827/battle-of-name
-- **问题反馈**: [GitHub Issues](https://github.com/zyf8827/battle-of-name/issues)
-
----
-
 <div align="center">
 
-**如果这个项目对你有帮助，请给一个 ⭐️ Star！**
+**这是一个 AI Agent 能力验证项目，代码质量不代表人类最佳实践**
 
-Made with ❤️ by zyf8827
+Made with 🤖 by Claude Code (AI Agent)
 
 </div>
