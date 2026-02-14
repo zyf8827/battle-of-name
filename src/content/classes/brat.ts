@@ -48,14 +48,14 @@ const disassemble: Modifier = {
               actor: owner,
               target,
             });
-            // 移除装备（直接调用state的removeModifier，不会重复记录日志）
-            target.modifiers = target.modifiers.filter(
+            // 移除装备（使用 state.removeModifiersByMatcher，不会记录日志）
+            engine.state.removeModifiersByMatcher(
+              target,
               (m) =>
-                !(
-                  m.id === dropped.id &&
-                  m.source === 'EQUIP' &&
-                  m.stacking?.stackKey === dropped.stacking?.stackKey
-                ),
+                m.id === dropped.id &&
+                m.source === 'EQUIP' &&
+                m.stacking?.stackKey === dropped.stacking?.stackKey,
+              1,
             );
           }
         }
