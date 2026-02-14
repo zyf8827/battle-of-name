@@ -389,7 +389,7 @@ const systemTextFallback: Record<string, TextTemplate> = {
   gainShield: ['{ownerName} 临时加了防护层 🛡️，获得 {amount} 点护盾。'],
   dispel: ['{ownerName} 一键清插件，{targetName} 的增益被下线 🧹。'],
   envEventTriggered: ['热搜突发：{eventName} 📢'],
-  heal: ['{sourceName} 血条回暖，恢复 {amount} 点生命 💚。'],
+  heal: ['{targetName} 血条回暖，恢复 {amount} 点生命 💚。'],
   eventDamage: ['{targetName} 被突发事件波及，掉了 {amount} 点生命 📉。'],
   eventHeal: ['{targetName} 吃到临时补给，恢复 {amount} 点生命 💊。'],
   applyBuff: ['{targetName} 获得新状态：{modifierName} ✨'],

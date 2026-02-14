@@ -25,7 +25,7 @@ const forcedCheckup: EventPoolEntry = {
       kind: 'DIRECT_HEAL',
       target: 'ALL',
       value: 15,
-      tags: ['heal'],
+      tags: ['heal', 'env'],
     },
   ],
   texts: {

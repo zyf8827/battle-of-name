@@ -9,7 +9,7 @@ const redPenny: EventPoolEntry = {
       kind: 'DIRECT_HEAL',
       target: 'SELF',
       value: 5,
-      tags: ['heal'],
+      tags: ['heal', 'env'],
     },
     {
       kind: 'APPLY_MODIFIER',
