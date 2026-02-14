@@ -18,12 +18,12 @@ const cameraOn: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 的摄像头一直开着...全班都看见了 📹',
+        apply: '{targetName} 意识到全班都看完了ta这节课的各种自拍表演 😱',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 网课结束，发现摄像头开了一整节课 📹',
+    trigger: '下课铃响了，屏幕角落的红点却依然亮着 📹',
   },
 };
 

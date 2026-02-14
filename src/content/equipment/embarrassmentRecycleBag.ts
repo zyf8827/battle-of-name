@@ -16,7 +16,12 @@ const embarrassmentRecycleBag: EquipmentLike = {
       trigger: { on: 'TURN_START' },
       effects: [
         { kind: 'LOSE_RANDOM_CONSUMABLE', target: 'SELF', count: 1 },
-        { kind: 'DIRECT_HEAL', target: 'SELF', value: 6, tags: ['heal', 'equip'] },
+        {
+          kind: 'DIRECT_HEAL',
+          target: 'SELF',
+          value: 6,
+          tags: ['heal', 'equip'],
+        },
       ],
     },
   ],

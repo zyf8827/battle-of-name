@@ -61,6 +61,16 @@ import viralSelf from './viralSelf';
 import gymOnce from './gymOnce';
 import hiddenGacha from './hiddenGacha';
 import refundCoupon from './refundCoupon';
+import expressDelivery from './expressDelivery';
+import colleagueGift from './colleagueGift';
+import cleanerFind from './cleanerFind';
+import assetCheck from './assetCheck';
+import deskOrganize from './deskOrganize';
+import snackThief from './snackThief';
+import afternoonTea from './afternoonTea';
+import expiredItem from './expiredItem';
+import vendingMachine from './vendingMachine';
+import fridgeSharing from './fridgeSharing';
 
 export const roundEventEntries: EventPoolEntry[] = [
   trafficJam,
@@ -124,9 +134,22 @@ export const turnEventEntries: EventPoolEntry[] = [
   gymOnce,
   hiddenGacha,
   refundCoupon,
+  expressDelivery,
+  colleagueGift,
+  cleanerFind,
+  assetCheck,
+  deskOrganize,
+  snackThief,
+  afternoonTea,
+  expiredItem,
+  vendingMachine,
+  fridgeSharing,
 ];
 
-export const eventEntries: EventPoolEntry[] = [...roundEventEntries, ...turnEventEntries];
+export const eventEntries: EventPoolEntry[] = [
+  ...roundEventEntries,
+  ...turnEventEntries,
+];
 
 const eventEntryCatalog: Record<string, EventPoolEntry> = Object.fromEntries(
   eventEntries.map((item) => [item.id, item]),

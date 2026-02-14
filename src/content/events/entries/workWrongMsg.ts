@@ -23,12 +23,13 @@ const workWrongMsg: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 在工作群发了不该发的消息...超过2分钟了 🫣',
+        apply:
+          '{targetName} 疯狂长按气泡，却发现撤回选项已经无情消失，时间刚好过去两分零一秒 💀',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 在工作群发了消息，抬头发现是...隔壁吐槽群 🫣',
+    trigger: '消息发出的瞬间，大脑皮层突然尖叫：回错群了！🫣',
   },
 };
 

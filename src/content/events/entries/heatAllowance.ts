@@ -15,7 +15,6 @@ const heatAllowance: EventPoolEntry = {
   texts: {
     trigger: '天气太热，公司发了高温补贴（一根老冰棍） 🍦。',
   },
-
 };
 
 export default heatAllowance;

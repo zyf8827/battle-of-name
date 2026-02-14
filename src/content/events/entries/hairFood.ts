@@ -24,12 +24,13 @@ const hairFood: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 吃到一根头发，反胃了一下午 🤢',
+        apply:
+          '{targetName} 胃部一阵剧烈翻腾，当场决定这辈子再也不点这家店了 🤮',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 吃外卖，嚼到一根卷曲的头发 🧑‍🦲',
+    trigger: '外卖里的红烧肉看起来很诱人，直到一根卷曲的黑线浮现出来 🤢',
   },
 };
 

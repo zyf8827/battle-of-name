@@ -15,7 +15,11 @@ const overconfidentBadge: EquipmentLike = {
     {
       trigger: {
         on: 'POST_ACTION',
-        when: { role: 'SOURCE', eventType: 'ATTACK', notHasTags: ['miss', 'reflect', 'true_damage'] },
+        when: {
+          role: 'SOURCE',
+          eventType: 'ATTACK',
+          notHasTags: ['miss', 'reflect', 'true_damage'],
+        },
       },
       effects: [{ kind: 'LIFESTEAL', ratio: 0.12, tags: ['heal', 'equip'] }],
     },

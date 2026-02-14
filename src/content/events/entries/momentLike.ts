@@ -18,12 +18,12 @@ const momentLike: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 的朋友圈被老板发现了！👍',
+        apply: '{targetName} 激动得反复确认了三次，感觉自己离加薪又近了一步 🌟',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 发的朋友圈收到了老板的赞 👋。',
+    trigger: '深夜分享的励志感悟，竟然得到了老板的亲自回复和点赞 👋',
   },
 };
 

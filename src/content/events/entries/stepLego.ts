@@ -28,7 +28,6 @@ const stepLego: EventPoolEntry = {
   texts: {
     trigger: '{actorName} 光脚踩到了乐高积木！发出了一声惨叫！📢',
   },
-
 };
 
 export default stepLego;

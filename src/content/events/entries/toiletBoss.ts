@@ -18,7 +18,8 @@ const toiletBoss: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 在公厕隔间听到熟悉的声音 💀。',
+        apply:
+          '{targetName} 盯着那双昂贵的皮鞋，瞬间连大气都不敢喘，感觉心脏都要停跳了 😱',
       },
     },
     {
@@ -27,7 +28,7 @@ const toiletBoss: EventPoolEntry = {
     },
   ],
   texts: {
-    trigger: '{actorName} 推开门，发现隔壁脚是老板的皮鞋... 💩',
+    trigger: '正在享受带薪拉屎的静谧时光，隔壁隔间传来了熟悉的低沉咳嗽声 💩',
   },
 };
 

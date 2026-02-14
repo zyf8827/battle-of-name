@@ -12,23 +12,27 @@ const dimensionStrike: Modifier = {
     onOutgoing: (event) => {
       if (event.type === 'ATTACK') {
         // 强制转换为魔法伤害，并增加 50% 伤害
-        const newTags = event.payload.tags.filter(t => t !== 'physical').concat('magic');
+        const newTags = event.payload.tags
+          .filter((t) => t !== 'physical')
+          .concat('magic');
         const newValue = Math.floor((event.payload.value ?? 0) * 1.5);
-        
+
         return {
           ...event,
           payload: {
             ...event.payload,
             value: newValue,
-            tags: newTags
-          }
+            tags: newTags,
+          },
         };
       }
       return event;
-    }
+    },
   },
   texts: {
-    trigger: ['{sourceName} 打开了精心制作的 PPT，对 {targetName} 造成了降维打击 📊。'],
+    trigger: [
+      '{sourceName} 打开了精心制作的 PPT，对 {targetName} 造成了降维打击 📊。',
+    ],
   },
 };
 

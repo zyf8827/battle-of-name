@@ -26,7 +26,7 @@ const brick: Consumable = {
     // 或者，我们假装它是一个 "Dizziness" Debuff，降低命中率，而不是完全眩晕。
     // 如果要完全眩晕，且带概率，最好的办法是 Hook。
     // 这里我们做成: 100% 施加 "轻微脑震荡" (降属性), 且该 Debuff 在生效瞬间有概率转化为 "Stun"。
-    
+
     // 简化方案：直接施加 Stun，持续 1 回合。作为一次性道具，这很合理。
     { kind: 'APPLY_MODIFIER', target: 'TARGET', modifier: stunEffect },
   ],

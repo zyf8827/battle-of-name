@@ -24,12 +24,13 @@ const redPenny: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 扫码领了0.01元红包...侮辱性极强 😒',
+        apply:
+          '{targetName} 看着屏幕上弹出的“0.01元”，感觉自尊受到了极大的侮辱 😒',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 兴奋扫码，红包到账：0.01元 🧧',
+    trigger: '满怀期待地点击开那个巨大的虚拟红包，金光灿灿 🧧',
   },
 };
 

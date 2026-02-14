@@ -12,10 +12,15 @@ const foodPoisoning: Modifier = {
     {
       trigger: { on: 'TURN_START' },
       effects: [
-        { kind: 'DIRECT_DAMAGE', target: 'SELF', value: 5, tags: ['dot', 'true_damage'] }
-      ]
-    }
-  ]
+        {
+          kind: 'DIRECT_DAMAGE',
+          target: 'SELF',
+          value: 5,
+          tags: ['dot', 'true_damage'],
+        },
+      ],
+    },
+  ],
 };
 
 const expiredSandwich: Consumable = {

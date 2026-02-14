@@ -18,12 +18,13 @@ const toiletPaper: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 帮助了路人，感觉暖暖的 🧻',
+        apply:
+          '{targetName} 慷慨地递过去一叠纸，完成了一次充满禅意的跨隔间交流 💚',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 在公厕，隔壁隔间传来：能借张纸吗？🧻',
+    trigger: '一只苍白的手从隔壁隔间底下悄悄伸了过来：“大哥，救救火……” 🧻',
   },
 };
 

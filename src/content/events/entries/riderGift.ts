@@ -18,12 +18,12 @@ const riderGift: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 收到外卖小哥的小礼物，暖化了 ❤️',
+        apply: '{targetName} 感到一股暖流涌上心头，原来人间真的还有温情 ❤️',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 点外卖，骑手小哥送了个小糖：祝您今天开心 🚲',
+    trigger: '外卖袋子上贴着一张手写的小纸条，旁边还粘着一颗亮晶晶的薄荷糖 🍭',
   },
 };
 

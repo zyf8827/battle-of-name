@@ -28,8 +28,17 @@ import seedrandom from 'seedrandom';
 
 import type { TextTemplate } from './base/text';
 import { DEFAULT_CLASS_WEIGHT, classList } from './classes';
-import { DEFAULT_CONSUMABLE_WEIGHT, getConsumableById, consumableIds } from './consumables';
-import { DEFAULT_EQUIPMENT_WEIGHT, cloneEquipment, equipmentIds, getEquipmentById } from './equipment';
+import {
+  DEFAULT_CONSUMABLE_WEIGHT,
+  getConsumableById,
+  consumableIds,
+} from './consumables';
+import {
+  DEFAULT_EQUIPMENT_WEIGHT,
+  cloneEquipment,
+  equipmentIds,
+  getEquipmentById,
+} from './equipment';
 import { defaultTurnActionExecutor } from './effects/defaultTurnAction';
 import { defaultControlSourceResolver } from './effects/defaultControlResolver';
 import { defaultTurnConsumableExecutor } from './effects/defaultTurnConsumable';
@@ -61,7 +70,8 @@ function nameHash(input: string): number {
   let hash = 2166136261;
   for (let index = 0; index < input.length; index += 1) {
     hash ^= input.charCodeAt(index);
-    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    hash +=
+      (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
   }
   return Math.abs(hash >>> 0);
 }
@@ -79,10 +89,16 @@ function statsFromName(name: string): BaseStats {
     return 57 + Math.floor(rng() * 8);
   };
 
-  const clampStat = (value: number): number => Math.max(4, Math.min(26, Math.floor(value)));
+  const clampStat = (value: number): number =>
+    Math.max(4, Math.min(26, Math.floor(value)));
 
   const allocBalanced = (budget: number): BaseStats => {
-    const values = [Math.floor(budget / 4), Math.floor(budget / 4), Math.floor(budget / 4), Math.floor(budget / 4)];
+    const values = [
+      Math.floor(budget / 4),
+      Math.floor(budget / 4),
+      Math.floor(budget / 4),
+      Math.floor(budget / 4),
+    ];
     let remain = budget - values.reduce((sum, item) => sum + item, 0);
     while (remain > 0) {
       values[Math.floor(rng() * 4)] += 1;
@@ -161,7 +177,11 @@ function chooseOne<T>(rng: seedrandom.PRNG, values: T[]): T {
   return values[index];
 }
 
-function chooseOneWeighted<T>(rng: seedrandom.PRNG, values: T[], getWeight: (value: T) => number): T | undefined {
+function chooseOneWeighted<T>(
+  rng: seedrandom.PRNG,
+  values: T[],
+  getWeight: (value: T) => number,
+): T | undefined {
   if (values.length === 0) return undefined;
   let total = 0;
   const weights = values.map((value) => {
@@ -179,8 +199,12 @@ function chooseOneWeighted<T>(rng: seedrandom.PRNG, values: T[], getWeight: (val
   return values[values.length - 1];
 }
 
-function sanitizeBuiltinWeight(value: number | undefined, fallback: number): number {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return fallback;
+function sanitizeBuiltinWeight(
+  value: number | undefined,
+  fallback: number,
+): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0)
+    return fallback;
   return Math.min(3, Math.max(0.2, value));
 }
 
@@ -208,10 +232,13 @@ function buildIdentityFromName(name: string): Pick<Loadout, 'classId'> {
   const rng = seedrandom(`identity::${name}`);
   const classId =
     rng() < CURRENT_WEIGHT_PROFILE.classPickChance && classList.length > 0
-      ? chooseOneWeighted(
-          rng,
-          classList,
-          (item) => resolveProfileOrBuiltinWeight(CURRENT_WEIGHT_PROFILE.classWeights, item.id, item.weight, DEFAULT_CLASS_WEIGHT),
+      ? chooseOneWeighted(rng, classList, (item) =>
+          resolveProfileOrBuiltinWeight(
+            CURRENT_WEIGHT_PROFILE.classWeights,
+            item.id,
+            item.weight,
+            DEFAULT_CLASS_WEIGHT,
+          ),
         )?.id
       : undefined;
 
@@ -220,15 +247,24 @@ function buildIdentityFromName(name: string): Pick<Loadout, 'classId'> {
 
 // 装备生成：依赖名字 + 种子
 // 保证同一个名字在不同对局中可能有不同的初始装备 (增加肉鸽随机性)
-function buildGearFromNameAndSeed(name: string, seed: string): Pick<Loadout, 'equipmentIds' | 'consumables'> {
+function buildGearFromNameAndSeed(
+  name: string,
+  seed: string,
+): Pick<Loadout, 'equipmentIds' | 'consumables'> {
   const rng = seedrandom(`${seed}::gear::${name}`);
   const equipmentBySlot = new Map<string, string>();
   const items: string[] = [];
 
   const allEquipments = equipmentIds
     .map((id) => getEquipmentById(id))
-    .filter((item): item is NonNullable<ReturnType<typeof getEquipmentById>> => !!item);
-  const bySlot: Record<'WEAPON' | 'ARMOR' | 'ACCESSORY', NonNullable<ReturnType<typeof getEquipmentById>>[]> = {
+    .filter(
+      (item): item is NonNullable<ReturnType<typeof getEquipmentById>> =>
+        !!item,
+    );
+  const bySlot: Record<
+    'WEAPON' | 'ARMOR' | 'ACCESSORY',
+    NonNullable<ReturnType<typeof getEquipmentById>>[]
+  > = {
     WEAPON: [],
     ARMOR: [],
     ACCESSORY: [],
@@ -240,16 +276,13 @@ function buildGearFromNameAndSeed(name: string, seed: string): Pick<Loadout, 'eq
   for (const slot of ['WEAPON', 'ARMOR', 'ACCESSORY'] as const) {
     const chance = CURRENT_WEIGHT_PROFILE.initialEquipmentSlotChance[slot];
     if (rng() >= chance) continue;
-    const picked = chooseOneWeighted(
-      rng,
-      bySlot[slot],
-      (equipment) =>
-        resolveProfileOrBuiltinWeight(
-          CURRENT_WEIGHT_PROFILE.equipmentWeights,
-          equipment.id,
-          equipment.weight,
-          DEFAULT_EQUIPMENT_WEIGHT,
-        ),
+    const picked = chooseOneWeighted(rng, bySlot[slot], (equipment) =>
+      resolveProfileOrBuiltinWeight(
+        CURRENT_WEIGHT_PROFILE.equipmentWeights,
+        equipment.id,
+        equipment.weight,
+        DEFAULT_EQUIPMENT_WEIGHT,
+      ),
     );
     if (picked) {
       equipmentBySlot.set(slot, picked.id);
@@ -257,17 +290,18 @@ function buildGearFromNameAndSeed(name: string, seed: string): Pick<Loadout, 'eq
   }
 
   // 保底机制：如果随机没随到装备，有一定概率给一件
-  if (equipmentBySlot.size === 0 && rng() < CURRENT_WEIGHT_PROFILE.equipmentFallbackChance && allEquipments.length > 0) {
-    const fallback = chooseOneWeighted(
-      rng,
-      allEquipments,
-      (equipment) =>
-        resolveProfileOrBuiltinWeight(
-          CURRENT_WEIGHT_PROFILE.equipmentWeights,
-          equipment.id,
-          equipment.weight,
-          DEFAULT_EQUIPMENT_WEIGHT,
-        ),
+  if (
+    equipmentBySlot.size === 0 &&
+    rng() < CURRENT_WEIGHT_PROFILE.equipmentFallbackChance &&
+    allEquipments.length > 0
+  ) {
+    const fallback = chooseOneWeighted(rng, allEquipments, (equipment) =>
+      resolveProfileOrBuiltinWeight(
+        CURRENT_WEIGHT_PROFILE.equipmentWeights,
+        equipment.id,
+        equipment.weight,
+        DEFAULT_EQUIPMENT_WEIGHT,
+      ),
     );
     if (fallback) {
       equipmentBySlot.set(fallback.slot, fallback.id);
@@ -275,7 +309,10 @@ function buildGearFromNameAndSeed(name: string, seed: string): Pick<Loadout, 'eq
   }
 
   // 随机初始道具
-  if (rng() < CURRENT_WEIGHT_PROFILE.initialConsumableChance && consumableIds.length > 0) {
+  if (
+    rng() < CURRENT_WEIGHT_PROFILE.initialConsumableChance &&
+    consumableIds.length > 0
+  ) {
     const picked = chooseOneWeighted(rng, consumableIds, (id) => {
       const consumable = getConsumableById(id);
       return resolveProfileOrBuiltinWeight(
@@ -329,7 +366,9 @@ function buildUnit(id: string, name: string, seed: string): Unit {
   };
 
   // 3-4. 计算属性
-  const classSpec = loadout.classId ? classList.find((item) => item.id === loadout.classId) : undefined;
+  const classSpec = loadout.classId
+    ? classList.find((item) => item.id === loadout.classId)
+    : undefined;
   const classBase = classSpec?.baseStats ?? { STR: 0, AGI: 0, VIT: 0, LUK: 0 };
   const seededStats = statsFromName(name);
   const stats: BaseStats = {
@@ -346,7 +385,14 @@ function buildUnit(id: string, name: string, seed: string): Unit {
     classId: classSpec?.id,
     className: classSpec?.name,
     stats,
-    state: { hp: 0, maxHp: 0, shield: 0, cd: {}, rewindUsed: false, consumables: loadout.consumables },
+    state: {
+      hp: 0,
+      maxHp: 0,
+      shield: 0,
+      cd: {},
+      rewindUsed: false,
+      consumables: loadout.consumables,
+    },
     modifiers: [
       ...loadout.equipmentIds.map((equipId) => cloneEquipment(equipId)),
       ...(classSpec?.talents.map((talent) => deepCloneKeepFns(talent)) ?? []),
@@ -367,7 +413,9 @@ const systemTextFallback: Record<string, TextTemplate> = {
   pickupConsumable: ['{targetName} 捡到道具：{itemName} 🎒。'],
   dropConsumable: ['{targetName} 背包已满，丢弃了：{itemName} 🗑️。'],
   pickupEquipment: ['{targetName} 捡到装备：{equipmentName} 🗡️。'],
-  replaceEquipment: ['{targetName} 用 {equipmentName} 替换了 {oldEquipmentName} 🔄。'],
+  replaceEquipment: [
+    '{targetName} 用 {equipmentName} 替换了 {oldEquipmentName} 🔄。',
+  ],
   dropEquipment: ['{targetName} 在突发事件里丢失了装备：{equipmentName} 💸。'],
   useConsumable: ['{unitName} 使用了道具：{itemName} 🧪。'],
   death: ['{targetName} 已被击败 💀。'],
@@ -392,7 +440,11 @@ function renderSystemLog(
     if (sourceType === 'event' && sourceId) {
       const eventEntry = getEventEntryById(sourceId);
       if (eventEntry?.texts?.trigger) {
-        return renderTextTemplate(eventEntry.texts.trigger, variables, rngValue);
+        return renderTextTemplate(
+          eventEntry.texts.trigger,
+          variables,
+          rngValue,
+        );
       }
     }
   }
@@ -402,16 +454,24 @@ function renderSystemLog(
     if (sourceId) {
       const consumable = getConsumableById(sourceId);
       if (consumable?.texts?.use) {
-        return renderTextTemplate(consumable.texts.use, {
-          ...variables,
-          itemName: consumable.name,
-        }, rngValue);
+        return renderTextTemplate(
+          consumable.texts.use,
+          {
+            ...variables,
+            itemName: consumable.name,
+          },
+          rngValue,
+        );
       }
       if (consumable) {
-        return renderTextTemplate(systemTextFallback.useConsumable, {
-          ...variables,
-          itemName: consumable.name,
-        }, rngValue);
+        return renderTextTemplate(
+          systemTextFallback.useConsumable,
+          {
+            ...variables,
+            itemName: consumable.name,
+          },
+          rngValue,
+        );
       }
     }
   }
@@ -421,7 +481,11 @@ function renderSystemLog(
     if (eventId) {
       const eventEntry = getEventEntryById(eventId);
       if (eventEntry?.texts?.trigger) {
-        return renderTextTemplate(eventEntry.texts.trigger, variables, rngValue);
+        return renderTextTemplate(
+          eventEntry.texts.trigger,
+          variables,
+          rngValue,
+        );
       }
     }
   }
@@ -436,7 +500,13 @@ function renderSystemLog(
           equipment.texts.equip,
           {
             ...variables,
-            unitName: String(variables.unitName ?? variables.ownerName ?? variables.sourceName ?? variables.actorName ?? ''),
+            unitName: String(
+              variables.unitName ??
+                variables.ownerName ??
+                variables.sourceName ??
+                variables.actorName ??
+                '',
+            ),
             equipmentName: equipment.name,
           },
           rngValue,
@@ -450,10 +520,14 @@ function renderSystemLog(
     if (itemId) {
       const item = getConsumableById(itemId);
       if (item) {
-        return renderTextTemplate(systemTextFallback[key] ?? '{targetName} 处理了一个道具。', {
-          ...variables,
-          itemName: item.name,
-        }, rngValue);
+        return renderTextTemplate(
+          systemTextFallback[key] ?? '{targetName} 处理了一个道具。',
+          {
+            ...variables,
+            itemName: item.name,
+          },
+          rngValue,
+        );
       }
     }
   }
@@ -462,12 +536,21 @@ function renderSystemLog(
     const equipmentId = String(variables.equipmentId ?? '');
     const oldEquipmentId = String(variables.oldEquipmentId ?? '');
     const equipment = equipmentId ? getEquipmentById(equipmentId) : undefined;
-    const oldEquipment = oldEquipmentId ? getEquipmentById(oldEquipmentId) : undefined;
-    return renderTextTemplate(systemTextFallback[key] ?? '{targetName} 调整了装备。', {
-      ...variables,
-      equipmentName: equipment?.name ?? String(variables.equipmentName ?? equipmentId),
-      oldEquipmentName: oldEquipment?.name ?? String(variables.oldEquipmentName ?? oldEquipmentId),
-    }, rngValue);
+    const oldEquipment = oldEquipmentId
+      ? getEquipmentById(oldEquipmentId)
+      : undefined;
+    return renderTextTemplate(
+      systemTextFallback[key] ?? '{targetName} 调整了装备。',
+      {
+        ...variables,
+        equipmentName:
+          equipment?.name ?? String(variables.equipmentName ?? equipmentId),
+        oldEquipmentName:
+          oldEquipment?.name ??
+          String(variables.oldEquipmentName ?? oldEquipmentId),
+      },
+      rngValue,
+    );
   }
 
   if (key === 'heal') {
@@ -477,10 +560,26 @@ function renderSystemLog(
       for (const modifier of sourceUnit.modifiers) {
         const byTag = modifier.texts?.triggerByTag?.heal;
         if (byTag) {
-          return renderTextTemplate(byTag, { ...variables, modifierId: modifier.id, modifierName: modifier.name }, rngValue);
+          return renderTextTemplate(
+            byTag,
+            {
+              ...variables,
+              modifierId: modifier.id,
+              modifierName: modifier.name,
+            },
+            rngValue,
+          );
         }
         if (modifier.texts?.trigger) {
-          return renderTextTemplate(modifier.texts.trigger, { ...variables, modifierId: modifier.id, modifierName: modifier.name }, rngValue);
+          return renderTextTemplate(
+            modifier.texts.trigger,
+            {
+              ...variables,
+              modifierId: modifier.id,
+              modifierName: modifier.name,
+            },
+            rngValue,
+          );
         }
       }
     }
@@ -492,7 +591,10 @@ function renderSystemLog(
 
 export const defaultBattleContentAdapter: BattleContentAdapter = {
   bootstrap(input) {
-    const units = [buildUnit('u1', input.name1, input.seed), buildUnit('u2', input.name2, input.seed)];
+    const units = [
+      buildUnit('u1', input.name1, input.seed),
+      buildUnit('u2', input.name2, input.seed),
+    ];
     const unitMap = new Map(units.map((unit) => [unit.id, unit]));
     const narrate = createNarrationResolver({
       resolveTemplates: (event) => {
@@ -578,18 +680,29 @@ export const defaultBattleContentAdapter: BattleContentAdapter = {
         {
           window: 'RoundStart',
           poolId: 'pool.round.global',
-          chance: 0.28 * resolveWeight(CURRENT_WEIGHT_PROFILE.scheduleChanceMultiplier, 'pool.round.global@RoundStart'),
+          chance:
+            0.28 *
+            resolveWeight(
+              CURRENT_WEIGHT_PROFILE.scheduleChanceMultiplier,
+              'pool.round.global@RoundStart',
+            ),
         },
         { window: 'RoundEnd', poolId: 'pool.round.global', chance: 0 },
         {
           window: 'TurnStart',
           poolId: 'pool.turn.personal',
-          chance: 0.16 * resolveWeight(CURRENT_WEIGHT_PROFILE.scheduleChanceMultiplier, 'pool.turn.personal@TurnStart'),
+          chance:
+            0.16 *
+            resolveWeight(
+              CURRENT_WEIGHT_PROFILE.scheduleChanceMultiplier,
+              'pool.turn.personal@TurnStart',
+            ),
         },
         { window: 'TurnEnd', poolId: 'pool.turn.personal', chance: 0 },
       ],
       narrate,
-      logText: (key, variables, rngValue) => renderSystemLog(key, variables, rngValue, unitMap),
+      logText: (key, variables, rngValue) =>
+        renderSystemLog(key, variables, rngValue, unitMap),
       createModifierById,
       getEquipmentById: (id: string) => {
         const equipment = getEquipmentById(id);

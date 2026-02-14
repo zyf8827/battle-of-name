@@ -15,7 +15,6 @@ const pptCrash: EventPoolEntry = {
   texts: {
     trigger: '{actorName} 辛辛苦苦做了一天的PPT突然闪退，且没有保存！💻🔥',
   },
-
 };
 
 export default pptCrash;

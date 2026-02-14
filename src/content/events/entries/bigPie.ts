@@ -22,15 +22,14 @@ const bigPie: EventPoolEntry = {
         tags: ['buff', 'env'],
         duration: 2,
         texts: {
-          remove: '{targetName} 发现大饼其实不能吃，护盾消失 💨。'
-        }
+          remove: '{targetName} 发现大饼其实不能吃，护盾消失 💨。',
+        },
       },
     },
   ],
   texts: {
     trigger: '老板给 {actorName} 画了一个巨大的饼 🤥。',
   },
-
 };
 
 export default bigPie;

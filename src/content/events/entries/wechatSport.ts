@@ -18,12 +18,13 @@ const wechatSport: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 占领了微信运动封面 🏆',
+        apply:
+          '{targetName} 看着满屏点赞，虽然腿快断了，但虚荣心得到了极大的满足 👑',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 打开微信运动，发现自己占领了封面 👟',
+    trigger: '系统推送响起：您今日步数已达三万，成功占领了封面 👟',
   },
 };
 

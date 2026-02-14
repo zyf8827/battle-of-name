@@ -4,7 +4,11 @@ import { runBattle } from '../src/engine/engine.ts';
 import { defaultBattleContentAdapter } from '../src/content/battleContentAdapter.ts';
 
 type Counter = { games: number; wins: number; roundSum: number };
-type EventCounter = { gamesTriggered: number; fastGames: number; longGames: number };
+type EventCounter = {
+  gamesTriggered: number;
+  fastGames: number;
+  longGames: number;
+};
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((arg) => {
@@ -17,7 +21,8 @@ const total = Number(args.total ?? 5000);
 const baseSeed = String(args.seed ?? 'balance-sim-v2');
 const minSamples = Number(args.minSamples ?? 150);
 
-const nameChars = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜马牛猫狗鸟鱼龙凤虎豹宇宙量子朋克摸鱼摆烂玄学暴富社死';
+const nameChars =
+  '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜马牛猫狗鸟鱼龙凤虎豹宇宙量子朋克摸鱼摆烂玄学暴富社死';
 
 function makeRandomName(rng: seedrandom.PRNG): string {
   const len = rng() < 0.68 ? 3 : rng() < 0.92 ? 4 : 5;
@@ -28,7 +33,12 @@ function makeRandomName(rng: seedrandom.PRNG): string {
   return value;
 }
 
-function upsert(map: Map<string, Counter>, key: string, won: boolean, rounds: number): void {
+function upsert(
+  map: Map<string, Counter>,
+  key: string,
+  won: boolean,
+  rounds: number,
+): void {
   const prev = map.get(key) ?? { games: 0, wins: 0, roundSum: 0 };
   prev.games += 1;
   if (won) prev.wins += 1;
@@ -36,7 +46,11 @@ function upsert(map: Map<string, Counter>, key: string, won: boolean, rounds: nu
   map.set(key, prev);
 }
 
-function percentileFromHist(hist: Map<number, number>, totalGames: number, ratio: number): number {
+function percentileFromHist(
+  hist: Map<number, number>,
+  totalGames: number,
+  ratio: number,
+): number {
   const sorted = [...hist.entries()].sort((a, b) => a[0] - b[0]);
   const target = totalGames * ratio;
   let cumulative = 0;
@@ -47,7 +61,11 @@ function percentileFromHist(hist: Map<number, number>, totalGames: number, ratio
   return sorted[sorted.length - 1]?.[0] ?? 0;
 }
 
-function topWinrate(map: Map<string, Counter>, minGameCount: number, limit = 12): Array<{ id: string; games: number; winRate: number; avgRounds: number }> {
+function topWinrate(
+  map: Map<string, Counter>,
+  minGameCount: number,
+  limit = 12,
+): Array<{ id: string; games: number; winRate: number; avgRounds: number }> {
   return [...map.entries()]
     .filter(([, stat]) => stat.games >= minGameCount)
     .map(([id, stat]) => ({
@@ -60,7 +78,11 @@ function topWinrate(map: Map<string, Counter>, minGameCount: number, limit = 12)
     .slice(0, limit);
 }
 
-function bottomWinrate(map: Map<string, Counter>, minGameCount: number, limit = 12): Array<{ id: string; games: number; winRate: number; avgRounds: number }> {
+function bottomWinrate(
+  map: Map<string, Counter>,
+  minGameCount: number,
+  limit = 12,
+): Array<{ id: string; games: number; winRate: number; avgRounds: number }> {
   return [...map.entries()]
     .filter(([, stat]) => stat.games >= minGameCount)
     .map(([id, stat]) => ({
@@ -151,7 +173,11 @@ for (let gameIndex = 0; gameIndex < total; gameIndex += 1) {
   const name2 = makeRandomName(rng);
   const seed = `${baseSeed}:battle:${gameIndex}`;
 
-  const bootstrap = defaultBattleContentAdapter.bootstrap({ name1, name2, seed });
+  const bootstrap = defaultBattleContentAdapter.bootstrap({
+    name1,
+    name2,
+    seed,
+  });
   const result = runBattle(
     { name1, name2, seed },
     defaultBattleContentAdapter,
@@ -179,7 +205,9 @@ for (let gameIndex = 0; gameIndex < total; gameIndex += 1) {
     if (unit.classId) {
       upsert(classStats, unit.classId, won, rounds);
     }
-    const equipIds = unit.modifiers.filter((modifier) => modifier.source === 'EQUIP').map((modifier) => modifier.id);
+    const equipIds = unit.modifiers
+      .filter((modifier) => modifier.source === 'EQUIP')
+      .map((modifier) => modifier.id);
     for (const equipmentId of equipIds) {
       upsert(equipStats, equipmentId, won, rounds);
     }
@@ -194,9 +222,15 @@ for (let gameIndex = 0; gameIndex < total; gameIndex += 1) {
       effectTriggered.set(kind, (effectTriggered.get(kind) ?? 0) + count);
     }
 
-    for (const [eventId, count] of Object.entries(diagnostics.poolEntriesTriggered)) {
+    for (const [eventId, count] of Object.entries(
+      diagnostics.poolEntriesTriggered,
+    )) {
       if (count <= 0) continue;
-      const prev = eventStats.get(eventId) ?? { gamesTriggered: 0, fastGames: 0, longGames: 0 };
+      const prev = eventStats.get(eventId) ?? {
+        gamesTriggered: 0,
+        fastGames: 0,
+        longGames: 0,
+      };
       prev.gamesTriggered += 1;
       if (isFast) prev.fastGames += 1;
       if (isLong) prev.longGames += 1;
@@ -214,11 +248,28 @@ const overallFastRate = fastGames / total;
 const overallLongRate = longGames / total;
 const baselineWinrate = 0.5;
 
-const classWeightAdjustments = weightSuggestionByWinrate(classStats, baselineWinrate, minSamples);
-const equipmentWeightAdjustments = weightSuggestionByWinrate(equipStats, baselineWinrate, minSamples);
+const classWeightAdjustments = weightSuggestionByWinrate(
+  classStats,
+  baselineWinrate,
+  minSamples,
+);
+const equipmentWeightAdjustments = weightSuggestionByWinrate(
+  equipStats,
+  baselineWinrate,
+  minSamples,
+);
 const consumableMinSample = Math.max(30, Math.floor(minSamples * 0.3));
-const consumableWeightAdjustments = weightSuggestionByWinrate(consumableStats, baselineWinrate, consumableMinSample);
-const eventWeightAdjustments = weightSuggestionByEventCorrelation(eventStats, overallFastRate, overallLongRate, Math.max(100, Math.floor(minSamples * 0.7)));
+const consumableWeightAdjustments = weightSuggestionByWinrate(
+  consumableStats,
+  baselineWinrate,
+  consumableMinSample,
+);
+const eventWeightAdjustments = weightSuggestionByEventCorrelation(
+  eventStats,
+  overallFastRate,
+  overallLongRate,
+  Math.max(100, Math.floor(minSamples * 0.7)),
+);
 
 const effectTop = [...effectTriggered.entries()]
   .sort((a, b) => b[1] - a[1])
@@ -236,7 +287,9 @@ const result = {
     mid8to12Pct: Number(((midGames / total) * 100).toFixed(2)),
     longPct: Number((overallLongRate * 100).toFixed(2)),
   },
-  histTop20: [...roundHist.entries()].sort((a, b) => a[0] - b[0]).filter(([round]) => round <= 20),
+  histTop20: [...roundHist.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .filter(([round]) => round <= 20),
   topClassWinrate: topWinrate(classStats, minSamples),
   lowClassWinrate: bottomWinrate(classStats, minSamples),
   topEquipmentWinrate: topWinrate(equipStats, minSamples),
@@ -244,7 +297,10 @@ const result = {
   topConsumableWinrate: topWinrate(consumableStats, consumableMinSample),
   lowConsumableWinrate: bottomWinrate(consumableStats, consumableMinSample),
   eventCorrelationTop: [...eventStats.entries()]
-    .filter(([, stat]) => stat.gamesTriggered >= Math.max(100, Math.floor(minSamples * 0.7)))
+    .filter(
+      ([, stat]) =>
+        stat.gamesTriggered >= Math.max(100, Math.floor(minSamples * 0.7)),
+    )
     .map(([id, stat]) => ({
       id,
       gamesTriggered: stat.gamesTriggered,

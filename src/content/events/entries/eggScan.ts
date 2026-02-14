@@ -22,12 +22,12 @@ const eggScan: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 扫码领了一盒鸡蛋 🥚',
+        apply: '{targetName} 拎着一盒鸡蛋，虽然占了便宜但总觉得哪里不对 🥚',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 路过扫码点，排了半小时队领鸡蛋 🥚',
+    trigger: '路边超市正在搞活动，只要扫码关注就送新鲜鸡蛋 🥚',
   },
 };
 

@@ -13,8 +13,18 @@ const electronicMuyuHF: EquipmentLike = {
   statBonus: { STR: 1, LUK: 2 },
   triggers: [
     {
-      trigger: { on: 'POST_ACTION', when: { role: 'SOURCE', eventType: 'ATTACK', notHasTags: ['miss'] } },
-      effects: [{ kind: 'DIRECT_HEAL', target: 'SELF', value: 4, tags: ['heal', 'equip'] }],
+      trigger: {
+        on: 'POST_ACTION',
+        when: { role: 'SOURCE', eventType: 'ATTACK', notHasTags: ['miss'] },
+      },
+      effects: [
+        {
+          kind: 'DIRECT_HEAL',
+          target: 'SELF',
+          value: 4,
+          tags: ['heal', 'equip'],
+        },
+      ],
     },
   ],
   texts: {

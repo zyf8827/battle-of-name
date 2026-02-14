@@ -22,7 +22,6 @@ const lotteryWin: EventPoolEntry = {
   texts: {
     trigger: '{actorName} 刮刮乐中了两块钱！这就是天选之子吗？🤑',
   },
-
 };
 
 export default lotteryWin;

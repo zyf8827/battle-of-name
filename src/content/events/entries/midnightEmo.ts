@@ -18,14 +18,13 @@ const midnightEmo: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 打开了评论区，眼泪止不住地流 💧。',
+        apply: '{targetName} 沉浸在忧郁的旋律中，感觉全世界都欠自己一个拥抱 🥀',
       },
     },
   ],
   texts: {
-    trigger: '到了十二点，{actorName} 准时带上了耳机，开启了网抑云模式 🎧。',
+    trigger: '午夜的钟声响起，房间里只剩下冷冰冰的手机荧光 🌙',
   },
-
 };
 
 export default midnightEmo;

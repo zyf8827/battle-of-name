@@ -18,14 +18,13 @@ const cameraAccident: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 发现视频会议没关摄像头，全公司都看见了ta的粉色睡衣 👙。',
+        apply: '{targetName} 抠脚的动作瞬间凝固，全世界都看到了那件粉色睡衣 😳',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 穿着睡衣抠着脚，突然发现会议摄像头是开着的！😱',
+    trigger: '会议进行到一半，后台突然自动开启了全员视频模式 📹',
   },
-
 };
 
 export default cameraAccident;

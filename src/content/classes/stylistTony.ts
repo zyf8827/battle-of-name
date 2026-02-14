@@ -26,7 +26,11 @@ const justALittleBit: Modifier = {
             tags: ['debuff'],
             statBonus: { LUK: -1, VIT: -1 },
             duration: -1, // 永久
-            stacking: { stackKey: 'debuff.bad_haircut', policy: 'STACK', maxStacks: 10 },
+            stacking: {
+              stackKey: 'debuff.bad_haircut',
+              policy: 'STACK',
+              maxStacks: 10,
+            },
           },
         },
       ],

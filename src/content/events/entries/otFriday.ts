@@ -18,12 +18,12 @@ const otFriday: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 收到加班通知，心碎了一地 💔',
+        apply: '{targetName} 看着已经定好的电影票，留下了打工人屈辱的泪水 💔',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 准备下班，老板点名：你留下来加班 📅',
+    trigger: '就在关机键即将按下的那一刻，老板的手稳稳搭在了肩上 📅',
   },
 };
 

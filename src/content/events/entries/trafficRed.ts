@@ -18,12 +18,13 @@ const trafficRed: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 被堵在路上，寸步难行 🚦',
+        apply:
+          '{targetName} 被困在十字路口中心，体验着什么是现实版的“寸步难行” 🛑',
       },
     },
   ],
   texts: {
-    trigger: '城市交通系统故障，全城红绿灯全红 🚦',
+    trigger: '交通灯仿佛集体陷入了某种固执，所有路口都亮起了那抹不祥的红色 🚦',
   },
 };
 

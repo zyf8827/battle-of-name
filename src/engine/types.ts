@@ -95,9 +95,9 @@ export type TextTemplate = string | string[];
  * - maxStacks: 最大叠加层数（仅 STACK 策略有效）
  */
 export type ModifierStacking = {
-  stackKey: string;       // 叠加键值
-  policy: StackPolicy;    // 叠加策略
-  maxStacks?: number;     // 最大层数（可选）
+  stackKey: string; // 叠加键值
+  policy: StackPolicy; // 叠加策略
+  maxStacks?: number; // 最大层数（可选）
 };
 
 /**
@@ -121,20 +121,20 @@ export type ModifierStacking = {
  * modifiers - 当前应用的所有修饰器（装备、天赋、Buff等）
  */
 export interface Unit {
-  id: string;                    // 唯一标识
-  name: string;                  // 显示名称
-  classId?: string;              // 职业 ID
-  className?: string;             // 职业名称
-  stats: BaseStats;               // 四维属性
+  id: string; // 唯一标识
+  name: string; // 显示名称
+  classId?: string; // 职业 ID
+  className?: string; // 职业名称
+  stats: BaseStats; // 四维属性
   state: {
-    hp: number;                  // 当前生命值
-    maxHp: number;               // 最大生命值
-    shield: number;              // 护盾值
-    cd: Record<string, number>;  // 冷却时间记录
-    rewindUsed?: boolean;        // 是否已使用时光回溯
-    consumables?: string[];      // 持有的消耗品
+    hp: number; // 当前生命值
+    maxHp: number; // 最大生命值
+    shield: number; // 护盾值
+    cd: Record<string, number>; // 冷却时间记录
+    rewindUsed?: boolean; // 是否已使用时光回溯
+    consumables?: string[]; // 持有的消耗品
   };
-  modifiers: Modifier[];          // 活跃修饰器列表
+  modifiers: Modifier[]; // 活跃修饰器列表
 }
 
 /**
@@ -160,13 +160,19 @@ export interface Unit {
  * 按修饰器的 priority → appliedOrder → id 排序，确保确定性
  */
 export interface ModifierHooks {
-  onRoundStart?: (ctx: TriggerContext) => void;           // 回合开始
-  onRoundEnd?: (ctx: TriggerContext) => void;               // 回合结束
-  onTurnStart?: (ctx: TriggerContext) => void;              // 行动开始
-  onTurnEnd?: (ctx: TriggerContext) => void;                // 行动结束
-  onOutgoing?: (event: CombatEvent, ctx: InteractionContext) => CombatEvent | null;   // 事件发出前
-  onIncoming?: (event: CombatEvent, ctx: InteractionContext) => CombatEvent | null;   // 事件结算前
-  onPostAction?: (event: CombatEvent, ctx: InteractionContext) => CombatEvent[];       // 事件结算后
+  onRoundStart?: (ctx: TriggerContext) => void; // 回合开始
+  onRoundEnd?: (ctx: TriggerContext) => void; // 回合结束
+  onTurnStart?: (ctx: TriggerContext) => void; // 行动开始
+  onTurnEnd?: (ctx: TriggerContext) => void; // 行动结束
+  onOutgoing?: (
+    event: CombatEvent,
+    ctx: InteractionContext,
+  ) => CombatEvent | null; // 事件发出前
+  onIncoming?: (
+    event: CombatEvent,
+    ctx: InteractionContext,
+  ) => CombatEvent | null; // 事件结算前
+  onPostAction?: (event: CombatEvent, ctx: InteractionContext) => CombatEvent[]; // 事件结算后
 }
 
 /**
@@ -178,9 +184,9 @@ export interface ModifierHooks {
  * - EVENT_VALUE: 使用事件的原始 value
  */
 export type ValueExpr =
-  | { type: 'FLAT'; value: number }                                     // 固定值
-  | { type: 'SCALE'; stat: keyof BaseStats; ratio: number }             // 属性缩放
-  | { type: 'EVENT_VALUE' };                                            // 事件数值
+  | { type: 'FLAT'; value: number } // 固定值
+  | { type: 'SCALE'; stat: keyof BaseStats; ratio: number } // 属性缩放
+  | { type: 'EVENT_VALUE' }; // 事件数值
 
 /**
  * 目标选择器
@@ -214,11 +220,11 @@ export type EventEffectTarget = TargetSelector | 'ALL';
  * { role: 'TARGET', hasTag: 'physical' } - 作为物理攻击目标时触发
  */
 export type EventWhen = {
-  role?: 'SOURCE' | 'TARGET';              // 单位角色
-  eventType?: CombatEvent['type'];         // 事件类型
-  hasTag?: CombatTag;                     // 必须包含的标签
-  notHasTag?: CombatTag;                  // 不能包含的标签（单个）
-  notHasTags?: CombatTag[];               // 不能包含的标签（多个）
+  role?: 'SOURCE' | 'TARGET'; // 单位角色
+  eventType?: CombatEvent['type']; // 事件类型
+  hasTag?: CombatTag; // 必须包含的标签
+  notHasTag?: CombatTag; // 不能包含的标签（单个）
+  notHasTags?: CombatTag[]; // 不能包含的标签（多个）
 };
 
 /**
@@ -240,13 +246,13 @@ export type EventWhen = {
  * - ON_HURT: 受伤时（相当于 PIPELINE_INCOMING + !miss + !immune）
  */
 export type TriggerSpec =
-  | { on: 'ROUND_START' }                                              // 回合开始
-  | { on: 'TURN_START' }                                               // 行动开始
-  | { on: 'PIPELINE_INCOMING'; when?: EventWhen }                        // 事件结算前
-  | { on: 'PIPELINE_OUTGOING'; when?: EventWhen }                        // 事件发出前
-  | { on: 'POST_ACTION'; when?: EventWhen }                              // 事件结算后
-  | { on: 'ON_HIT'; when?: Omit<EventWhen, 'eventType'> }               // 命中时
-  | { on: 'ON_HURT'; when?: Omit<EventWhen, 'eventType'> };             // 受伤时
+  | { on: 'ROUND_START' } // 回合开始
+  | { on: 'TURN_START' } // 行动开始
+  | { on: 'PIPELINE_INCOMING'; when?: EventWhen } // 事件结算前
+  | { on: 'PIPELINE_OUTGOING'; when?: EventWhen } // 事件发出前
+  | { on: 'POST_ACTION'; when?: EventWhen } // 事件结算后
+  | { on: 'ON_HIT'; when?: Omit<EventWhen, 'eventType'> } // 命中时
+  | { on: 'ON_HURT'; when?: Omit<EventWhen, 'eventType'> }; // 受伤时
 
 /**
  * 修饰器文本模板覆盖
@@ -259,11 +265,11 @@ export type TriggerSpec =
  * - tick: 每回合持续时间减少时显示的文本
  */
 export type ModifierTextOverrides = {
-  apply?: TextTemplate;                                           // 应用时
-  remove?: TextTemplate;                                          // 移除时
-  trigger?: TextTemplate;                                         // 触发时（默认）
-  triggerByTag?: Partial<Record<CombatTag, TextTemplate>>;        // 按标签定制触发文本
-  tick?: TextTemplate;                                            // 持续时间减少时
+  apply?: TextTemplate; // 应用时
+  remove?: TextTemplate; // 移除时
+  trigger?: TextTemplate; // 触发时（默认）
+  triggerByTag?: Partial<Record<CombatTag, TextTemplate>>; // 按标签定制触发文本
+  tick?: TextTemplate; // 持续时间减少时
 };
 
 /**
@@ -284,20 +290,64 @@ export type ModifierTextOverrides = {
  * 这些类型定义了每种效果所需的参数
  */
 export type BuiltinEffectSpec =
-  | { kind: 'APPLY_MODIFIER'; target?: EventEffectTarget; modifierId?: string; modifier?: Modifier; duration?: number; textOverrides?: Modifier['texts'] }
+  | {
+      kind: 'APPLY_MODIFIER';
+      target?: EventEffectTarget;
+      modifierId?: string;
+      modifier?: Modifier;
+      duration?: number;
+      textOverrides?: Modifier['texts'];
+    }
   | { kind: 'TRIGGER_EVENT_POOL'; poolId: string }
-  | { kind: 'SHIELD'; target?: EventEffectTarget; value: ValueExpr[]; tags: CombatTag[] }
+  | {
+      kind: 'SHIELD';
+      target?: EventEffectTarget;
+      value: ValueExpr[];
+      tags: CombatTag[];
+    }
   | { kind: 'LIFESTEAL'; ratio: number; tags: CombatTag[] }
-  | { kind: 'DISPEL'; target: TargetSelector; mode: 'BUFF' | 'DEBUFF' | 'ANY'; byTag?: CombatTag; max?: number }
+  | {
+      kind: 'DISPEL';
+      target: TargetSelector;
+      mode: 'BUFF' | 'DEBUFF' | 'ANY';
+      byTag?: CombatTag;
+      max?: number;
+    }
   | { kind: 'MITIGATE'; when: EventWhen; multiplier: number; min?: number }
-  | { kind: 'DIRECT_DAMAGE'; target: EventEffectTarget; value: number; tags?: CombatTag[] }
-  | { kind: 'DIRECT_HEAL'; target: EventEffectTarget; value: number; tags?: CombatTag[] }
-  | { kind: 'GRANT_CONSUMABLE'; target: EventEffectTarget; consumableId: string }
+  | {
+      kind: 'DIRECT_DAMAGE';
+      target: EventEffectTarget;
+      value: number;
+      tags?: CombatTag[];
+    }
+  | {
+      kind: 'DIRECT_HEAL';
+      target: EventEffectTarget;
+      value: number;
+      tags?: CombatTag[];
+    }
+  | {
+      kind: 'GRANT_CONSUMABLE';
+      target: EventEffectTarget;
+      consumableId: string;
+    }
   | { kind: 'GRANT_RANDOM_CONSUMABLE'; target: EventEffectTarget }
-  | { kind: 'LOSE_RANDOM_CONSUMABLE'; target: EventEffectTarget; count?: number }
+  | {
+      kind: 'LOSE_RANDOM_CONSUMABLE';
+      target: EventEffectTarget;
+      count?: number;
+    }
   | { kind: 'GRANT_EQUIPMENT'; target: EventEffectTarget; equipment: Modifier }
-  | { kind: 'GRANT_RANDOM_EQUIPMENT'; target: EventEffectTarget; slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY' }
-  | { kind: 'LOSE_RANDOM_EQUIPMENT'; target: EventEffectTarget; slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY' };
+  | {
+      kind: 'GRANT_RANDOM_EQUIPMENT';
+      target: EventEffectTarget;
+      slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY';
+    }
+  | {
+      kind: 'LOSE_RANDOM_EQUIPMENT';
+      target: EventEffectTarget;
+      slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY';
+    };
 
 /**
  * 所有内置效果的 kind 类型
@@ -325,8 +375,8 @@ export type BuiltinEffectKind = BuiltinEffectSpec['kind'];
  */
 export type EffectSpec<K extends string = BuiltinEffectKind> =
   K extends BuiltinEffectKind
-    ? Extract<BuiltinEffectSpec, { kind: K }>  // 内置效果：严格类型
-    : { kind: K; target?: EventEffectTarget; [key: string]: unknown };  // 扩展效果：开放结构
+    ? Extract<BuiltinEffectSpec, { kind: K }> // 内置效果：严格类型
+    : { kind: K; target?: EventEffectTarget; [key: string]: unknown }; // 扩展效果：开放结构
 
 /**
  * 修饰器规格定义
@@ -351,18 +401,18 @@ export type EffectSpec<K extends string = BuiltinEffectKind> =
  * - texts: 文本模板覆盖
  */
 export type ModifierSpec = {
-  id: string;                                                    // 唯一标识
-  source: ModifierSource;                                        // 来源类型
-  name: string;                                                 // 显示名称
-  description?: string;                                          // 描述文本
-  texts?: ModifierTextOverrides;                                 // 文本模板
-  priority?: number;                                            // 优先级（默认 0）
-  duration?: number;                                             // 持续时间（-1 = 永久）
-  tags?: CombatTag[];                                            // 标签列表
-  stacking?: ModifierStacking;                                   // 叠加规则
-  statBonus?: Partial<BaseStats>;                               // 属性加成
-  triggers?: Array<{ trigger: TriggerSpec; effects: EffectSpec[] }>;// DSL 触发器
-  hooks?: ModifierHooks;                                        // 自定义钩子
+  id: string; // 唯一标识
+  source: ModifierSource; // 来源类型
+  name: string; // 显示名称
+  description?: string; // 描述文本
+  texts?: ModifierTextOverrides; // 文本模板
+  priority?: number; // 优先级（默认 0）
+  duration?: number; // 持续时间（-1 = 永久）
+  tags?: CombatTag[]; // 标签列表
+  stacking?: ModifierStacking; // 叠加规则
+  statBonus?: Partial<BaseStats>; // 属性加成
+  triggers?: Array<{ trigger: TriggerSpec; effects: EffectSpec[] }>; // DSL 触发器
+  hooks?: ModifierHooks; // 自定义钩子
 };
 
 /**
@@ -373,8 +423,8 @@ export type ModifierSpec = {
  * - stacks: 当前叠加层数
  */
 export interface Modifier extends ModifierSpec {
-  appliedOrder?: number;        // 应用顺序（第几个被应用）
-  stacks?: number;              // 当前层数（叠加时使用）
+  appliedOrder?: number; // 应用顺序（第几个被应用）
+  stacks?: number; // 当前层数（叠加时使用）
 }
 
 /**
@@ -409,24 +459,25 @@ export interface Modifier extends ModifierSpec {
  * - parentId: 父事件 ID（用于构建事件树）
  */
 export interface CombatEvent {
-  id: string;                                                     // 唯一标识
+  id: string; // 唯一标识
   type: 'ATTACK' | 'HEAL' | 'APPLY_BUFF' | 'REMOVE_BUFF' | 'DEATH'; // 事件类型
-  sourceId: string;                                               // 发起者 ID
-  targetId: string;                                               // 目标 ID
+  sourceId: string; // 发起者 ID
+  targetId: string; // 目标 ID
   meta: {
-    round: number;                                                // 回合数
-    turn: number;                                                 // 行动序号
-    seq: number;                                                  // 全局序号
+    round: number; // 回合数
+    turn: number; // 行动序号
+    seq: number; // 全局序号
   };
-  payload: Readonly<{                                            // 不可变负载
-    value?: number;                                               // 数值
-    modifier?: Modifier;                                          // 修饰器
-    tags: CombatTag[];                                            // 标签
-    isCrit?: boolean;                                            // 暴击标记
-    isMiss?: boolean;                                            // 未命中标记
+  payload: Readonly<{
+    // 不可变负载
+    value?: number; // 数值
+    modifier?: Modifier; // 修饰器
+    tags: CombatTag[]; // 标签
+    isCrit?: boolean; // 暴击标记
+    isMiss?: boolean; // 未命中标记
   }>;
-  depth: number;                                                  // 递归深度
-  parentId?: string;                                             // 父事件 ID
+  depth: number; // 递归深度
+  parentId?: string; // 父事件 ID
 }
 
 /**
@@ -437,8 +488,8 @@ export interface CombatEvent {
  * - owner: 修饰器拥有者
  */
 export type TriggerContext = {
-  engine: EngineRuntime;          // 引擎运行时
-  owner: Unit;                    // 修饰器拥有者
+  engine: EngineRuntime; // 引擎运行时
+  owner: Unit; // 修饰器拥有者
 };
 
 /**
@@ -450,8 +501,8 @@ export type TriggerContext = {
  * - target: 事件目标
  */
 export type InteractionContext = TriggerContext & {
-  source: Unit;                   // 事件发起者
-  target: Unit;                   // 事件目标
+  source: Unit; // 事件发起者
+  target: Unit; // 事件目标
 };
 
 /**
@@ -467,11 +518,12 @@ export type InteractionContext = TriggerContext & {
 export const DEFAULT_EVENT_POOL_ENTRY_WEIGHT = 10;
 
 export type EventPoolEntry = {
-  id: string;                             // 唯一标识
-  name: string;                           // 显示名称
-  weight?: number;                        // 权重（未配置时使用默认权重）
-  effects: EffectSpec[];                  // 效果列表
-  texts?: {                              // 文本模板
+  id: string; // 唯一标识
+  name: string; // 显示名称
+  weight?: number; // 权重（未配置时使用默认权重）
+  effects: EffectSpec[]; // 效果列表
+  texts?: {
+    // 文本模板
     trigger?: TextTemplate;
     tick?: TextTemplate;
   };
@@ -486,9 +538,9 @@ export type EventPoolEntry = {
  * - sourceName: 来源名称
  */
 export type RewindReason = {
-  sourceType?: 'consumable' | 'event' | 'talent' | 'system';  // 来源类型
-  sourceId?: string;                                             // 来源 ID
-  sourceName?: string;                                           // 来源名称
+  sourceType?: 'consumable' | 'event' | 'talent' | 'system'; // 来源类型
+  sourceId?: string; // 来源 ID
+  sourceName?: string; // 来源名称
 };
 
 /**
@@ -500,9 +552,9 @@ export type RewindReason = {
  * - entries: 池中的事件条目列表
  */
 export type EventPoolSpec = {
-  id: string;                                     // 池 ID
-  domain: 'EVENT' | 'COMBAT';                    // 触发域
-  entries: EventPoolEntry[];                     // 事件条目
+  id: string; // 池 ID
+  domain: 'EVENT' | 'COMBAT'; // 触发域
+  entries: EventPoolEntry[]; // 事件条目
 };
 
 /**
@@ -515,10 +567,10 @@ export type EventPoolSpec = {
  * - maxTriggersPerModifierPerRound: 单个修饰器每回合最大触发次数
  */
 export type EngineLimits = {
-  maxEventDepth: number;                              // 最大递归深度
-  maxEventsPerRound: number;                          // 每回合最大事件数
-  maxDerivedEventsPerEvent: number;                   // 单事件最大衍生数
-  maxTriggersPerModifierPerRound: number;             // 单修饰器每回合最大触发次数
+  maxEventDepth: number; // 最大递归深度
+  maxEventsPerRound: number; // 每回合最大事件数
+  maxDerivedEventsPerEvent: number; // 单事件最大衍生数
+  maxTriggersPerModifierPerRound: number; // 单修饰器每回合最大触发次数
 };
 
 /**
@@ -529,8 +581,8 @@ export type EngineLimits = {
  * - hpPerVit: 每点VIT增加的生命值
  */
 export type BattleBalanceParams = {
-  hpBase: number;     // 基础生命值
-  hpPerVit: number;   // 每点VIT的生命值加成
+  hpBase: number; // 基础生命值
+  hpPerVit: number; // 每点VIT的生命值加成
 };
 
 /**
@@ -583,17 +635,17 @@ export const DEFAULT_BATTLE_CONFIG: Readonly<{
  * - actorId/actorName/targetId/targetName: 参与者信息
  */
 export type LogEntry = {
-  round: number;                      // 回合数
-  turn: number;                      // 行动序号
-  seq: number;                       // 全局序号
-  text: string;                      // 渲染后的文本
-  tags: CombatTag[];                 // 标签
-  eventId?: string;                  // 关联事件 ID
-  eventType?: CombatEvent['type'];   // 关联事件类型
-  actorId?: string;                  // 行动者 ID
-  actorName?: string;                // 行动者名称
-  targetId?: string;                 // 目标 ID
-  targetName?: string;               // 目标名称
+  round: number; // 回合数
+  turn: number; // 行动序号
+  seq: number; // 全局序号
+  text: string; // 渲染后的文本
+  tags: CombatTag[]; // 标签
+  eventId?: string; // 关联事件 ID
+  eventType?: CombatEvent['type']; // 关联事件类型
+  actorId?: string; // 行动者 ID
+  actorName?: string; // 行动者名称
+  targetId?: string; // 目标 ID
+  targetName?: string; // 目标名称
 };
 
 /**
@@ -607,11 +659,12 @@ export type LogEntry = {
  * - eventTrace: 事件轨迹（所有发生的事件及其关系）
  */
 export type ReplayRecord = {
-  engineVersion: string;                                                    // 引擎版本
-  seed: string;                                                             // 战斗种子
-  initialState: Snapshot;                                                    // 初始快照
-  rngTrace: Array<{ n: number; label: string; value: number }>;              // RNG 轨迹
-  eventTrace: Array<{                                                       // 事件轨迹
+  engineVersion: string; // 引擎版本
+  seed: string; // 战斗种子
+  initialState: Snapshot; // 初始快照
+  rngTrace: Array<{ n: number; label: string; value: number }>; // RNG 轨迹
+  eventTrace: Array<{
+    // 事件轨迹
     eventId: string;
     parentId?: string;
     type: string;
@@ -629,15 +682,16 @@ export type ReplayRecord = {
  * - envModifiers: 环境修饰器列表
  */
 export type Snapshot = {
-  round: number;                                              // 当前回合
-  units: Array<{                                             // 所有单位
+  round: number; // 当前回合
+  units: Array<{
+    // 所有单位
     id: string;
     name: string;
     stats: BaseStats;
     state: Unit['state'];
     modifiers: Modifier[];
   }>;
-  envModifiers: Modifier[];                                  // 环境修饰器
+  envModifiers: Modifier[]; // 环境修饰器
 };
 
 /**
@@ -652,14 +706,15 @@ export type Snapshot = {
  * - summary: 统计摘要
  */
 export type BattleOutcome = {
-  seed: string;                                                   // 战斗种子
-  winnerId: string;                                               // 胜利者 ID
-  logs: LogEntry[];                                               // 战斗日志
-  snapshots: Snapshot[];                                           // 状态快照
-  replay: ReplayRecord;                                            // 回放记录
-  summary: {                                                       // 统计摘要
-    totalRounds: number;                                           // 总回合数
-    totalDamageByUnit: Record<string, number>;                      // 各单位总伤害
+  seed: string; // 战斗种子
+  winnerId: string; // 胜利者 ID
+  logs: LogEntry[]; // 战斗日志
+  snapshots: Snapshot[]; // 状态快照
+  replay: ReplayRecord; // 回放记录
+  summary: {
+    // 统计摘要
+    totalRounds: number; // 总回合数
+    totalDamageByUnit: Record<string, number>; // 各单位总伤害
     diagnostics?: {
       eventsProcessed: number;
       eventsSkipped: {
@@ -689,11 +744,19 @@ export type BattleOutcome = {
  * label 参数用于调试和回放（记录每次调用的用途）
  */
 export interface RNG {
-  next(label?: string): number;                                                           // [0, 1) 随机数
-  range(min: number, max: number, label?: string): number;                                   // [min, max] 随机整数
-  bool(chance: number, luck?: { domain: 'EVENT' | 'COMBAT'; luk: number }, label?: string): boolean;  // 概率判定
-  weightedPick<T>(options: T[], weights: (item: T) => number, label?: string): T;            // 加权选择
-  getTrace(): Array<{ n: number; label: string; value: number }>;                           // 获取轨迹
+  next(label?: string): number; // [0, 1) 随机数
+  range(min: number, max: number, label?: string): number; // [min, max] 随机整数
+  bool(
+    chance: number,
+    luck?: { domain: 'EVENT' | 'COMBAT'; luk: number },
+    label?: string,
+  ): boolean; // 概率判定
+  weightedPick<T>(
+    options: T[],
+    weights: (item: T) => number,
+    label?: string,
+  ): T; // 加权选择
+  getTrace(): Array<{ n: number; label: string; value: number }>; // 获取轨迹
 }
 
 /**
@@ -723,24 +786,28 @@ export interface RNG {
  * - hpAfterHeal: 治疗后的 HP
  */
 export type RuntimeMath = {
-  clamp: (value: number, min: number, max: number) => number;                     // 数值限制
-  toInt: (value: number, min?: number, max?: number) => number;                   // 转整数
-  nonNegativeInt: (value: number, max?: number) => number;                        // 非负整数
-  safeStat: (value: number) => number;                                             // 安全属性值
-  safeHp: (value: number, maxHp: number) => number;                                // 安全生命值
-  safeShield: (value: number) => number;                                            // 安全护盾值
-  chance: (base: number, options?: { min?: number; max?: number }) => number;     // 概率计算
-  critRate: (base: number, luk: number) => number;                                 // 暴击率
-  evadeRate: (base: number, luk: number) => number;                                // 闪避率
-  scale: (value: number, ratio: number, min?: number, max?: number) => number;     // 缩放
-  splitDamageByShield: (incoming: number, shield: number) => {                      // 伤害分配
-    incoming: number;                  // 原始伤害
-    shieldBlocked: number;            // 护盾抵挡
-    hpDamage: number;                 // HP 受伤
-    shieldAfter: number;             // 剩余护盾
+  clamp: (value: number, min: number, max: number) => number; // 数值限制
+  toInt: (value: number, min?: number, max?: number) => number; // 转整数
+  nonNegativeInt: (value: number, max?: number) => number; // 非负整数
+  safeStat: (value: number) => number; // 安全属性值
+  safeHp: (value: number, maxHp: number) => number; // 安全生命值
+  safeShield: (value: number) => number; // 安全护盾值
+  chance: (base: number, options?: { min?: number; max?: number }) => number; // 概率计算
+  critRate: (base: number, luk: number) => number; // 暴击率
+  evadeRate: (base: number, luk: number) => number; // 闪避率
+  scale: (value: number, ratio: number, min?: number, max?: number) => number; // 缩放
+  splitDamageByShield: (
+    incoming: number,
+    shield: number,
+  ) => {
+    // 伤害分配
+    incoming: number; // 原始伤害
+    shieldBlocked: number; // 护盾抵挡
+    hpDamage: number; // HP 受伤
+    shieldAfter: number; // 剩余护盾
   };
-  hpAfterDamage: (hp: number, damage: number) => number;                          // 扣血后 HP
-  hpAfterHeal: (hp: number, maxHp: number, amount: number) => number;              // 治疗后 HP
+  hpAfterDamage: (hp: number, damage: number) => number; // 扣血后 HP
+  hpAfterHeal: (hp: number, maxHp: number, amount: number) => number; // 治疗后 HP
 };
 
 /**
@@ -795,42 +862,91 @@ export type RuntimeMath = {
  * - system: 记录系统日志（使用文本模板）
  */
 export type EngineRuntime = {
-  rng: RNG;                                                        // 随机数生成器
-  calc: RuntimeMath;                                              // 数学计算工具
+  rng: RNG; // 随机数生成器
+  calc: RuntimeMath; // 数学计算工具
   rule: {
-    evaluateValueExpr: (unit: Unit, event: CombatEvent | undefined, value: ValueExpr) => number;  // 计算数值表达式
-    whenMatched: (when: EventWhen | undefined, event: CombatEvent, role: 'SOURCE' | 'TARGET') => boolean;  // 条件匹配
+    evaluateValueExpr: (
+      unit: Unit,
+      event: CombatEvent | undefined,
+      value: ValueExpr,
+    ) => number; // 计算数值表达式
+    whenMatched: (
+      when: EventWhen | undefined,
+      event: CombatEvent,
+      role: 'SOURCE' | 'TARGET',
+    ) => boolean; // 条件匹配
   };
   event: {
-    make: (partial: Omit<CombatEvent, 'id' | 'meta'> & { meta?: Partial<CombatEvent['meta']> }) => CombatEvent;  // 创建事件
-    process: (event: CombatEvent) => void;                         // 处理事件
-    triggerPool: (poolId: string, ownerId: string, depth: number, parentId?: string) => void;  // 触发事件池
-    emitDirectDamage: (owner: Unit, target: Unit, value: number, tags?: CombatTag[], depth?: number, parentId?: string) => void;  // 直接伤害
-    emitDirectHeal: (owner: Unit, target: Unit, value: number, tags?: CombatTag[], depth?: number, parentId?: string) => void;   // 直接治疗
+    make: (
+      partial: Omit<CombatEvent, 'id' | 'meta'> & {
+        meta?: Partial<CombatEvent['meta']>;
+      },
+    ) => CombatEvent; // 创建事件
+    process: (event: CombatEvent) => void; // 处理事件
+    triggerPool: (
+      poolId: string,
+      ownerId: string,
+      depth: number,
+      parentId?: string,
+    ) => void; // 触发事件池
+    emitDirectDamage: (
+      owner: Unit,
+      target: Unit,
+      value: number,
+      tags?: CombatTag[],
+      depth?: number,
+      parentId?: string,
+    ) => void; // 直接伤害
+    emitDirectHeal: (
+      owner: Unit,
+      target: Unit,
+      value: number,
+      tags?: CombatTag[],
+      depth?: number,
+      parentId?: string,
+    ) => void; // 直接治疗
   };
   state: {
-    resolveTargets: (owner: Unit, selector: EventEffectTarget) => Unit[];  // 解析目标列表
-    resolveTargetFromEvent: (owner: Unit, selector: TargetSelector, event: CombatEvent) => Unit;  // 从事件解析目标
-    applyModifierEffect: (source: Unit, target: Unit, effect: EffectSpec) => void;  // 应用修饰器效果
-    removeModifiersByMatcher: (target: Unit, matcher: (modifier: Modifier) => boolean, max?: number) => number;  // 移除修饰器
-    grantConsumable: (target: Unit, consumableId: string) => void;  // 给予消耗品
-    grantRandomConsumable: (target: Unit) => void;                   // 给予随机消耗品
-    loseRandomConsumable: (target: Unit, count?: number) => void;   // 失去随机消耗品
-    loseConsumable: (target: Unit, consumableId: string) => boolean;  // 移除消耗品
-    grantEquipment: (target: Unit, equipment: Modifier) => void;   // 给予装备
-    grantRandomEquipment: (target: Unit, slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY') => void;  // 给予随机装备
-    loseRandomEquipment: (target: Unit, slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY') => void;  // 移除随机装备
-    loseEquipment: (target: Unit, equipmentId: string) => boolean;  // 移除装备
-    grantRandomItem: (target: Unit) => void;                        // 给予随机物品
-    loseRandomItem: (target: Unit) => void;                         // 移除随机物品
+    resolveTargets: (owner: Unit, selector: EventEffectTarget) => Unit[]; // 解析目标列表
+    resolveTargetFromEvent: (
+      owner: Unit,
+      selector: TargetSelector,
+      event: CombatEvent,
+    ) => Unit; // 从事件解析目标
+    applyModifierEffect: (
+      source: Unit,
+      target: Unit,
+      effect: EffectSpec,
+    ) => void; // 应用修饰器效果
+    removeModifiersByMatcher: (
+      target: Unit,
+      matcher: (modifier: Modifier) => boolean,
+      max?: number,
+    ) => number; // 移除修饰器
+    grantConsumable: (target: Unit, consumableId: string) => void; // 给予消耗品
+    grantRandomConsumable: (target: Unit) => void; // 给予随机消耗品
+    loseRandomConsumable: (target: Unit, count?: number) => void; // 失去随机消耗品
+    loseConsumable: (target: Unit, consumableId: string) => boolean; // 移除消耗品
+    grantEquipment: (target: Unit, equipment: Modifier) => void; // 给予装备
+    grantRandomEquipment: (
+      target: Unit,
+      slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY',
+    ) => void; // 给予随机装备
+    loseRandomEquipment: (
+      target: Unit,
+      slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY',
+    ) => void; // 移除随机装备
+    loseEquipment: (target: Unit, equipmentId: string) => boolean; // 移除装备
+    grantRandomItem: (target: Unit) => void; // 给予随机物品
+    loseRandomItem: (target: Unit) => void; // 移除随机物品
   };
   log: {
     system: (args: {
-      key: string;                                                  // 日志 key
-      variables: Record<string, string | number | undefined>;       // 模板变量
-      tags: CombatTag[];                                           // 标签
-      actor?: Unit;                                                 // 行动者
-      target?: Unit;                                                // 目标
-    }) => void;                                                     // 记录系统日志
+      key: string; // 日志 key
+      variables: Record<string, string | number | undefined>; // 模板变量
+      tags: CombatTag[]; // 标签
+      actor?: Unit; // 行动者
+      target?: Unit; // 目标
+    }) => void; // 记录系统日志
   };
 };

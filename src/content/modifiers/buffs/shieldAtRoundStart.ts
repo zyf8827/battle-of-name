@@ -12,7 +12,10 @@ const shieldAtRoundStart: Modifier = {
   duration: 3,
   priority: 0,
   tags: ['buff', 'shield'],
-  stacking: { stackKey: 'seed.start.shield_at_round_start', policy: 'REFRESH_DURATION' },
+  stacking: {
+    stackKey: 'seed.start.shield_at_round_start',
+    policy: 'REFRESH_DURATION',
+  },
   triggers: [
     {
       trigger: { on: 'ROUND_START' },

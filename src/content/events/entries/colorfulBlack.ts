@@ -17,18 +17,27 @@ const colorfulBlack: EventPoolEntry = {
         duration: 2,
         triggers: [
           {
-            trigger: { on: 'PIPELINE_OUTGOING', when: { role: 'SOURCE', eventType: 'ATTACK' } },
-            effects: [{ kind: 'MITIGATE', when: { role: 'SOURCE', eventType: 'ATTACK' }, multiplier: 0.7 }]
-          }
-        ]
+            trigger: {
+              on: 'PIPELINE_OUTGOING',
+              when: { role: 'SOURCE', eventType: 'ATTACK' },
+            },
+            effects: [
+              {
+                kind: 'MITIGATE',
+                when: { role: 'SOURCE', eventType: 'ATTACK' },
+                multiplier: 0.7,
+              },
+            ],
+          },
+        ],
       },
       textOverrides: {
-        apply: '{targetName} 被要求设计“五彩斑斓的黑”，陷入了逻辑死循环 🤯。(伤害降低)',
+        apply: '{targetName} 面对离谱要求瞬间红码，逻辑 CPU 负载过高 🤯',
       },
     },
   ],
   texts: {
-    trigger: '甲方提出了一个新的需求：要是五彩斑斓的黑 🖌️。',
+    trigger: '甲方推门而入：“我们要那种五彩斑斓的黑，你懂吧？” 🎨',
   },
 };
 

@@ -18,12 +18,12 @@ const annivRed: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 收到周年庆红包 🧧',
+        apply: '{targetName} 抢到了周年纪念红包，心情大涨 💸',
       },
     },
   ],
   texts: {
-    trigger: '公司周年庆，全员发红包雨 🧧',
+    trigger: '屏幕上突然下起了红包雨，原来是公司周年庆 🧧',
   },
 };
 

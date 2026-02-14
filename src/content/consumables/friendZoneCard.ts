@@ -16,7 +16,12 @@ const friendZoneCard: Consumable = {
   name: '好人卡 💔',
   description: '“你是个好人”。造成真实伤害并降低幸运。',
   effects: [
-    { kind: 'DIRECT_DAMAGE', target: 'TARGET', value: 20, tags: ['true_damage'] },
+    {
+      kind: 'DIRECT_DAMAGE',
+      target: 'TARGET',
+      value: 20,
+      tags: ['true_damage'],
+    },
     { kind: 'APPLY_MODIFIER', target: 'TARGET', modifier: emotionalDamage },
   ],
   texts: {

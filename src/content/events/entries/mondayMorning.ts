@@ -18,14 +18,14 @@ const mondayMorning: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 被五个闹钟叫醒，灵魂出窍了 👻。(全属性 -1)',
+        apply:
+          '{targetName} 挣扎着坐起来，感觉身体虽然在刷牙，灵魂还在梦里摸鱼 👻',
       },
     },
   ],
   texts: {
-    trigger: '今天是周一，{actorName} 准时被早八的闹钟摧毁了意志 🛌。',
+    trigger: '尖锐的闹钟声撕碎了周一清晨的宁静，空气中弥漫着绝望 ⏰',
   },
-
 };
 
 export default mondayMorning;

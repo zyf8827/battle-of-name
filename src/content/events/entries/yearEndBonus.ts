@@ -26,7 +26,6 @@ const yearEndBonus: EventPoolEntry = {
   texts: {
     trigger: '{actorName} 的年终奖终于到账了！虽然扣完税没剩多少 💸。',
   },
-
 };
 
 export default yearEndBonus;

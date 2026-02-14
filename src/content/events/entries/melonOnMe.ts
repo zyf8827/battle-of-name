@@ -28,7 +28,6 @@ const melonOnMe: EventPoolEntry = {
   texts: {
     trigger: '{actorName} 吃瓜吃得正香，突然发现主角是自己偶像！😧',
   },
-
 };
 
 export default melonOnMe;

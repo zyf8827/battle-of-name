@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+dist/
+pnpm-lock.yaml
+package-lock.json
+
+# Build artifacts
+*.tsbuildinfo
+
+# Public assets
+public/

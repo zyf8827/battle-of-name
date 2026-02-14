@@ -18,14 +18,13 @@ const colleaguePot: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 接住了一口又黑又大的锅 🌚。',
+        apply: '{targetName} 感觉头顶阴影笼罩，一口厚重的黑锅稳稳落在了肩上 🌚',
       },
     },
   ],
   texts: {
-    trigger: '同事突然在群里艾特 {actorName}：“这块不是你负责的吗？” 🤔',
+    trigger: '大群里突然飞出一条艾特：“这个 Bug 之前的逻辑是你写的吧？” 🍳',
   },
-
 };
 
 export default colleaguePot;

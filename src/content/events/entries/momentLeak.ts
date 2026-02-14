@@ -18,14 +18,14 @@ const momentLeak: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 发朋友圈吐槽公司，忘了屏蔽领导！ 💀',
+        apply:
+          '{targetName} 感到一股透心凉的寒意从脊梁骨升起，职业生涯仿佛看到了尽头 💀',
       },
     },
   ],
   texts: {
-    trigger: '领导在 {actorName} 的朋友圈点了一个赞 👍。',
+    trigger: '刚刚发出的吐槽朋友圈，在三秒后出现了一个熟悉的头像点赞 👍',
   },
-
 };
 
 export default momentLeak;

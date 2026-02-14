@@ -38,9 +38,9 @@ export type TriggerWindow = 'RoundStart' | 'RoundEnd' | 'TurnStart' | 'TurnEnd';
  * → 每回合开始时有 28% 概率触发全局事件池
  */
 export type SchedulerRule = {
-  window: TriggerWindow;   // 触发窗口
-  poolId: string;         // 事件池 ID
-  chance: number;         // 触发概率
+  window: TriggerWindow; // 触发窗口
+  poolId: string; // 事件池 ID
+  chance: number; // 触发概率
 };
 
 /**
@@ -59,8 +59,8 @@ export type SchedulerRule = {
  */
 export class EventScheduler {
   constructor(
-    private readonly pools: Record<string, EventPoolSpec>,  // 事件池映射表
-    private readonly rules: SchedulerRule[],              // 调度规则列表
+    private readonly pools: Record<string, EventPoolSpec>, // 事件池映射表
+    private readonly rules: SchedulerRule[], // 调度规则列表
   ) {}
 
   /**
@@ -83,6 +83,8 @@ export class EventScheduler {
    * ```
    */
   getRules(window: TriggerWindow): SchedulerRule[] {
-    return this.rules.filter((rule) => rule.window === window && this.pools[rule.poolId]);
+    return this.rules.filter(
+      (rule) => rule.window === window && this.pools[rule.poolId],
+    );
   }
 }

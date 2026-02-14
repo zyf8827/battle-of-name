@@ -13,8 +13,21 @@ const blameCatapult: EquipmentLike = {
   statBonus: { AGI: 1, LUK: 2 },
   triggers: [
     {
-      trigger: { on: 'ON_HURT', when: { role: 'TARGET', notHasTags: ['miss', 'reflect', 'true_damage'] } },
-      effects: [{ kind: 'DIRECT_DAMAGE', target: 'SOURCE', value: 5, tags: ['reflect', 'true_damage', 'equip'] }],
+      trigger: {
+        on: 'ON_HURT',
+        when: {
+          role: 'TARGET',
+          notHasTags: ['miss', 'reflect', 'true_damage'],
+        },
+      },
+      effects: [
+        {
+          kind: 'DIRECT_DAMAGE',
+          target: 'SOURCE',
+          value: 5,
+          tags: ['reflect', 'true_damage', 'equip'],
+        },
+      ],
     },
   ],
   texts: {

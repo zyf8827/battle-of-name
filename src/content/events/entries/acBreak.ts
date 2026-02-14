@@ -18,12 +18,12 @@ const acBreak: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 因为空调故障，浑身难受 🌡️',
+        apply: '{targetName} 感到室温急速上升，汗流浃背，操作都变慢了 🌡️',
       },
     },
   ],
   texts: {
-    trigger: '大楼空调集体失灵，全员享受冬冷夏热 ❄️',
+    trigger: '大楼空调主机发出一声闷响，彻底罢工了 ❄️',
   },
 };
 

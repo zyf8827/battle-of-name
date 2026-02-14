@@ -16,7 +16,11 @@ const moyuPermit: EquipmentLike = {
       trigger: { on: 'TURN_START' },
       effects: [
         { kind: 'TRIGGER_EVENT_POOL', poolId: 'pool.turn.personal' },
-        { kind: 'SHIELD', value: [{ type: 'FLAT', value: 3 }], tags: ['shield', 'equip'] },
+        {
+          kind: 'SHIELD',
+          value: [{ type: 'FLAT', value: 3 }],
+          tags: ['shield', 'equip'],
+        },
       ],
     },
   ],

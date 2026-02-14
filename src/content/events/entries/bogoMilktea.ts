@@ -28,7 +28,6 @@ const bogoMilktea: EventPoolEntry = {
   texts: {
     trigger: '{actorName} 发现喜茶买一送一，快乐水续命成功！😋',
   },
-
 };
 
 export default bogoMilktea;

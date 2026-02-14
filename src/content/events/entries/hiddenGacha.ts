@@ -18,7 +18,7 @@ const hiddenGacha: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 抽到了隐藏款！欧皇附体 🌟',
+        apply: '{targetName} 爆发出了一阵甚至引起邻居投诉的尖叫：出货了！🌟',
       },
     },
     {
@@ -27,7 +27,7 @@ const hiddenGacha: EventPoolEntry = {
     },
   ],
   texts: {
-    trigger: '{actorName} 抽卡，闪卡出现！是隐藏款 🎴',
+    trigger: '盲盒包装拆开的一角，露出了那抹只在传说中见过的特殊色泽 🎴',
   },
 };
 

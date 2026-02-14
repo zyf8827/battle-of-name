@@ -12,7 +12,10 @@ const physicalMitigationStance: Modifier = {
   duration: 2,
   priority: 10,
   tags: ['buff'],
-  stacking: { stackKey: 'seed.start.physical_mitigation_stance', policy: 'REFRESH_DURATION' },
+  stacking: {
+    stackKey: 'seed.start.physical_mitigation_stance',
+    policy: 'REFRESH_DURATION',
+  },
   triggers: [
     {
       trigger: {

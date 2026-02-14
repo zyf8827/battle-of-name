@@ -25,18 +25,21 @@ const disassemble: Modifier = {
   hooks: {
     onPostAction: (event, { engine, owner, target }) => {
       if (event.sourceId !== owner.id || event.type !== 'ATTACK') return [];
-      
+
       if (engine.rng.bool(0.1, { domain: 'COMBAT', luk: owner.stats.LUK })) {
-         engine.state.loseRandomEquipment(target);
+        engine.state.loseRandomEquipment(target);
       }
       if (engine.rng.bool(0.1, { domain: 'COMBAT', luk: owner.stats.LUK })) {
-         engine.state.loseRandomConsumable(target);
+        engine.state.loseRandomConsumable(target);
       }
       return [];
-    }
+    },
   },
   texts: {
-    trigger: ['{targetName} 发现自己的东西被 {sourceName} 弄坏了！ 😭', '{sourceName} 的家长说：他还只是个孩子，又不是故意的。'],
+    trigger: [
+      '{targetName} 发现自己的东西被 {sourceName} 弄坏了！ 😭',
+      '{sourceName} 的家长说：他还只是个孩子，又不是故意的。',
+    ],
   },
 };
 

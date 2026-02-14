@@ -11,10 +11,16 @@ const fishPond: Modifier = {
   hooks: {
     onPostAction: (event, { engine, owner }) => {
       // 仅限主动攻击触发
-      if (event.sourceId !== owner.id || event.type !== 'ATTACK' || event.depth > 0) return [];
-      
+      if (
+        event.sourceId !== owner.id ||
+        event.type !== 'ATTACK' ||
+        event.depth > 0
+      )
+        return [];
+
       // 30% 概率
-      if (!engine.rng.bool(0.3, { domain: 'COMBAT', luk: owner.stats.LUK })) return [];
+      if (!engine.rng.bool(0.3, { domain: 'COMBAT', luk: owner.stats.LUK }))
+        return [];
 
       // 追加一次 50% 伤害的攻击
       const damage = Math.floor((event.payload.value ?? 0) * 0.5);

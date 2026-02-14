@@ -18,14 +18,13 @@ const badHaircut: EventPoolEntry = {
         duration: 3,
       },
       textOverrides: {
-        apply: '{targetName} 被托尼老师剪坏了刘海，魅力值归零 📉。',
+        apply: '{targetName} 看着镜子里那个像被狗啃过的发型，陷入了沉思 🗿',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 相信了理发师说的“只修一点点” 🤡。',
+    trigger: '理发师挥舞着剪刀：“信我，这绝对是今年最火的造型。” 💇',
   },
-
 };
 
 export default badHaircut;

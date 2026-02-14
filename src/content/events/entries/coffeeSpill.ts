@@ -17,14 +17,13 @@ const coffeeSpill: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 本回合只能用来擦键盘了！(无法行动) 🧻',
+        apply: '{targetName} 惊叫着跳了起来，手忙脚乱地开始拯救进水的按键 🧻',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 不小心把美式咖啡倒进了机械键盘里！💧',
+    trigger: '手滑了！一整杯浓缩咖啡呈完美的抛物线落向了键盘 ☕',
   },
-
 };
 
 export default coffeeSpill;

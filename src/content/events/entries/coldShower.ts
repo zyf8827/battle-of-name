@@ -18,14 +18,13 @@ const coldShower: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 洗澡洗一半没热水了！冻得瑟瑟发抖 🧊。',
+        apply: '{targetName} 发出了一声刺破耳膜的尖叫，感觉血液都凝固了 🧊',
       },
     },
   ],
   texts: {
-    trigger: '热水器突然坏了，{actorName} 体验了一把冰桶挑战 ⛄。',
+    trigger: '燃气热水器由于欠费，在最关键的时刻无情熄火 🚿',
   },
-
 };
 
 export default coldShower;

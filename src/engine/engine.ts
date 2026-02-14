@@ -44,7 +44,11 @@
  * - EngineRuntime: 提供给修饰器的运行时 API
  */
 
-import type { BattleContentAdapter, BattleSystemLogKey, EffectHandlerContext } from './contentAdapter';
+import type {
+  BattleContentAdapter,
+  BattleSystemLogKey,
+  EffectHandlerContext,
+} from './contentAdapter';
 import { deepCloneKeepFns } from './clone';
 import { ENGINE_VERSION } from './replay';
 import { createRng } from './rng';
@@ -72,7 +76,10 @@ import type {
   Unit,
   ValueExpr,
 } from './types';
-import { DEFAULT_BATTLE_CONFIG, DEFAULT_EVENT_POOL_ENTRY_WEIGHT } from './types';
+import {
+  DEFAULT_BATTLE_CONFIG,
+  DEFAULT_EVENT_POOL_ENTRY_WEIGHT,
+} from './types';
 
 const NUMERIC_LIMITS = {
   minChance: 0,
@@ -107,26 +114,42 @@ function unitAlive(unit: Unit): boolean {
   return unit.state.hp > 0;
 }
 
-function calcInitialMaxHp(vit: number, hpBase: number, hpPerVit: number): number {
+function calcInitialMaxHp(
+  vit: number,
+  hpBase: number,
+  hpPerVit: number,
+): number {
   const safeVit = Math.max(1, Math.floor(Number.isFinite(vit) ? vit : 1));
   const linear = hpBase + Math.floor(safeVit * hpPerVit * 1.08);
-  const survivalBonus = Math.floor(Math.sqrt(safeVit) * hpPerVit * 0.55) + Math.floor(hpBase * 0.2);
+  const survivalBonus =
+    Math.floor(Math.sqrt(safeVit) * hpPerVit * 0.55) + Math.floor(hpBase * 0.2);
   return Math.min(NUMERIC_LIMITS.maxHp, Math.max(1, linear + survivalBonus));
 }
 
-function whenMatched(when: EventWhen | undefined, event: CombatEvent, role: 'SOURCE' | 'TARGET'): boolean {
+function whenMatched(
+  when: EventWhen | undefined,
+  event: CombatEvent,
+  role: 'SOURCE' | 'TARGET',
+): boolean {
   if (!when) return true;
   if (when.role && when.role !== role) return false;
   if (when.eventType && when.eventType !== event.type) return false;
   if (when.hasTag && !event.payload.tags.includes(when.hasTag)) return false;
-  if (when.notHasTag && event.payload.tags.includes(when.notHasTag)) return false;
-  if (when.notHasTags?.some((tag) => event.payload.tags.includes(tag))) return false;
+  if (when.notHasTag && event.payload.tags.includes(when.notHasTag))
+    return false;
+  if (when.notHasTags?.some((tag) => event.payload.tags.includes(tag)))
+    return false;
   return true;
 }
 
-function evaluateValue(unit: Unit, event: CombatEvent | undefined, value: ValueExpr): number {
+function evaluateValue(
+  unit: Unit,
+  event: CombatEvent | undefined,
+  value: ValueExpr,
+): number {
   if (value.type === 'FLAT') return value.value;
-  if (value.type === 'SCALE') return (unit.stats[value.stat] ?? 0) * value.ratio;
+  if (value.type === 'SCALE')
+    return (unit.stats[value.stat] ?? 0) * value.ratio;
   return event?.payload.value ?? 0;
 }
 
@@ -154,10 +177,12 @@ export function runBattle(
   };
   const BALANCE = finalConfig.balance;
   const limits = finalConfig.limits;
-  const debugEnabled = config?.diagnostics?.debugLog ?? (() => {
-    const raw = (globalThis as Record<string, unknown>).__BATTLE_DEBUG__;
-    return raw === true || raw === 'true' || raw === 1;
-  })();
+  const debugEnabled =
+    config?.diagnostics?.debugLog ??
+    (() => {
+      const raw = (globalThis as Record<string, unknown>).__BATTLE_DEBUG__;
+      return raw === true || raw === 'true' || raw === 1;
+    })();
   const collectDiagnostics = config?.diagnostics?.collectSummary ?? true;
   const debugLog = (scope: string, payload: Record<string, unknown>) => {
     if (!debugEnabled) return;
@@ -178,7 +203,9 @@ export function runBattle(
   const envUnit = createEnvUnit();
   const rng = createRng(seed);
   const bootstrap = contentAdapter.bootstrap({ name1, name2, seed });
-  const units: Unit[] = bootstrap.units.map((unit) => cloneUnit(deepCloneKeepFns(unit)));
+  const units: Unit[] = bootstrap.units.map((unit) =>
+    cloneUnit(deepCloneKeepFns(unit)),
+  );
   const eventPools = bootstrap.eventPools;
   const consumablePoolIds = bootstrap.consumablePoolIds ?? [];
   const equipmentPoolIds = bootstrap.equipmentPoolIds ?? [];
@@ -200,7 +227,9 @@ export function runBattle(
     throw new Error('Battle content adapter must provide executeTurnAction');
   }
   if (!executeTurnConsumable) {
-    throw new Error('Battle content adapter must provide executeTurnConsumable');
+    throw new Error(
+      'Battle content adapter must provide executeTurnConsumable',
+    );
   }
   if (!resolveControlSource) {
     throw new Error('Battle content adapter must provide resolveControlSource');
@@ -211,16 +240,24 @@ export function runBattle(
 
   for (const unit of units) {
     if (unit.state.maxHp <= 0) {
-      unit.state.maxHp = calcInitialMaxHp(unit.stats.VIT, BALANCE.hpBase, BALANCE.hpPerVit);
+      unit.state.maxHp = calcInitialMaxHp(
+        unit.stats.VIT,
+        BALANCE.hpBase,
+        BALANCE.hpPerVit,
+      );
     }
     if (unit.state.hp <= 0) {
       unit.state.hp = unit.state.maxHp;
     }
   }
 
-  const envModifiers: Modifier[] = (bootstrap.envModifiers ?? []).map((modifier) => deepCloneKeepFns(modifier));
+  const envModifiers: Modifier[] = (bootstrap.envModifiers ?? []).map(
+    (modifier) => deepCloneKeepFns(modifier),
+  );
   const logs: BattleOutcome['logs'] = [];
-  const totalDamageByUnit: Record<string, number> = Object.fromEntries(units.map((unit) => [unit.id, 0]));
+  const totalDamageByUnit: Record<string, number> = Object.fromEntries(
+    units.map((unit) => [unit.id, 0]),
+  );
   const snapshots: Snapshot[] = [];
   const recentNarrationKeys: string[] = [];
   const triggerCount = new Map<string, number>();
@@ -241,7 +278,8 @@ export function runBattle(
     return found;
   };
 
-  const getEnemy = (id: string): Unit => units.find((item) => item.id !== id) ?? units[0];
+  const getEnemy = (id: string): Unit =>
+    units.find((item) => item.id !== id) ?? units[0];
 
   // 核心数值计算库：处理战斗中的所有数学公式，确保数值在安全范围内
   const runtimeMath: EngineRuntime['calc'] = {
@@ -250,7 +288,11 @@ export function runBattle(
       if (max < min) return min;
       return Math.min(max, Math.max(min, value));
     },
-    toInt: (value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => {
+    toInt: (
+      value,
+      min = Number.MIN_SAFE_INTEGER,
+      max = Number.MAX_SAFE_INTEGER,
+    ) => {
       if (!Number.isFinite(value)) return min;
       return Math.min(max, Math.max(min, Math.floor(value)));
     },
@@ -263,7 +305,10 @@ export function runBattle(
       return Math.min(NUMERIC_LIMITS.maxStat, Math.max(1, Math.floor(value)));
     },
     safeHp: (value, maxHp) => {
-      const safeMaxHp = Math.min(NUMERIC_LIMITS.maxHp, Math.max(1, Math.floor(maxHp)));
+      const safeMaxHp = Math.min(
+        NUMERIC_LIMITS.maxHp,
+        Math.max(1, Math.floor(maxHp)),
+      );
       if (!Number.isFinite(value)) return safeMaxHp;
       return Math.min(safeMaxHp, Math.max(0, Math.floor(value)));
     },
@@ -299,8 +344,14 @@ export function runBattle(
     },
     // 护盾结算逻辑：优先扣除护盾，剩余伤害溢出到 HP
     splitDamageByShield: (incoming, shield) => {
-      const safeIncoming = Math.max(0, Math.floor(Number.isFinite(incoming) ? incoming : 0));
-      const safeShield = Math.max(0, Math.floor(Number.isFinite(shield) ? shield : 0));
+      const safeIncoming = Math.max(
+        0,
+        Math.floor(Number.isFinite(incoming) ? incoming : 0),
+      );
+      const safeShield = Math.max(
+        0,
+        Math.floor(Number.isFinite(shield) ? shield : 0),
+      );
       const shieldBlocked = Math.min(safeShield, safeIncoming);
       const hpDamage = safeIncoming - shieldBlocked;
       return {
@@ -312,13 +363,22 @@ export function runBattle(
     },
     hpAfterDamage: (hp, damage) => {
       const safeHp = Math.max(0, Math.floor(Number.isFinite(hp) ? hp : 0));
-      const safeDamage = Math.max(0, Math.floor(Number.isFinite(damage) ? damage : 0));
+      const safeDamage = Math.max(
+        0,
+        Math.floor(Number.isFinite(damage) ? damage : 0),
+      );
       return Math.max(0, safeHp - safeDamage);
     },
     hpAfterHeal: (hp, maxHp, amount) => {
       const safeHp = Math.max(0, Math.floor(Number.isFinite(hp) ? hp : 0));
-      const safeMaxHp = Math.min(NUMERIC_LIMITS.maxHp, Math.max(1, Math.floor(Number.isFinite(maxHp) ? maxHp : 1)));
-      const safeAmount = Math.max(0, Math.floor(Number.isFinite(amount) ? amount : 0));
+      const safeMaxHp = Math.min(
+        NUMERIC_LIMITS.maxHp,
+        Math.max(1, Math.floor(Number.isFinite(maxHp) ? maxHp : 1)),
+      );
+      const safeAmount = Math.max(
+        0,
+        Math.floor(Number.isFinite(amount) ? amount : 0),
+      );
       return Math.min(safeMaxHp, safeHp + safeAmount);
     },
   };
@@ -338,16 +398,22 @@ export function runBattle(
     parentId: partial.parentId,
   });
 
-  const sortedUnitModifiers = (unit: Unit): Modifier[] => sortModifiers(unit.modifiers);
+  const sortedUnitModifiers = (unit: Unit): Modifier[] =>
+    sortModifiers(unit.modifiers);
   const sortedEnvModifiers = (): Modifier[] => sortModifiers(envModifiers);
 
   const createSnapshot = (): Snapshot => ({
     round,
     units: units.map(cloneUnit),
-    envModifiers: sortedEnvModifiers().map((modifier) => deepCloneKeepFns(modifier)),
+    envModifiers: sortedEnvModifiers().map((modifier) =>
+      deepCloneKeepFns(modifier),
+    ),
   });
 
-  const pushLog = ({ seq, ...entry }: Omit<BattleOutcome['logs'][number], 'seq'> & { seq?: number }) => {
+  const pushLog = ({
+    seq,
+    ...entry
+  }: Omit<BattleOutcome['logs'][number], 'seq'> & { seq?: number }) => {
     logs.push({ ...entry, seq: seq ?? ++eventSeq });
     snapshots.push(createSnapshot());
   };
@@ -375,7 +441,7 @@ export function runBattle(
   const applyModifierToArray = (list: Modifier[], modifier: Modifier): void => {
     const cloned = deepCloneKeepFns(modifier);
     const key = cloned.stacking?.stackKey;
-    
+
     // 如果没有 stackKey，视为独立 Modifier，直接添加
     if (!key) {
       cloned.appliedOrder = ++appliedOrderCounter;
@@ -404,11 +470,17 @@ export function runBattle(
       }
       case 'REFRESH_DURATION':
         exists.duration = cloned.duration;
-        exists.stacks = 1;  // 显式重置层数为1
+        exists.stacks = 1; // 显式重置层数为1
         return;
       case 'STACK':
-        exists.stacks = Math.min((exists.stacks ?? 1) + 1, cloned.stacking?.maxStacks ?? Number.MAX_SAFE_INTEGER);
-        exists.duration = Math.max(exists.duration ?? -1, cloned.duration ?? -1);
+        exists.stacks = Math.min(
+          (exists.stacks ?? 1) + 1,
+          cloned.stacking?.maxStacks ?? Number.MAX_SAFE_INTEGER,
+        );
+        exists.duration = Math.max(
+          exists.duration ?? -1,
+          cloned.duration ?? -1,
+        );
         return;
       default:
         return;
@@ -437,11 +509,15 @@ export function runBattle(
   }
 
   function pickRandomConsumableId(): string | undefined {
-    const candidates = consumablePoolIds.filter((id) => !!getConsumableById(id));
+    const candidates = consumablePoolIds.filter(
+      (id) => !!getConsumableById(id),
+    );
     return pickRandomFrom(candidates, 'runtime.state.grantRandomConsumable');
   }
 
-  function pickRandomEquipment(slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY'): Modifier | undefined {
+  function pickRandomEquipment(
+    slot?: 'WEAPON' | 'ARMOR' | 'ACCESSORY',
+  ): Modifier | undefined {
     const candidates = equipmentPoolIds
       .map((id) => getEquipmentById(id))
       .filter((item): item is Modifier => !!item)
@@ -454,10 +530,17 @@ export function runBattle(
     return pickRandomFrom(candidates, 'runtime.state.grantRandomEquipment');
   }
 
-  function pickRandomItemKind(target: Unit, mode: 'gain' | 'lose'): 'consumable' | 'equipment' | undefined {
+  function pickRandomItemKind(
+    target: Unit,
+    mode: 'gain' | 'lose',
+  ): 'consumable' | 'equipment' | undefined {
     if (mode === 'gain') {
-      const hasConsumablePool = consumablePoolIds.some((id) => !!getConsumableById(id));
-      const hasEquipmentPool = equipmentPoolIds.some((id) => !!getEquipmentById(id));
+      const hasConsumablePool = consumablePoolIds.some(
+        (id) => !!getConsumableById(id),
+      );
+      const hasEquipmentPool = equipmentPoolIds.some(
+        (id) => !!getEquipmentById(id),
+      );
       const kinds: Array<'consumable' | 'equipment'> = [
         ...(hasConsumablePool ? (['consumable'] as const) : []),
         ...(hasEquipmentPool ? (['equipment'] as const) : []),
@@ -465,7 +548,9 @@ export function runBattle(
       return pickRandomFrom(kinds, 'runtime.state.randomItemKind.gain');
     }
 
-    const hasAnyEquipOwned = target.modifiers.some((modifier) => modifier.source === 'EQUIP');
+    const hasAnyEquipOwned = target.modifiers.some(
+      (modifier) => modifier.source === 'EQUIP',
+    );
     const hasAnyConsumableOwned = (target.state.consumables ?? []).length > 0;
     const kinds: Array<'consumable' | 'equipment'> = [
       ...(hasAnyConsumableOwned ? (['consumable'] as const) : []),
@@ -474,7 +559,10 @@ export function runBattle(
     return pickRandomFrom(kinds, 'runtime.state.randomItemKind.lose');
   }
 
-  function resolveEffectTargets(owner: Unit, selector: 'SELF' | 'SOURCE' | 'TARGET' | 'ALL'): Unit[] {
+  function resolveEffectTargets(
+    owner: Unit,
+    selector: 'SELF' | 'SOURCE' | 'TARGET' | 'ALL',
+  ): Unit[] {
     if (selector === 'ALL') {
       return units.filter(unitAlive);
     }
@@ -493,7 +581,11 @@ export function runBattle(
     return unitAlive(enemy) ? [enemy] : [];
   }
 
-  function resolveTargetFromEvent(selector: 'SELF' | 'SOURCE' | 'TARGET', owner: Unit, event: CombatEvent): Unit {
+  function resolveTargetFromEvent(
+    selector: 'SELF' | 'SOURCE' | 'TARGET',
+    owner: Unit,
+    event: CombatEvent,
+  ): Unit {
     if (selector === 'SELF') {
       return owner;
     }
@@ -507,9 +599,19 @@ export function runBattle(
     pickRandomFrom: <T>(values: T[], label: string) => T | undefined;
     cloneModifier: <T>(value: T) => T;
     applyModifier: (targetId: string, modifier: Modifier) => void;
-    removeModifier: (targetId: string, modifierId?: string, stackKey?: string, max?: number) => number;
+    removeModifier: (
+      targetId: string,
+      modifierId?: string,
+      stackKey?: string,
+      max?: number,
+    ) => number;
     log: (args: {
-      key: 'pickupConsumable' | 'dropConsumable' | 'pickupEquipment' | 'replaceEquipment' | 'dropEquipment';
+      key:
+        | 'pickupConsumable'
+        | 'dropConsumable'
+        | 'pickupEquipment'
+        | 'replaceEquipment'
+        | 'dropEquipment';
       variables: Record<string, string | number | undefined>;
       tags: ('env' | 'equip')[];
       actor: Unit;
@@ -517,7 +619,11 @@ export function runBattle(
     }) => void;
   };
 
-  const removeModifierFromArray = (list: Modifier[], matcher: (modifier: Modifier) => boolean, max = Number.MAX_SAFE_INTEGER): number => {
+  const removeModifierFromArray = (
+    list: Modifier[],
+    matcher: (modifier: Modifier) => boolean,
+    max = Number.MAX_SAFE_INTEGER,
+  ): number => {
     let removed = 0;
     for (let index = list.length - 1; index >= 0; index -= 1) {
       if (removed >= max) break;
@@ -529,8 +635,14 @@ export function runBattle(
     return removed;
   };
 
-  const removeModifier = (targetId: string, modifierId?: string, stackKey?: string, max?: number): number => {
-    const list = targetId === 'ENV' ? envModifiers : getUnit(targetId).modifiers;
+  const removeModifier = (
+    targetId: string,
+    modifierId?: string,
+    stackKey?: string,
+    max?: number,
+  ): number => {
+    const list =
+      targetId === 'ENV' ? envModifiers : getUnit(targetId).modifiers;
     return removeModifierFromArray(
       list,
       (modifier) => {
@@ -622,11 +734,15 @@ export function runBattle(
       },
     },
     state: {
-      resolveTargets: (owner, selector) => resolveEffectTargets(owner, selector),
-      resolveTargetFromEvent: (owner, selector, event) => resolveTargetFromEvent(selector, owner, event),
+      resolveTargets: (owner, selector) =>
+        resolveEffectTargets(owner, selector),
+      resolveTargetFromEvent: (owner, selector, event) =>
+        resolveTargetFromEvent(selector, owner, event),
       applyModifierEffect,
-      removeModifiersByMatcher: (target, matcher, max) => removeModifierFromArray(target.modifiers, matcher, max),
-      grantConsumable: (target, consumableId) => grantConsumableWithPolicy(runtimeServiceDeps, target, consumableId),
+      removeModifiersByMatcher: (target, matcher, max) =>
+        removeModifierFromArray(target.modifiers, matcher, max),
+      grantConsumable: (target, consumableId) =>
+        grantConsumableWithPolicy(runtimeServiceDeps, target, consumableId),
       grantRandomConsumable: (target) => {
         const picked = pickRandomConsumableId();
         if (!picked) return;
@@ -638,25 +754,31 @@ export function runBattle(
           loseRandomConsumableWithPolicy(runtimeServiceDeps, target);
         }
       },
-      loseConsumable: (target, consumableId) => loseConsumableByIdWithPolicy(runtimeServiceDeps, target, consumableId),
-      grantEquipment: (target, equipment) => grantEquipmentWithPolicy(runtimeServiceDeps, target, equipment),
+      loseConsumable: (target, consumableId) =>
+        loseConsumableByIdWithPolicy(runtimeServiceDeps, target, consumableId),
+      grantEquipment: (target, equipment) =>
+        grantEquipmentWithPolicy(runtimeServiceDeps, target, equipment),
       grantRandomEquipment: (target, slot) => {
         const picked = pickRandomEquipment(slot);
         if (!picked) return;
         grantEquipmentWithPolicy(runtimeServiceDeps, target, picked);
       },
-      loseRandomEquipment: (target, slot) => loseRandomEquipmentWithPolicy(runtimeServiceDeps, target, slot),
-      loseEquipment: (target, equipmentId) => loseEquipmentByIdWithPolicy(runtimeServiceDeps, target, equipmentId),
+      loseRandomEquipment: (target, slot) =>
+        loseRandomEquipmentWithPolicy(runtimeServiceDeps, target, slot),
+      loseEquipment: (target, equipmentId) =>
+        loseEquipmentByIdWithPolicy(runtimeServiceDeps, target, equipmentId),
       grantRandomItem: (target) => {
         const kind = pickRandomItemKind(target, 'gain');
         if (kind === 'consumable') {
           const picked = pickRandomConsumableId();
-          if (picked) grantConsumableWithPolicy(runtimeServiceDeps, target, picked);
+          if (picked)
+            grantConsumableWithPolicy(runtimeServiceDeps, target, picked);
           return;
         }
         if (kind === 'equipment') {
           const picked = pickRandomEquipment();
-          if (picked) grantEquipmentWithPolicy(runtimeServiceDeps, target, picked);
+          if (picked)
+            grantEquipmentWithPolicy(runtimeServiceDeps, target, picked);
         }
       },
       loseRandomItem: (target) => {
@@ -694,13 +816,17 @@ export function runBattle(
     const modifier = 'modifier' in effect ? effect.modifier : undefined;
     const modifierId = 'modifierId' in effect ? effect.modifierId : undefined;
     const duration = 'duration' in effect ? effect.duration : undefined;
-    const textOverrides = 'textOverrides' in effect ? effect.textOverrides : undefined;
+    const textOverrides =
+      'textOverrides' in effect ? effect.textOverrides : undefined;
 
     let created: Modifier;
     if (modifier && typeof modifier === 'object') {
       created = deepCloneKeepFns(modifier as Modifier);
     } else if (typeof modifierId === 'string') {
-      created = createModifierById(modifierId, typeof duration === 'number' ? duration : undefined);
+      created = createModifierById(
+        modifierId,
+        typeof duration === 'number' ? duration : undefined,
+      );
     } else {
       throw new Error('APPLY_MODIFIER requires modifier or modifierId');
     }
@@ -715,7 +841,8 @@ export function runBattle(
       ...(textOverrides as Modifier['texts']),
       triggerByTag: {
         ...(created.texts?.triggerByTag ?? {}),
-        ...(((textOverrides as Modifier['texts'])?.triggerByTag ?? {}) as NonNullable<Modifier['texts']>['triggerByTag']),
+        ...(((textOverrides as Modifier['texts'])?.triggerByTag ??
+          {}) as NonNullable<Modifier['texts']>['triggerByTag']),
       },
     };
     return created;
@@ -775,14 +902,27 @@ export function runBattle(
     };
   }
 
-  function fireEffects(owner: Unit, trigger: TriggerSpec, effects: EffectSpec[], event: CombatEvent | null, phase: 'INTERCEPT' | 'REACTION'): CombatEvent | null {
+  function fireEffects(
+    owner: Unit,
+    trigger: TriggerSpec,
+    effects: EffectSpec[],
+    event: CombatEvent | null,
+    phase: 'INTERCEPT' | 'REACTION',
+  ): CombatEvent | null {
     let currentEvent = event;
-    const role: 'SOURCE' | 'TARGET' = owner.id === currentEvent?.sourceId ? 'SOURCE' : 'TARGET';
-    if (currentEvent && 'when' in trigger && trigger.when && !whenMatched(trigger.when, currentEvent, role)) {
+    const role: 'SOURCE' | 'TARGET' =
+      owner.id === currentEvent?.sourceId ? 'SOURCE' : 'TARGET';
+    if (
+      currentEvent &&
+      'when' in trigger &&
+      trigger.when &&
+      !whenMatched(trigger.when, currentEvent, role)
+    ) {
       return currentEvent;
     }
     for (const effect of effects) {
-      diagnostics.effectsTriggered[effect.kind] = (diagnostics.effectsTriggered[effect.kind] ?? 0) + 1;
+      diagnostics.effectsTriggered[effect.kind] =
+        (diagnostics.effectsTriggered[effect.kind] ?? 0) + 1;
       const handler = effectHandlers[effect.kind];
       if (!handler) {
         throw new Error(`No handler for effect kind: ${effect.kind}`);
@@ -817,9 +957,15 @@ export function runBattle(
     return currentEvent;
   }
 
-  function runModifierTriggers(owner: Unit, triggerOn: TriggerSpec['on'], event: CombatEvent | null, phase: 'INTERCEPT' | 'REACTION'): CombatEvent | null {
+  function runModifierTriggers(
+    owner: Unit,
+    triggerOn: TriggerSpec['on'],
+    event: CombatEvent | null,
+    phase: 'INTERCEPT' | 'REACTION',
+  ): CombatEvent | null {
     let currentEvent = event;
-    const pool = owner.id === 'ENV' ? sortedEnvModifiers() : sortedUnitModifiers(owner);
+    const pool =
+      owner.id === 'ENV' ? sortedEnvModifiers() : sortedUnitModifiers(owner);
     for (const modifier of pool) {
       const key = `${round}:${owner.id}:${modifier.id}:${triggerOn}`;
       const count = triggerCount.get(key) ?? 0;
@@ -840,9 +986,22 @@ export function runBattle(
             eventId: currentEvent?.id,
             eventType: currentEvent?.type,
           });
-          currentEvent = fireEffects(owner, spec.trigger, spec.effects, currentEvent, phase);
+          currentEvent = fireEffects(
+            owner,
+            spec.trigger,
+            spec.effects,
+            currentEvent,
+            phase,
+          );
         }
-        if (triggerOn === 'POST_ACTION' && spec.trigger.on === 'ON_HIT' && currentEvent && currentEvent.type === 'ATTACK' && currentEvent.sourceId === owner.id && !currentEvent.payload.tags.includes('miss')) {
+        if (
+          triggerOn === 'POST_ACTION' &&
+          spec.trigger.on === 'ON_HIT' &&
+          currentEvent &&
+          currentEvent.type === 'ATTACK' &&
+          currentEvent.sourceId === owner.id &&
+          !currentEvent.payload.tags.includes('miss')
+        ) {
           debugLog('trigger.matched', {
             ownerId: owner.id,
             ownerName: owner.name,
@@ -853,9 +1012,22 @@ export function runBattle(
             eventId: currentEvent.id,
             eventType: currentEvent.type,
           });
-          currentEvent = fireEffects(owner, spec.trigger, spec.effects, currentEvent, phase);
+          currentEvent = fireEffects(
+            owner,
+            spec.trigger,
+            spec.effects,
+            currentEvent,
+            phase,
+          );
         }
-        if (triggerOn === 'POST_ACTION' && spec.trigger.on === 'ON_HURT' && currentEvent && currentEvent.type === 'ATTACK' && currentEvent.targetId === owner.id && !currentEvent.payload.tags.includes('miss')) {
+        if (
+          triggerOn === 'POST_ACTION' &&
+          spec.trigger.on === 'ON_HURT' &&
+          currentEvent &&
+          currentEvent.type === 'ATTACK' &&
+          currentEvent.targetId === owner.id &&
+          !currentEvent.payload.tags.includes('miss')
+        ) {
           debugLog('trigger.matched', {
             ownerId: owner.id,
             ownerName: owner.name,
@@ -866,14 +1038,25 @@ export function runBattle(
             eventId: currentEvent.id,
             eventType: currentEvent.type,
           });
-          currentEvent = fireEffects(owner, spec.trigger, spec.effects, currentEvent, phase);
+          currentEvent = fireEffects(
+            owner,
+            spec.trigger,
+            spec.effects,
+            currentEvent,
+            phase,
+          );
         }
       }
     }
     return currentEvent;
   }
 
-  function applyBattleEffect(owner: Unit, effect: EffectSpec, depth: number, parentId?: string): void {
+  function applyBattleEffect(
+    owner: Unit,
+    effect: EffectSpec,
+    depth: number,
+    parentId?: string,
+  ): void {
     const handler = effectHandlers[effect.kind];
     if (!handler) {
       throw new Error(`No handler for effect kind: ${effect.kind}`);
@@ -892,15 +1075,26 @@ export function runBattle(
     );
   }
 
-  function triggerPool(poolId: string, ownerId: string, depth: number, parentId?: string): void {
+  function triggerPool(
+    poolId: string,
+    ownerId: string,
+    depth: number,
+    parentId?: string,
+  ): void {
     const pool = eventPools[poolId];
     if (!pool || pool.entries.length === 0) return;
-    const picked = rng.weightedPick(pool.entries, (entry) => entry.weight ?? DEFAULT_EVENT_POOL_ENTRY_WEIGHT, `pool:${poolId}`);
+    const picked = rng.weightedPick(
+      pool.entries,
+      (entry) => entry.weight ?? DEFAULT_EVENT_POOL_ENTRY_WEIGHT,
+      `pool:${poolId}`,
+    );
     if (!picked) return;
 
     const owner = getUnit(ownerId);
-    diagnostics.poolsTriggered[poolId] = (diagnostics.poolsTriggered[poolId] ?? 0) + 1;
-    diagnostics.poolEntriesTriggered[picked.id] = (diagnostics.poolEntriesTriggered[picked.id] ?? 0) + 1;
+    diagnostics.poolsTriggered[poolId] =
+      (diagnostics.poolsTriggered[poolId] ?? 0) + 1;
+    diagnostics.poolEntriesTriggered[picked.id] =
+      (diagnostics.poolEntriesTriggered[picked.id] ?? 0) + 1;
     pushLog({
       round,
       turn,
@@ -927,7 +1121,9 @@ export function runBattle(
     const consumableIds = [...(owner.state.consumables ?? [])];
     if (!consumableIds.includes(itemId)) return;
     const consumable = getConsumableById(itemId);
-    owner.state.consumables = consumableIds.filter((id, index) => id !== itemId || index !== consumableIds.indexOf(itemId));
+    owner.state.consumables = consumableIds.filter(
+      (id, index) => id !== itemId || index !== consumableIds.indexOf(itemId),
+    );
     pushLog({
       round,
       turn,
@@ -943,7 +1139,10 @@ export function runBattle(
       actorName: owner.name,
     });
     for (const effect of consumable?.effects ?? []) {
-      const normalized: EffectSpec = 'target' in effect && effect.target ? effect : ({ ...effect, target: 'SELF' } as EffectSpec);
+      const normalized: EffectSpec =
+        'target' in effect && effect.target
+          ? effect
+          : ({ ...effect, target: 'SELF' } as EffectSpec);
       applyBattleEffect(owner, normalized, 0);
     }
   }
@@ -970,11 +1169,18 @@ export function runBattle(
       const hpBefore = target.state.hp;
       const shieldBefore = target.state.shield;
       if (value > 0) {
-        const split = runtimeMath.splitDamageByShield(value, target.state.shield);
+        const split = runtimeMath.splitDamageByShield(
+          value,
+          target.state.shield,
+        );
         target.state.shield = runtimeMath.safeShield(split.shieldAfter);
         actualDamage = split.hpDamage;
-        target.state.hp = runtimeMath.safeHp(runtimeMath.hpAfterDamage(target.state.hp, actualDamage), target.state.maxHp);
-        totalDamageByUnit[source.id] = (totalDamageByUnit[source.id] ?? 0) + actualDamage;
+        target.state.hp = runtimeMath.safeHp(
+          runtimeMath.hpAfterDamage(target.state.hp, actualDamage),
+          target.state.maxHp,
+        );
+        totalDamageByUnit[source.id] =
+          (totalDamageByUnit[source.id] ?? 0) + actualDamage;
       }
       debugLog('event.resolved.attack', {
         eventId: event.id,
@@ -989,7 +1195,13 @@ export function runBattle(
         tags: event.payload.tags,
       });
 
-      const narration = narrate(event, source.name, target.name, rng.next('narration'), recentNarrationKeys.slice(-3));
+      const narration = narrate(
+        event,
+        source.name,
+        target.name,
+        rng.next('narration'),
+        recentNarrationKeys.slice(-3),
+      );
       recentNarrationKeys.push(narration.key);
       pushLog({
         round,
@@ -1023,8 +1235,14 @@ export function runBattle(
     if (event.type === 'HEAL') {
       const amount = runtimeMath.nonNegativeInt(event.payload.value ?? 0);
       const hpBefore = target.state.hp;
-      target.state.hp = runtimeMath.hpAfterHeal(target.state.hp, target.state.maxHp, amount);
-      const healLogKey: BattleSystemLogKey = event.payload.tags.includes('env') ? 'eventHeal' : 'heal';
+      target.state.hp = runtimeMath.hpAfterHeal(
+        target.state.hp,
+        target.state.maxHp,
+        amount,
+      );
+      const healLogKey: BattleSystemLogKey = event.payload.tags.includes('env')
+        ? 'eventHeal'
+        : 'heal';
       debugLog('event.resolved.heal', {
         eventId: event.id,
         sourceId: source.id,
@@ -1097,7 +1315,12 @@ export function runBattle(
     }
 
     if (event.type === 'REMOVE_BUFF' && event.payload.modifier) {
-      removeModifier(target.id, event.payload.modifier.id, event.payload.modifier.stacking?.stackKey, 1);
+      removeModifier(
+        target.id,
+        event.payload.modifier.id,
+        event.payload.modifier.stacking?.stackKey,
+        1,
+      );
       pushLog({
         round,
         turn,
@@ -1163,17 +1386,32 @@ export function runBattle(
     const derived: CombatEvent[] = [];
 
     const runReactor = (owner: Unit, modifier: Modifier): void => {
-      const ctx: InteractionContext = { engine: runtime, owner, source, target };
+      const ctx: InteractionContext = {
+        engine: runtime,
+        owner,
+        source,
+        target,
+      };
       // 执行 onPostAction 钩子，收集返回值作为新事件
       const hooksDerived = modifier.hooks?.onPostAction?.(event, ctx) ?? [];
-      for (const child of hooksDerived.slice(0, limits.maxDerivedEventsPerEvent)) {
-        derived.push({ ...child, parentId: event.id, depth: event.depth + 1, meta: { round, turn, seq: ++eventSeq } });
+      for (const child of hooksDerived.slice(
+        0,
+        limits.maxDerivedEventsPerEvent,
+      )) {
+        derived.push({
+          ...child,
+          parentId: event.id,
+          depth: event.depth + 1,
+          meta: { round, turn, seq: ++eventSeq },
+        });
       }
     };
 
     // 遍历所有相关单位的 Modifier
-    for (const modifier of sortedUnitModifiers(source)) runReactor(source, modifier);
-    for (const modifier of sortedUnitModifiers(target)) runReactor(target, modifier);
+    for (const modifier of sortedUnitModifiers(source))
+      runReactor(source, modifier);
+    for (const modifier of sortedUnitModifiers(target))
+      runReactor(target, modifier);
     for (const modifier of sortedEnvModifiers()) runReactor(envUnit, modifier);
 
     // 触发 POST_ACTION 类型的触发器 (通常用于处理 Buff 移除等无衍生事件的副作用)
@@ -1188,7 +1426,10 @@ export function runBattle(
   // 负责事件的生命周期：创建 -> 拦截/修改(Intercept) -> 结算(Resolve) -> 衍生(Derived)
   function processEvent(event: CombatEvent): void {
     // 1. 深度和数量限制，防止无限递归 (如: 反伤触发反伤)
-    if (event.depth > limits.maxEventDepth || roundEventCount >= limits.maxEventsPerRound) {
+    if (
+      event.depth > limits.maxEventDepth ||
+      roundEventCount >= limits.maxEventsPerRound
+    ) {
       diagnostics.eventsSkipped.depthOrBudget += 1;
       debugLog('event.skipped.limit', {
         eventId: event.id,
@@ -1226,53 +1467,99 @@ export function runBattle(
 
     const source = getUnit(event.sourceId);
     const target = getUnit(event.targetId);
-    
+
     // 3. 死亡检查 (死人无法行动，除非是复活等特殊事件)
     if (!unitAlive(source) && event.type !== 'DEATH') {
       diagnostics.eventsSkipped.sourceDead += 1;
-      debugLog('event.skipped.source-dead', { eventId: event.id, sourceId: source.id, type: event.type });
+      debugLog('event.skipped.source-dead', {
+        eventId: event.id,
+        sourceId: source.id,
+        type: event.type,
+      });
       return;
     }
     if (!unitAlive(target) && !['HEAL', 'DEATH'].includes(event.type)) {
       diagnostics.eventsSkipped.targetDead += 1;
-      debugLog('event.skipped.target-dead', { eventId: event.id, targetId: target.id, type: event.type });
+      debugLog('event.skipped.target-dead', {
+        eventId: event.id,
+        targetId: target.id,
+        type: event.type,
+      });
       return;
     }
 
-    let current: CombatEvent | null = { ...event, payload: { ...event.payload, tags: [...event.payload.tags] } };
+    let current: CombatEvent | null = {
+      ...event,
+      payload: { ...event.payload, tags: [...event.payload.tags] },
+    };
 
     // 4. 环境 (Environment) 拦截阶段
     // 环境效果 (如: 停电导致命中率下降) 优先处理
     for (const modifier of sortedEnvModifiers()) {
-      const ctx: InteractionContext = { engine: runtime, owner: envUnit, source, target };
+      const ctx: InteractionContext = {
+        engine: runtime,
+        owner: envUnit,
+        source,
+        target,
+      };
       current = modifier.hooks?.onOutgoing?.(current, ctx) ?? current;
       if (!current) return; // 事件被取消
       current = modifier.hooks?.onIncoming?.(current, ctx) ?? current;
       if (!current) return;
     }
-    current = runModifierTriggers(envUnit, 'PIPELINE_OUTGOING', current, 'INTERCEPT');
+    current = runModifierTriggers(
+      envUnit,
+      'PIPELINE_OUTGOING',
+      current,
+      'INTERCEPT',
+    );
     if (!current) return;
-    current = runModifierTriggers(envUnit, 'PIPELINE_INCOMING', current, 'INTERCEPT');
+    current = runModifierTriggers(
+      envUnit,
+      'PIPELINE_INCOMING',
+      current,
+      'INTERCEPT',
+    );
     if (!current) return;
 
     // 5. 发起者 (Source) 拦截阶段 (Outgoing)
     // 处理发起者的 Buff/Debuff (如: 增加攻击力)
     for (const modifier of sortedUnitModifiers(source)) {
-      const ctx: InteractionContext = { engine: runtime, owner: source, source, target };
+      const ctx: InteractionContext = {
+        engine: runtime,
+        owner: source,
+        source,
+        target,
+      };
       current = modifier.hooks?.onOutgoing?.(current, ctx) ?? current;
       if (!current) return;
     }
-    current = runModifierTriggers(source, 'PIPELINE_OUTGOING', current, 'INTERCEPT');
+    current = runModifierTriggers(
+      source,
+      'PIPELINE_OUTGOING',
+      current,
+      'INTERCEPT',
+    );
     if (!current) return;
 
     // 6. 目标 (Target) 拦截阶段 (Incoming)
     // 处理目标的 Buff/Debuff (如: 减伤、闪避)
     for (const modifier of sortedUnitModifiers(target)) {
-      const ctx: InteractionContext = { engine: runtime, owner: target, source, target };
+      const ctx: InteractionContext = {
+        engine: runtime,
+        owner: target,
+        source,
+        target,
+      };
       current = modifier.hooks?.onIncoming?.(current, ctx) ?? current;
       if (!current) return;
     }
-    current = runModifierTriggers(target, 'PIPELINE_INCOMING', current, 'INTERCEPT');
+    current = runModifierTriggers(
+      target,
+      'PIPELINE_INCOMING',
+      current,
+      'INTERCEPT',
+    );
     if (!current) return;
 
     // 7. 结算阶段 (Resolve)
@@ -1328,14 +1615,23 @@ export function runBattle(
   function decrementCooldowns(): void {
     for (const unit of units) {
       Object.keys(unit.state.cd).forEach((skillId) => {
-        unit.state.cd[skillId] = runtimeMath.nonNegativeInt((unit.state.cd[skillId] ?? 0) - 1, 999);
+        unit.state.cd[skillId] = runtimeMath.nonNegativeInt(
+          (unit.state.cd[skillId] ?? 0) - 1,
+          999,
+        );
       });
     }
   }
 
   function getEffectiveStat(unit: Unit, stat: keyof BaseStats): number {
-    const selfBonus = unit.modifiers.reduce((sum, modifier) => sum + (modifier.statBonus?.[stat] ?? 0), 0);
-    const envBonus = envModifiers.reduce((sum, modifier) => sum + (modifier.statBonus?.[stat] ?? 0), 0);
+    const selfBonus = unit.modifiers.reduce(
+      (sum, modifier) => sum + (modifier.statBonus?.[stat] ?? 0),
+      0,
+    );
+    const envBonus = envModifiers.reduce(
+      (sum, modifier) => sum + (modifier.statBonus?.[stat] ?? 0),
+      0,
+    );
     return runtimeMath.safeStat(unit.stats[stat] + selfBonus + envBonus);
   }
 
@@ -1360,7 +1656,7 @@ export function runBattle(
     turn = 0;
     roundEventCount = 0;
     triggerCount.clear(); // 清空每回合的触发计数器
-    dedup.clear();        // 清空事件去重缓存
+    dedup.clear(); // 清空事件去重缓存
     snapshots.push(createSnapshot());
 
     // 1. 回合开始 (RoundStart)
@@ -1368,7 +1664,16 @@ export function runBattle(
 
     // 处理全局回合开始事件 (如: 随机天气、突发新闻)
     for (const rule of scheduler.getRules('RoundStart')) {
-      if (rng.bool(rule.chance, { domain: 'EVENT', luk: Math.max(...units.map((unit) => unit.stats.LUK)) }, `scheduler:${rule.poolId}:start`)) {
+      if (
+        rng.bool(
+          rule.chance,
+          {
+            domain: 'EVENT',
+            luk: Math.max(...units.map((unit) => unit.stats.LUK)),
+          },
+          `scheduler:${rule.poolId}:start`,
+        )
+      ) {
         triggerPool(rule.poolId, 'ENV', 0);
       }
     }
@@ -1376,13 +1681,12 @@ export function runBattle(
     decrementCooldowns();
 
     // 2. 确定行动顺序 (基于 AGI 敏捷属性)
-    const queue = units
-      .filter(unitAlive)
-      .sort((left, right) => {
-        const agiDiff = getEffectiveStat(right, 'AGI') - getEffectiveStat(left, 'AGI');
-        if (agiDiff !== 0) return agiDiff;
-        return left.id.localeCompare(right.id);
-      });
+    const queue = units.filter(unitAlive).sort((left, right) => {
+      const agiDiff =
+        getEffectiveStat(right, 'AGI') - getEffectiveStat(left, 'AGI');
+      if (agiDiff !== 0) return agiDiff;
+      return left.id.localeCompare(right.id);
+    });
 
     // 3. 逐个单位行动 (Turn)
     for (const acting of queue) {
@@ -1399,13 +1703,22 @@ export function runBattle(
 
       // 个人突发事件检查
       for (const rule of scheduler.getRules('TurnStart')) {
-        if (rng.bool(rule.chance, { domain: 'EVENT', luk: acting.stats.LUK }, `scheduler:${rule.poolId}:turn-start:${acting.id}`)) {
+        if (
+          rng.bool(
+            rule.chance,
+            { domain: 'EVENT', luk: acting.stats.LUK },
+            `scheduler:${rule.poolId}:turn-start:${acting.id}`,
+          )
+        ) {
           triggerPool(rule.poolId, acting.id, 0);
         }
       }
 
       // 检查控制效果 (眩晕、冰冻等)
-      const controlSource = runControlResolver({ actor: acting, envModifiers: sortedEnvModifiers() });
+      const controlSource = runControlResolver({
+        actor: acting,
+        envModifiers: sortedEnvModifiers(),
+      });
       if (controlSource) {
         pushLog({
           round,
@@ -1438,7 +1751,13 @@ export function runBattle(
       }
 
       for (const rule of scheduler.getRules('TurnEnd')) {
-        if (rng.bool(rule.chance, { domain: 'EVENT', luk: acting.stats.LUK }, `scheduler:${rule.poolId}:turn-end:${acting.id}`)) {
+        if (
+          rng.bool(
+            rule.chance,
+            { domain: 'EVENT', luk: acting.stats.LUK },
+            `scheduler:${rule.poolId}:turn-end:${acting.id}`,
+          )
+        ) {
           triggerPool(rule.poolId, acting.id, 0);
         }
       }
@@ -1451,13 +1770,23 @@ export function runBattle(
     tickModifierDurations(envModifiers); // 环境修饰器按回合结算持续时间
 
     for (const rule of scheduler.getRules('RoundEnd')) {
-      if (rng.bool(rule.chance, { domain: 'EVENT', luk: Math.max(...units.map((unit) => unit.stats.LUK)) }, `scheduler:${rule.poolId}:end`)) {
+      if (
+        rng.bool(
+          rule.chance,
+          {
+            domain: 'EVENT',
+            luk: Math.max(...units.map((unit) => unit.stats.LUK)),
+          },
+          `scheduler:${rule.poolId}:end`,
+        )
+      ) {
         triggerPool(rule.poolId, 'ENV', 0);
       }
     }
   }
   const alive = units.filter(unitAlive);
-  const winner = alive[0] ?? units.sort((left, right) => right.state.hp - left.state.hp)[0];
+  const winner =
+    alive[0] ?? units.sort((left, right) => right.state.hp - left.state.hp)[0];
 
   return {
     seed,

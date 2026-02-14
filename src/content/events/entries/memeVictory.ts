@@ -18,14 +18,13 @@ const memeVictory: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 掏出了珍藏多年的熊猫头，瞬间制霸全场！ 🐼',
+        apply: '{targetName} 祭出了压箱底的绝版熊猫头，完成了最后的绝杀 👑',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 在斗图中大获全胜，对方已无图可发 🚮。',
+    trigger: '大群里的表情包对攻进入白热化，对方的库存显然已经见底了 🖼️',
   },
-
 };
 
 export default memeVictory;

@@ -28,7 +28,6 @@ const greenTea: EventPoolEntry = {
   texts: {
     trigger: '路人对 {actorName} 发动了技能：“不像我，我只会心疼giegie~” 🥺',
   },
-
 };
 
 export default greenTea;

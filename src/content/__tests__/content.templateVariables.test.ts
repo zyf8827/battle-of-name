@@ -63,7 +63,12 @@ const SPEC_ALLOWED_VARIABLES = new Set<string>([
   'roundAfter',
 ]);
 
-function collectPlaceholderMismatches(node: unknown, path: string, mismatches: string[], seen = new WeakSet<object>()): void {
+function collectPlaceholderMismatches(
+  node: unknown,
+  path: string,
+  mismatches: string[],
+  seen = new WeakSet<object>(),
+): void {
   if (typeof node === 'string') {
     const vars = [...node.matchAll(PLACEHOLDER_RE)].map((match) => match[1]);
     for (const variable of vars) {
@@ -75,7 +80,9 @@ function collectPlaceholderMismatches(node: unknown, path: string, mismatches: s
   }
 
   if (Array.isArray(node)) {
-    node.forEach((item, index) => collectPlaceholderMismatches(item, `${path}[${index}]`, mismatches, seen));
+    node.forEach((item, index) =>
+      collectPlaceholderMismatches(item, `${path}[${index}]`, mismatches, seen),
+    );
     return;
   }
 
@@ -97,10 +104,18 @@ describe('content template variables', () => {
   it('uses only spec-defined placeholders across content assets', () => {
     const mismatches: string[] = [];
 
-    classList.forEach((item, index) => collectPlaceholderMismatches(item, `classList[${index}]`, mismatches));
-    equipments.forEach((item, index) => collectPlaceholderMismatches(item, `equipments[${index}]`, mismatches));
-    consumables.forEach((item, index) => collectPlaceholderMismatches(item, `consumables[${index}]`, mismatches));
-    eventEntries.forEach((item, index) => collectPlaceholderMismatches(item, `eventEntries[${index}]`, mismatches));
+    classList.forEach((item, index) =>
+      collectPlaceholderMismatches(item, `classList[${index}]`, mismatches),
+    );
+    equipments.forEach((item, index) =>
+      collectPlaceholderMismatches(item, `equipments[${index}]`, mismatches),
+    );
+    consumables.forEach((item, index) =>
+      collectPlaceholderMismatches(item, `consumables[${index}]`, mismatches),
+    );
+    eventEntries.forEach((item, index) =>
+      collectPlaceholderMismatches(item, `eventEntries[${index}]`, mismatches),
+    );
 
     expect(mismatches).toEqual([]);
   });

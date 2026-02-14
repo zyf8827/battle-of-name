@@ -16,9 +16,7 @@ const syrup: Consumable = {
   id: 'consumable.syrup',
   name: '急支糖浆 🌿',
   description: '喝了就会跑得很快（大概是被豹子追的）。',
-  effects: [
-    { kind: 'APPLY_MODIFIER', target: 'SELF', modifier: sugarRush },
-  ],
+  effects: [{ kind: 'APPLY_MODIFIER', target: 'SELF', modifier: sugarRush }],
   texts: {
     use: ['{unitName} 喝下 {itemName}，突然感觉背后有豹子在追！🏃‍♂️'],
   },

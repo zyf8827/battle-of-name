@@ -9,7 +9,10 @@ const adrenalineRush: Modifier = {
   duration: 2,
   priority: 6,
   tags: ['buff'],
-  stacking: { stackKey: 'consumable.adrenaline_shot.rush', policy: 'REFRESH_DURATION' },
+  stacking: {
+    stackKey: 'consumable.adrenaline_shot.rush',
+    policy: 'REFRESH_DURATION',
+  },
   statBonus: { STR: 2, AGI: 2 },
 };
 
@@ -19,7 +22,12 @@ const adrenalineShot: Consumable = {
   description: '临场提神道具，强调短时爆发感。',
   effects: [
     { kind: 'DIRECT_HEAL', target: 'SELF', value: 10, tags: ['heal'] },
-    { kind: 'APPLY_MODIFIER', target: 'SELF', modifier: adrenalineRush, duration: 2 },
+    {
+      kind: 'APPLY_MODIFIER',
+      target: 'SELF',
+      modifier: adrenalineRush,
+      duration: 2,
+    },
   ],
   texts: {
     use: [

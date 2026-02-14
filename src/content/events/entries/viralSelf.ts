@@ -18,12 +18,13 @@ const viralSelf: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 刷到自己的视频上了热门 📺',
+        apply:
+          '{targetName} 看着几万个赞和疯狂滚动的评论，彻底失去了睡眠的能力 😲',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 凌晨刷视频，刷到...自己？！📺',
+    trigger: '睡前最后一次刷新热榜，那段熟悉的社死视频居然排在第一位 📺',
   },
 };
 

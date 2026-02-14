@@ -65,28 +65,28 @@ type BattlePhase = 'idle' | 'running' | 'paused' | 'finished';
  */
 type BattleStore = {
   // === 输入状态 ===
-  nameA: string;              // 玩家 A 姓名
-  nameB: string;              // 玩家 B 姓名
-  seed: string;               // 战斗种子
+  nameA: string; // 玩家 A 姓名
+  nameB: string; // 玩家 B 姓名
+  seed: string; // 战斗种子
 
   // === 战斗结果 ===
-  result: BattleOutcome | null;  // 战斗结果（完成后非 null）
+  result: BattleOutcome | null; // 战斗结果（完成后非 null）
 
   // === 播放控制 ===
-  cursor: number;              // 当前播放位置（logs 数组索引）
-  speed: 1 | 2;              // 播放速度（1=正常, 2=倍速）
-  stepInterval: number;       // 单步播放间隔（毫秒，默认 800ms）
-  phase: BattlePhase;          // 当前阶段
+  cursor: number; // 当前播放位置（logs 数组索引）
+  speed: 1 | 2; // 播放速度（1=正常, 2=倍速）
+  stepInterval: number; // 单步播放间隔（毫秒，默认 800ms）
+  phase: BattlePhase; // 当前阶段
 
   // === 操作方法 ===
-  setNameA: (value: string) => void;           // 设置玩家 A 姓名
-  setNameB: (value: string) => void;           // 设置玩家 B 姓名
-  startBattle: (seedOverride?: string) => void;  // 开始战斗（可选覆盖种子）
-  togglePause: () => void;                       // 切换暂停/播放
-  step: () => void;                               // 单步前进
-  setSpeed: (speed: 1 | 2) => void;            // 设置播放速度
-  setStepInterval: (interval: number) => void;  // 设置播放间隔
-  reset: () => void;                              // 重置战斗
+  setNameA: (value: string) => void; // 设置玩家 A 姓名
+  setNameB: (value: string) => void; // 设置玩家 B 姓名
+  startBattle: (seedOverride?: string) => void; // 开始战斗（可选覆盖种子）
+  togglePause: () => void; // 切换暂停/播放
+  step: () => void; // 单步前进
+  setSpeed: (speed: 1 | 2) => void; // 设置播放速度
+  setStepInterval: (interval: number) => void; // 设置播放间隔
+  reset: () => void; // 重置战斗
 };
 
 /**
@@ -102,7 +102,8 @@ let battleCounter = 0;
  *
  * 种子使用的字符：数字 + 小写字母 + 大写字母（62 个字符）
  */
-const SEED_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const SEED_ALPHABET =
+  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 /**
  * 默认种子长度
@@ -132,13 +133,18 @@ function createSeedFromNumbers(values: number[], length: number): string {
   let seed = '';
 
   // 主循环：使用输入的数值
-  for (let index = 0; index < values.length && seed.length < length; index += 1) {
+  for (
+    let index = 0;
+    index < values.length && seed.length < length;
+    index += 1
+  ) {
     seed += SEED_ALPHABET[values[index] % SEED_ALPHABET.length];
   }
 
   // Fallback 循环：如果数值用完但长度不够
   while (seed.length < length) {
-    const fallbackValue = (Date.now() + battleCounter + seed.length * 17) % SEED_ALPHABET.length;
+    const fallbackValue =
+      (Date.now() + battleCounter + seed.length * 17) % SEED_ALPHABET.length;
     seed += SEED_ALPHABET[fallbackValue];
   }
 
@@ -185,7 +191,9 @@ function createBattleSeed(nameA: string, nameB: string): string {
 
   // 策略 2: Fallback 确定性算法
   const fallbackBase = `${nameA.trim()}|${nameB.trim()}|${Date.now()}|${battleCounter}`;
-  const values = Array.from(fallbackBase).map((char, index) => char.charCodeAt(0) + index * 13);
+  const values = Array.from(fallbackBase).map(
+    (char, index) => char.charCodeAt(0) + index * 13,
+  );
   return createSeedFromNumbers(values, DEFAULT_SEED_LENGTH);
 }
 
@@ -265,7 +273,9 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     }
 
     // 生成或使用覆盖种子
-    const normalizedSeed = seedOverride?.trim() || createBattleSeed(normalizedNameA, normalizedNameB);
+    const normalizedSeed =
+      seedOverride?.trim() ||
+      createBattleSeed(normalizedNameA, normalizedNameB);
 
     // 执行战斗
     const result = runBattle(
@@ -316,7 +326,12 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     if (!result) return;
 
     const next = Math.min(cursor + 1, result.logs.length);
-    const nextPhase = next >= result.logs.length ? 'finished' : phase === 'idle' ? 'paused' : phase;
+    const nextPhase =
+      next >= result.logs.length
+        ? 'finished'
+        : phase === 'idle'
+          ? 'paused'
+          : phase;
 
     set({ cursor: next, phase: nextPhase });
   },

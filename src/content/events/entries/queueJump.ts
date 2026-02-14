@@ -18,14 +18,14 @@ const queueJump: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 强行插队成功，虽然被骂，但快了。 🏃',
+        apply:
+          '{targetName} 顶着后面排队大妈杀人般的目光，强行缩短了等待时间 👺',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 在超市收银台发动技能：我赶时间！🕐',
+    trigger: '超市收银台前排起了长龙，一个人影突然鬼鬼祟祟地插到了最前面 🛒',
   },
-
 };
 
 export default queueJump;

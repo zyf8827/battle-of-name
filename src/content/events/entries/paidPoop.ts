@@ -28,7 +28,6 @@ const paidPoop: EventPoolEntry = {
   texts: {
     trigger: '{actorName} 躲进了厕所隔间，享受带薪时光 😌。',
   },
-
 };
 
 export default paidPoop;

@@ -1,21 +1,55 @@
 import { getClassById } from '../content/classes';
 import { getConsumableById } from '../content/consumables';
 import { getEquipmentById } from '../content/equipment';
-import type { Unit } from '../engine/types';
+import type { Modifier, Unit } from '../engine/types';
 import { Tooltip } from './Tooltip';
 
 type FighterPanelProps = {
   unit: Unit;
   winner?: boolean;
   totalDamage?: number;
+  envModifiers?: Modifier[];
 };
 
-export function FighterPanel({ unit, winner, totalDamage }: FighterPanelProps) {
-  const hpRate = Math.max(0, Math.min(1, unit.state.hp / Math.max(1, unit.state.maxHp)));
-  
+export function FighterPanel({
+  unit,
+  winner,
+  totalDamage,
+  envModifiers = [],
+}: FighterPanelProps) {
+  const hpRate = Math.max(
+    0,
+    Math.min(1, unit.state.hp / Math.max(1, unit.state.maxHp)),
+  );
+
   const equipmentModifiers = unit.modifiers.filter((m) => m.source === 'EQUIP');
-  const otherModifiers = unit.modifiers.filter((m) => m.source !== 'EQUIP');
-  
+
+  // 合并所有非装备修饰器，并按 ID 去重合并
+  const allOtherModifiers = [
+    ...unit.modifiers.filter((m) => m.source !== 'EQUIP'),
+    ...envModifiers,
+  ];
+  const otherModifiers = Array.from(
+    allOtherModifiers
+      .reduce((acc, modifier) => {
+        const existing = acc.get(modifier.id);
+        if (existing) {
+          // 相同 ID 的修饰器，合并层数和持续时间
+          const stacks = (existing.stacks ?? 1) + 1;
+          const duration = modifier.duration ?? existing.duration;
+          acc.set(modifier.id, {
+            ...existing,
+            stacks,
+            duration: Math.max(existing.duration ?? 0, duration ?? 0),
+          });
+        } else {
+          acc.set(modifier.id, { ...modifier, stacks: modifier.stacks ?? 1 });
+        }
+        return acc;
+      }, new Map<string, Modifier>())
+      .values(),
+  );
+
   let characterClass;
   try {
     characterClass = unit.classId ? getClassById(unit.classId) : undefined;
@@ -24,28 +58,37 @@ export function FighterPanel({ unit, winner, totalDamage }: FighterPanelProps) {
   }
 
   return (
-    <article className={`relative rounded-xl border p-4 transition-all duration-300 ${winner ? 'border-amber-500/50 bg-amber-950/20 shadow-[0_0_30px_-10px_rgba(245,158,11,0.3)]' : 'border-slate-700 bg-slate-900/80 shadow-lg'}`}>
+    <article
+      className={`relative rounded-xl border p-4 transition-all duration-300 ${winner ? 'border-amber-500/50 bg-amber-950/20 shadow-[0_0_30px_-10px_rgba(245,158,11,0.3)]' : 'border-slate-700 bg-slate-900/80 shadow-lg'}`}
+    >
       <header className="mb-4 flex items-start justify-between">
         <div>
           <h3 className="flex items-center gap-2 text-xl font-black tracking-wide text-slate-100">
             {unit.name}
             {winner && <span className="text-xl">👑</span>}
           </h3>
-          <Tooltip 
+          <Tooltip
             content={
               characterClass ? (
                 <div>
-                  <div className="font-bold text-slate-200">{characterClass.name}</div>
-                  <div className="mt-1 text-slate-400">{characterClass.description}</div>
-                  {characterClass.talents && characterClass.talents.length > 0 && (
-                    <div className="mt-1 text-sky-400 text-[10px]">
-                      {characterClass.talents.map(t => (
-                        <div key={t.id}>被动: {t.name}</div>
-                      ))}
-                    </div>
-                  )}
+                  <div className="font-bold text-slate-200">
+                    {characterClass.name}
+                  </div>
+                  <div className="mt-1 text-slate-400">
+                    {characterClass.description}
+                  </div>
+                  {characterClass.talents &&
+                    characterClass.talents.length > 0 && (
+                      <div className="mt-1 text-sky-400 text-[10px]">
+                        {characterClass.talents.map((t) => (
+                          <div key={t.id}>被动: {t.name}</div>
+                        ))}
+                      </div>
+                    )}
                 </div>
-              ) : "无职业"
+              ) : (
+                '无职业'
+              )
             }
           >
             <p className="cursor-help text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors">
@@ -64,25 +107,26 @@ export function FighterPanel({ unit, winner, totalDamage }: FighterPanelProps) {
       {/* HP Bar */}
       <div className="mb-1 flex items-center justify-between text-xs font-semibold text-slate-300">
         <span className="flex items-center gap-1 text-rose-400">
-          <span className="text-[10px]">❤️</span> {unit.state.hp} <span className="text-slate-500">/ {unit.state.maxHp}</span>
+          <span className="text-[10px]">❤️</span> {unit.state.hp}{' '}
+          <span className="text-slate-500">/ {unit.state.maxHp}</span>
         </span>
         {unit.state.shield > 0 && (
-          <span className="flex items-center gap-1 text-sky-400">
+          <span className="flex items-center gap-1 rounded bg-sky-500/20 px-2 py-0.5 text-xs font-bold text-sky-300 ring-1 ring-sky-500/40">
             🛡️ {unit.state.shield}
           </span>
         )}
       </div>
       <div className="relative mb-5 h-3 overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700/50">
-        <div 
-          className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-600 to-rose-400 transition-all duration-500 ease-out" 
-          style={{ width: `${hpRate * 100}%` }} 
+        <div
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-600 to-rose-400 transition-all duration-500 ease-out"
+          style={{ width: `${hpRate * 100}%` }}
         />
         {unit.state.shield > 0 && (
-          <div 
+          <div
             className="absolute top-0 h-full bg-sky-400/50 mix-blend-screen transition-all duration-500"
-            style={{ 
+            style={{
               left: 0,
-              width: `${Math.min(100, (unit.state.hp + unit.state.shield) / unit.state.maxHp * 100)}%` 
+              width: `${Math.min(100, ((unit.state.hp + unit.state.shield) / unit.state.maxHp) * 100)}%`,
             }}
           />
         )}
@@ -92,37 +136,53 @@ export function FighterPanel({ unit, winner, totalDamage }: FighterPanelProps) {
       <div className="mb-5 grid grid-cols-2 gap-3 rounded-lg bg-slate-950/30 p-3">
         <Tooltip content="决定物理攻击伤害 (STR)">
           <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-rose-500/10 text-lg">💪</div>
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-rose-500/10 text-lg">
+              💪
+            </div>
             <div>
               <div className="text-[10px] text-slate-500">力量 (STR)</div>
-              <div className="font-mono text-sm font-bold text-slate-200">{unit.stats.STR}</div>
+              <div className="font-mono text-sm font-bold text-slate-200">
+                {unit.stats.STR}
+              </div>
             </div>
           </div>
         </Tooltip>
         <Tooltip content="决定出手速度和闪避率 (AGI)">
           <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-emerald-500/10 text-lg">🦶</div>
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-emerald-500/10 text-lg">
+              🦶
+            </div>
             <div>
               <div className="text-[10px] text-slate-500">敏捷 (AGI)</div>
-              <div className="font-mono text-sm font-bold text-slate-200">{unit.stats.AGI}</div>
+              <div className="font-mono text-sm font-bold text-slate-200">
+                {unit.stats.AGI}
+              </div>
             </div>
           </div>
         </Tooltip>
         <Tooltip content="决定最大生命值 (VIT)">
           <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-amber-500/10 text-lg">❤️</div>
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-amber-500/10 text-lg">
+              ❤️
+            </div>
             <div>
               <div className="text-[10px] text-slate-500">体质 (VIT)</div>
-              <div className="font-mono text-sm font-bold text-slate-200">{unit.stats.VIT}</div>
+              <div className="font-mono text-sm font-bold text-slate-200">
+                {unit.stats.VIT}
+              </div>
             </div>
           </div>
         </Tooltip>
         <Tooltip content="决定暴击率和随机事件好运度 (LUK)">
           <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-purple-500/10 text-lg">🍀</div>
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-purple-500/10 text-lg">
+              🍀
+            </div>
             <div>
               <div className="text-[10px] text-slate-500">幸运 (LUK)</div>
-              <div className="font-mono text-sm font-bold text-slate-200">{unit.stats.LUK}</div>
+              <div className="font-mono text-sm font-bold text-slate-200">
+                {unit.stats.LUK}
+              </div>
             </div>
           </div>
         </Tooltip>
@@ -132,10 +192,13 @@ export function FighterPanel({ unit, winner, totalDamage }: FighterPanelProps) {
         {/* Equipment */}
         <div>
           <p className="mb-2 flex items-center gap-1 text-xs font-semibold text-slate-400">
-            <span className="inline-block h-1 w-1 rounded-full bg-slate-500"></span> 装备
+            <span className="inline-block h-1 w-1 rounded-full bg-slate-500"></span>{' '}
+            装备
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {equipmentModifiers.length === 0 ? <span className="text-xs italic text-slate-600">无</span> : null}
+            {equipmentModifiers.length === 0 ? (
+              <span className="text-xs italic text-slate-600">无</span>
+            ) : null}
             {equipmentModifiers.map((modifier) => {
               const equipDef = getEquipmentById(modifier.id);
               const rarityMap: Record<string, string> = {
@@ -151,15 +214,22 @@ export function FighterPanel({ unit, winner, totalDamage }: FighterPanelProps) {
               };
 
               return (
-                <Tooltip 
+                <Tooltip
                   key={`${unit.id}-equip-${modifier.id}-${modifier.appliedOrder}`}
                   content={
                     <div>
-                      <div className="font-bold text-amber-300">{modifier.name}</div>
-                      {equipDef?.description && <div className="mt-1 text-slate-300">{equipDef.description}</div>}
+                      <div className="font-bold text-amber-300">
+                        {modifier.name}
+                      </div>
+                      {equipDef?.description && (
+                        <div className="mt-1 text-slate-300">
+                          {equipDef.description}
+                        </div>
+                      )}
                       {equipDef && (
                         <div className="mt-1 text-[10px] text-slate-500 uppercase">
-                          {rarityMap[equipDef.rarity] ?? equipDef.rarity} · {slotMap[equipDef.slot] ?? equipDef.slot}
+                          {rarityMap[equipDef.rarity] ?? equipDef.rarity} ·{' '}
+                          {slotMap[equipDef.slot] ?? equipDef.slot}
                         </div>
                       )}
                     </div>
@@ -177,28 +247,46 @@ export function FighterPanel({ unit, winner, totalDamage }: FighterPanelProps) {
         {/* Status Effects */}
         <div>
           <p className="mb-2 flex items-center gap-1 text-xs font-semibold text-slate-400">
-            <span className="inline-block h-1 w-1 rounded-full bg-slate-500"></span> 状态效果
+            <span className="inline-block h-1 w-1 rounded-full bg-slate-500"></span>{' '}
+            状态效果
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {otherModifiers.length === 0 ? <span className="text-xs italic text-slate-600">无</span> : null}
+            {otherModifiers.length === 0 ? (
+              <span className="text-xs italic text-slate-600">无</span>
+            ) : null}
             {otherModifiers.map((modifier) => (
-              <Tooltip 
+              <Tooltip
                 key={`${unit.id}-${modifier.id}-${modifier.appliedOrder}`}
                 content={
                   <div>
-                    <div className="font-bold text-indigo-300">{modifier.name}</div>
-                    {modifier.description && <div className="mt-1 text-slate-300">{modifier.description}</div>}
+                    <div className="font-bold text-indigo-300">
+                      {modifier.name}
+                    </div>
+                    {modifier.description && (
+                      <div className="mt-1 text-slate-300">
+                        {modifier.description}
+                      </div>
+                    )}
                     <div className="mt-1 text-[10px] text-slate-500">
-                       持续: {modifier.duration ?? '无限'} | 层数: {modifier.stacks ?? 1}
+                      持续: {modifier.duration ?? '无限'} | 层数:{' '}
+                      {modifier.stacks ?? 1}
                     </div>
                   </div>
                 }
               >
                 <span className="inline-flex cursor-help items-center gap-1 rounded border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-xs text-indigo-300 transition hover:bg-indigo-500/20 hover:text-indigo-200">
                   {modifier.name}
-                  {typeof modifier.duration === 'number' && modifier.duration > 0 && (
-                    <span className="rounded bg-indigo-500/20 px-1 text-[10px] text-indigo-200">{modifier.duration}</span>
+                  {(modifier.stacks ?? 1) > 1 && (
+                    <span className="rounded bg-indigo-500/20 px-1 text-[10px] text-indigo-200">
+                      x{modifier.stacks}
+                    </span>
                   )}
+                  {typeof modifier.duration === 'number' &&
+                    modifier.duration > 0 && (
+                      <span className="rounded bg-indigo-500/20 px-1 text-[10px] text-indigo-200">
+                        {modifier.duration}
+                      </span>
+                    )}
                 </span>
               </Tooltip>
             ))}
@@ -208,23 +296,32 @@ export function FighterPanel({ unit, winner, totalDamage }: FighterPanelProps) {
         {/* Consumables */}
         <div>
           <p className="mb-2 flex items-center gap-1 text-xs font-semibold text-slate-400">
-            <span className="inline-block h-1 w-1 rounded-full bg-slate-500"></span> 持有物品
+            <span className="inline-block h-1 w-1 rounded-full bg-slate-500"></span>{' '}
+            持有物品
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {(unit.state.consumables ?? []).length === 0 ? <span className="text-xs italic text-slate-600">无</span> : null}
+            {(unit.state.consumables ?? []).length === 0 ? (
+              <span className="text-xs italic text-slate-600">无</span>
+            ) : null}
             {(unit.state.consumables ?? []).map((itemId, idx) => {
               const itemDef = getConsumableById(itemId);
               return (
-                <Tooltip 
+                <Tooltip
                   key={`${unit.id}-item-${itemId}-${idx}`}
                   content={
                     itemDef ? (
                       <div>
-                        <div className="font-bold text-emerald-300">{itemDef.name}</div>
-                        <div className="mt-1 text-slate-300">{itemDef.description}</div>
+                        <div className="font-bold text-emerald-300">
+                          {itemDef.name}
+                        </div>
+                        <div className="mt-1 text-slate-300">
+                          {itemDef.description}
+                        </div>
                       </div>
                     ) : (
-                      <div className="text-rose-400">Unknown Item: {itemId}</div>
+                      <div className="text-rose-400">
+                        Unknown Item: {itemId}
+                      </div>
                     )
                   }
                 >
@@ -241,7 +338,10 @@ export function FighterPanel({ unit, winner, totalDamage }: FighterPanelProps) {
       {typeof totalDamage === 'number' && (
         <div className="mt-4 border-t border-slate-700/50 pt-3 text-center">
           <p className="text-xs text-slate-400">
-            本场总输出 <span className="font-mono text-sm font-bold text-rose-400">{totalDamage}</span>
+            本场总输出{' '}
+            <span className="font-mono text-sm font-bold text-rose-400">
+              {totalDamage}
+            </span>
           </p>
         </div>
       )}

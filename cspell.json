@@ -1,0 +1,19 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "debuff",
+    "debuffs",
+    "respec",
+    "cooldown",
+    "cooldowns",
+    "buff",
+    "buffs",
+    "aggro"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    ".git"
+  ]
+}

@@ -28,7 +28,6 @@ const forcedTeamBuilding: EventPoolEntry = {
   texts: {
     trigger: '{actorName} 被拉去周末团建，身心俱疲 🏕️。',
   },
-
 };
 
 export default forcedTeamBuilding;

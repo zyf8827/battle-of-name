@@ -13,7 +13,10 @@ const slackPermit: EquipmentLike = {
   statBonus: { VIT: 2, LUK: 1 },
   triggers: [
     {
-      trigger: { on: 'ON_HURT', when: { role: 'TARGET', notHasTags: ['miss'] } },
+      trigger: {
+        on: 'ON_HURT',
+        when: { role: 'TARGET', notHasTags: ['miss'] },
+      },
       effects: [{ kind: 'DISPEL', target: 'SELF', mode: 'DEBUFF', max: 1 }],
     },
   ],

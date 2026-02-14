@@ -18,7 +18,8 @@ const refundCoupon: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 的外卖超时了，收到优惠券 🍀',
+        apply:
+          '{targetName} 摸着咕咕叫的肚子，在五元代金券中获得了一丝精神安慰 🍀',
       },
     },
     {
@@ -27,7 +28,7 @@ const refundCoupon: EventPoolEntry = {
     },
   ],
   texts: {
-    trigger: '{actorName} 点外卖超时，平台赔付了优惠券 🎫',
+    trigger: '外卖订单的配送时间已经变成了红色，系统自动弹出一条补偿消息 🎫',
   },
 };
 

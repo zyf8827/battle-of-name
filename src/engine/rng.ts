@@ -51,7 +51,7 @@ import type { RNG } from './types';
  * @returns 概率加成（[0, maxBias]）
  */
 function luckBias(domain: 'EVENT' | 'COMBAT', luk: number): number {
-  const k = domain === 'EVENT' ? 60 : 120;       // 衰减常数，决定曲线陡峭程度
+  const k = domain === 'EVENT' ? 60 : 120; // 衰减常数，决定曲线陡峭程度
   const maxBias = domain === 'EVENT' ? 0.25 : 0.08; // 最大概率加成上限 (25% 或 8%)
   return maxBias * (1 - Math.exp(-Math.max(0, luk) / k));
 }
@@ -210,7 +210,11 @@ export function createRng(seed: string): RNG {
      * // c: 50.0% 概率 (30/60)
      * ```
      */
-    weightedPick<T>(options: T[], weights: (item: T) => number, label = 'weightedPick'): T {
+    weightedPick<T>(
+      options: T[],
+      weights: (item: T) => number,
+      label = 'weightedPick',
+    ): T {
       // 归一化权重（确保非负）
       const normalized = options.map((item) => Math.max(0, weights(item)));
 

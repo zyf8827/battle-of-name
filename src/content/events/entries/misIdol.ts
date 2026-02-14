@@ -18,12 +18,13 @@ const misIdol: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 被路人当成网红要签名 📸',
+        apply:
+          '{targetName} 还没反应过来，就被塞了一支笔签名，虚荣心瞬间爆棚 ✨',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 走在路上，被路人拦住：能合个影吗？📸',
+    trigger: '几个扛着长枪短炮的摄影师突然围了上来，闪光灯亮成一片 📸',
   },
 };
 

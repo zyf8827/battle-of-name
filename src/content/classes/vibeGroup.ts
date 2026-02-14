@@ -16,7 +16,7 @@ const rhythmMaster: Modifier = {
         { statBonus: { VIT: 3 }, name: '氛围', description: '体质提升' },
       ];
       const picked = engine.rng.weightedPick(buffs, () => 1, 'vibe_group.buff');
-      
+
       engine.state.applyModifierEffect(owner, owner, {
         kind: 'APPLY_MODIFIER',
         modifier: {

@@ -24,12 +24,13 @@ const soupSpill: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 的外卖汤洒了一身，衣服烫坏了 🤕',
+        apply:
+          '{targetName} 低头看着身上刚买的浅色衬衫，感觉整个人都要裂开了 🤕',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 端外卖，汤盖飞了...浑身汤汁 🍲',
+    trigger: '外卖盒的塑料盖在热气的冲击下突然崩开，浓稠的汤汁四溅 🍲',
   },
 };
 

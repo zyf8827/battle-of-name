@@ -14,7 +14,13 @@ const cyberAmuletQr: EquipmentLike = {
   triggers: [
     {
       trigger: { on: 'ROUND_START' },
-      effects: [{ kind: 'SHIELD', value: [{ type: 'FLAT', value: 4 }], tags: ['shield', 'equip'] }],
+      effects: [
+        {
+          kind: 'SHIELD',
+          value: [{ type: 'FLAT', value: 4 }],
+          tags: ['shield', 'equip'],
+        },
+      ],
     },
   ],
   texts: {

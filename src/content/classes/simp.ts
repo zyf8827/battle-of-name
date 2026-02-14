@@ -12,9 +12,10 @@ const selfMoved: Modifier = {
     onPostAction: (event, { engine, owner }) => {
       // 只有自己是被打的目标才触发
       if (event.targetId !== owner.id || event.type !== 'ATTACK') return [];
-      
+
       // 20% 概率
-      if (!engine.rng.bool(0.2, { domain: 'COMBAT', luk: owner.stats.LUK })) return [];
+      if (!engine.rng.bool(0.2, { domain: 'COMBAT', luk: owner.stats.LUK }))
+        return [];
 
       return [
         engine.event.make({

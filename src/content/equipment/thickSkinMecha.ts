@@ -13,8 +13,17 @@ const thickSkinMecha: EquipmentLike = {
   statBonus: { VIT: 3 },
   triggers: [
     {
-      trigger: { on: 'ON_HURT', when: { role: 'TARGET', notHasTags: ['miss'] } },
-      effects: [{ kind: 'SHIELD', value: [{ type: 'FLAT', value: 7 }], tags: ['shield', 'equip'] }],
+      trigger: {
+        on: 'ON_HURT',
+        when: { role: 'TARGET', notHasTags: ['miss'] },
+      },
+      effects: [
+        {
+          kind: 'SHIELD',
+          value: [{ type: 'FLAT', value: 7 }],
+          tags: ['shield', 'equip'],
+        },
+      ],
     },
   ],
   texts: {

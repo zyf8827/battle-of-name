@@ -8,8 +8,8 @@ const warmInside: Modifier = {
   description: '多喝热水，包治百病。',
   duration: 1,
   tags: ['buff'],
-  // 免疫控制的实现：在 ControlResolver 中检查 buff tags? 
-  // 或者这里直接给一个高抗性? 
+  // 免疫控制的实现：在 ControlResolver 中检查 buff tags?
+  // 或者这里直接给一个高抗性?
   // 引擎默认实现检查 tags.includes('control') 作为控制源。
   // 我们这里只做文案和 Dispel 效果。
 };

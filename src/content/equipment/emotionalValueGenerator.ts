@@ -14,7 +14,14 @@ const emotionalValueGenerator: EquipmentLike = {
   triggers: [
     {
       trigger: { on: 'ROUND_START' },
-      effects: [{ kind: 'DIRECT_HEAL', target: 'SELF', value: 3, tags: ['heal', 'equip'] }],
+      effects: [
+        {
+          kind: 'DIRECT_HEAL',
+          target: 'SELF',
+          value: 3,
+          tags: ['heal', 'equip'],
+        },
+      ],
     },
   ],
   texts: {

@@ -25,10 +25,16 @@ const thorns: EquipmentLike = {
       if (event.type !== 'ATTACK' || event.targetId !== ctx.owner.id) {
         return [];
       }
-      if (event.payload.tags.includes('reflect') || event.payload.tags.includes('miss')) {
+      if (
+        event.payload.tags.includes('reflect') ||
+        event.payload.tags.includes('miss')
+      ) {
         return [];
       }
-      const reflected = Math.max(1, Math.floor((event.payload.value ?? 0) * 0.3));
+      const reflected = Math.max(
+        1,
+        Math.floor((event.payload.value ?? 0) * 0.3),
+      );
       return [
         ctx.engine.event.make({
           type: 'ATTACK',

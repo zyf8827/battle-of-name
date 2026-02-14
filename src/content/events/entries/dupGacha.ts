@@ -24,12 +24,12 @@ const dupGacha: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 抽到了重复角色！非酋实锤 🎲',
+        apply: '{targetName} 痛苦地捂住了钱包，甚至能听到系统嘲笑的声音 🎲',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 十连抽，金光一闪...是已经有的角色 🎮',
+    trigger: '伴随着激昂的音乐和金光，又一张熟悉的面孔出现在屏幕上 🎮',
   },
 };
 

@@ -13,8 +13,21 @@ const readIgnoreBoomerang: EquipmentLike = {
   statBonus: { AGI: 2, LUK: 2 },
   triggers: [
     {
-      trigger: { on: 'ON_HIT', when: { role: 'SOURCE', notHasTags: ['miss', 'true_damage', 'reflect'] } },
-      effects: [{ kind: 'DIRECT_DAMAGE', target: 'TARGET', value: 5, tags: ['true_damage', 'equip'] }],
+      trigger: {
+        on: 'ON_HIT',
+        when: {
+          role: 'SOURCE',
+          notHasTags: ['miss', 'true_damage', 'reflect'],
+        },
+      },
+      effects: [
+        {
+          kind: 'DIRECT_DAMAGE',
+          target: 'TARGET',
+          value: 5,
+          tags: ['true_damage', 'equip'],
+        },
+      ],
     },
   ],
   texts: {

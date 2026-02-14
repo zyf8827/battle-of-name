@@ -14,7 +14,13 @@ const urgentRedHeadDoc: EquipmentLike = {
   triggers: [
     {
       trigger: { on: 'TURN_START' },
-      effects: [{ kind: 'SHIELD', value: [{ type: 'FLAT', value: 5 }], tags: ['shield', 'equip'] }],
+      effects: [
+        {
+          kind: 'SHIELD',
+          value: [{ type: 'FLAT', value: 5 }],
+          tags: ['shield', 'equip'],
+        },
+      ],
     },
   ],
   texts: {

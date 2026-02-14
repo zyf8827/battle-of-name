@@ -61,7 +61,9 @@ export type EffectHandlerContext<K extends string = string> = {
   parentId?: string;
 };
 
-export type EffectHandler<K extends string = string> = (ctx: EffectHandlerContext<K>) => CombatEvent | null | void;
+export type EffectHandler<K extends string = string> = (
+  ctx: EffectHandlerContext<K>,
+) => CombatEvent | null | void;
 export type EffectHandlerRegistry = Partial<Record<string, EffectHandler>>;
 
 export type TurnActionContext = {
@@ -79,7 +81,9 @@ export type TurnConsumableContext = {
   actor: Unit;
   runtime: EngineRuntime;
   round: number;
-  getConsumableById: (id: string) => { id: string; name: string; effects?: EffectSpec[] } | undefined;
+  getConsumableById: (
+    id: string,
+  ) => { id: string; name: string; effects?: EffectSpec[] } | undefined;
   getConsumableIds: () => string[];
   pickRandomFrom: <T>(values: T[], label: string) => T | undefined;
   consumeById: (consumableId: string) => void;
@@ -92,7 +96,9 @@ export type ControlSourceResolverContext = {
   envModifiers: Modifier[];
 };
 
-export type ControlSourceResolver = (ctx: ControlSourceResolverContext) => Modifier | undefined;
+export type ControlSourceResolver = (
+  ctx: ControlSourceResolverContext,
+) => Modifier | undefined;
 
 export type BattleBootstrapResult = {
   units: Unit[];
@@ -105,7 +111,9 @@ export type BattleBootstrapResult = {
   logText: BattleLogTextResolver;
   createModifierById: (id: string, duration?: number) => Modifier;
   getEquipmentById?: (id: string) => Modifier | undefined;
-  getConsumableById: (id: string) => { id: string; name: string; effects?: EffectSpec[] } | undefined;
+  getConsumableById: (
+    id: string,
+  ) => { id: string; name: string; effects?: EffectSpec[] } | undefined;
   effectHandlers?: EffectHandlerRegistry;
   executeTurnAction?: TurnActionExecutor;
   executeTurnConsumable?: TurnConsumableExecutor;

@@ -12,18 +12,23 @@ const smell: Modifier = {
   triggers: [
     {
       trigger: { on: 'TURN_START' },
-      effects: [{ kind: 'DIRECT_DAMAGE', target: 'SELF', value: 8, tags: ['dot', 'magic'] }]
-    }
-  ]
+      effects: [
+        {
+          kind: 'DIRECT_DAMAGE',
+          target: 'SELF',
+          value: 8,
+          tags: ['dot', 'magic'],
+        },
+      ],
+    },
+  ],
 };
 
 const durian: Consumable = {
   id: 'consumable.durian',
   name: '没吃完的榴莲 💩',
   description: '生化武器。造成中毒和减速。',
-  effects: [
-    { kind: 'APPLY_MODIFIER', target: 'TARGET', modifier: smell },
-  ],
+  effects: [{ kind: 'APPLY_MODIFIER', target: 'TARGET', modifier: smell }],
   texts: {
     use: ['{unitName} 掏出一块 {itemName} 扔了过去，全场窒息！😷'],
   },

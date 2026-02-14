@@ -71,6 +71,18 @@ export const CURRENT_WEIGHT_PROFILE: BalanceWeightProfile = {
     'event.moment_like': 1.05,
     'event.toilet_boss': 1.05,
     'event.cold_shower': 1.05,
+    // 新增装备相关事件
+    'event.express_delivery': 1.15,
+    'event.colleague_gift': 1.12,
+    'event.cleaner_find': 1.1,
+    'event.asset_check': 0.95,
+    'event.desk_organize': 1.08,
+    // 新增物品相关事件
+    'event.snack_thief': 1.1,
+    'event.afternoon_tea': 1.12,
+    'event.expired_item': 0.9,
+    'event.vending_machine': 1.15,
+    'event.fridge_sharing': 1.08,
   },
   scheduleChanceMultiplier: {
     'pool.round.global@RoundStart': 0.95,
@@ -78,7 +90,10 @@ export const CURRENT_WEIGHT_PROFILE: BalanceWeightProfile = {
   },
 };
 
-export function resolveWeight(weights: Partial<Record<string, number>>, id: string): number {
+export function resolveWeight(
+  weights: Partial<Record<string, number>>,
+  id: string,
+): number {
   const value = weights[id];
   if (typeof value !== 'number' || !Number.isFinite(value)) return 1;
   return Math.min(3, Math.max(0.2, value));

@@ -18,7 +18,8 @@ const snackParty: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 吃到公司免费零食 🍬',
+        apply:
+          '{targetName} 凭借多年抢饭的经验，成功在人群中捞到了最后一包薯片 😋',
       },
     },
     {
@@ -27,7 +28,7 @@ const snackParty: EventPoolEntry = {
     },
   ],
   texts: {
-    trigger: '公司零食柜清仓大放送，全员开吃 🍬',
+    trigger: '行政部高喊：“零食柜更新，旧的快过期的随便拿！” 🍬',
   },
 };
 

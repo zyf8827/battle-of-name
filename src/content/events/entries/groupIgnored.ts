@@ -18,12 +18,12 @@ const groupIgnored: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 在群里说话，就像空气一样 💬',
+        apply: '{targetName} 疯狂刷新页面，确认了自己确实是被全员无视了 ❄️',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 在群里发了条消息，一个小时没人回 💬',
+    trigger: '在大群里发出的疑问石沉大海，只有屏幕冷冰冰的光 💬',
   },
 };
 

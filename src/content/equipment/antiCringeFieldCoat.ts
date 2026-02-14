@@ -17,7 +17,11 @@ const antiCringeFieldCoat: EquipmentLike = {
       effects: [
         {
           kind: 'MITIGATE',
-          when: { role: 'TARGET', eventType: 'ATTACK', notHasTags: ['true_damage'] },
+          when: {
+            role: 'TARGET',
+            eventType: 'ATTACK',
+            notHasTags: ['true_damage'],
+          },
           multiplier: 0.88,
           min: 1,
         },

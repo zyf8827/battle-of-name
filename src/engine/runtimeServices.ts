@@ -19,7 +19,12 @@ type RuntimeServiceDeps = {
   pickRandomFrom: <T>(values: T[], label: string) => T | undefined;
   cloneModifier: <T>(value: T) => T;
   applyModifier: (targetId: string, modifier: Modifier) => void;
-  removeModifier: (targetId: string, modifierId?: string, stackKey?: string, max?: number) => number;
+  removeModifier: (
+    targetId: string,
+    modifierId?: string,
+    stackKey?: string,
+    max?: number,
+  ) => number;
   log: (args: ServiceLogArgs) => void;
 };
 
@@ -57,7 +62,10 @@ export function grantConsumableWithPolicy(
       });
     }
   }
-  target.state.consumables = [...(target.state.consumables ?? []), consumableId];
+  target.state.consumables = [
+    ...(target.state.consumables ?? []),
+    consumableId,
+  ];
   deps.log({
     key: 'pickupConsumable',
     variables: {
@@ -72,7 +80,11 @@ export function grantConsumableWithPolicy(
   });
 }
 
-export function loseConsumableByIdWithPolicy(deps: RuntimeServiceDeps, target: Unit, consumableId: string): boolean {
+export function loseConsumableByIdWithPolicy(
+  deps: RuntimeServiceDeps,
+  target: Unit,
+  consumableId: string,
+): boolean {
   const items = [...(target.state.consumables ?? [])];
   const index = items.indexOf(consumableId);
   if (index < 0) return false;
@@ -93,11 +105,16 @@ export function loseConsumableByIdWithPolicy(deps: RuntimeServiceDeps, target: U
   return true;
 }
 
-export function loseRandomConsumableWithPolicy(deps: RuntimeServiceDeps, target: Unit): void {
+export function loseRandomConsumableWithPolicy(
+  deps: RuntimeServiceDeps,
+  target: Unit,
+): void {
   const items = [...(target.state.consumables ?? [])];
   const dropped = deps.pickRandomFrom(items, 'event.dropConsumable.random');
   if (!dropped) return;
-  target.state.consumables = items.filter((itemId, idx) => itemId !== dropped || idx !== items.indexOf(dropped));
+  target.state.consumables = items.filter(
+    (itemId, idx) => itemId !== dropped || idx !== items.indexOf(dropped),
+  );
   deps.log({
     key: 'dropConsumable',
     variables: {
@@ -112,14 +129,19 @@ export function loseRandomConsumableWithPolicy(deps: RuntimeServiceDeps, target:
   });
 }
 
-export function grantEquipmentWithPolicy(deps: RuntimeServiceDeps, target: Unit, equipment: Modifier): void {
+export function grantEquipmentWithPolicy(
+  deps: RuntimeServiceDeps,
+  target: Unit,
+  equipment: Modifier,
+): void {
   const nextEquipment = deps.cloneModifier(equipment);
   const slot = equipmentSlotOf(nextEquipment);
   let replaced: Modifier | undefined;
 
   if (slot) {
     const index = target.modifiers.findIndex(
-      (modifier) => modifier.source === 'EQUIP' && equipmentSlotOf(modifier) === slot,
+      (modifier) =>
+        modifier.source === 'EQUIP' && equipmentSlotOf(modifier) === slot,
     );
     if (index >= 0) {
       replaced = target.modifiers[index];
@@ -188,8 +210,14 @@ export function loseRandomEquipmentWithPolicy(
   });
 }
 
-export function loseEquipmentByIdWithPolicy(deps: RuntimeServiceDeps, target: Unit, equipmentId: string): boolean {
-  const dropped = target.modifiers.find((modifier) => modifier.source === 'EQUIP' && modifier.id === equipmentId);
+export function loseEquipmentByIdWithPolicy(
+  deps: RuntimeServiceDeps,
+  target: Unit,
+  equipmentId: string,
+): boolean {
+  const dropped = target.modifiers.find(
+    (modifier) => modifier.source === 'EQUIP' && modifier.id === equipmentId,
+  );
   if (!dropped) return false;
   deps.removeModifier(target.id, dropped.id, dropped.stacking?.stackKey, 1);
   deps.log({

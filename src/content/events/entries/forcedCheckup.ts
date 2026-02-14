@@ -18,7 +18,7 @@ const forcedCheckup: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 被拉去体检，看到针腿软 💉',
+        apply: '{targetName} 盯着那根细长的针头，感觉灵魂正在试图离开肉体 💉',
       },
     },
     {
@@ -29,7 +29,7 @@ const forcedCheckup: EventPoolEntry = {
     },
   ],
   texts: {
-    trigger: '公司组织全员体检，扎针人人怕 🏥',
+    trigger: '行政部通知：所有人即刻前往会议室参加年度强制体检 🏥',
   },
 };
 

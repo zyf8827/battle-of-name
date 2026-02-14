@@ -18,12 +18,13 @@ const elevatorFart: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 的屁被同事认出了！💀',
+        apply:
+          '{targetName} 试图装作若无其事，但同事精准的视线已经锁定了过来 💀',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 在电梯里放了个屁，同事说：又是你吧 💨',
+    trigger: '电梯里的空气突然凝固，一股不可名状的气息悄然扩散 💨',
   },
 };
 

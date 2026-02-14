@@ -13,10 +13,21 @@ const voiceToTextMachine: EquipmentLike = {
   statBonus: { LUK: 2 },
   triggers: [
     {
-      trigger: { on: 'ON_HIT', when: { role: 'SOURCE', notHasTags: ['miss', 'true_damage', 'reflect'] } },
+      trigger: {
+        on: 'ON_HIT',
+        when: {
+          role: 'SOURCE',
+          notHasTags: ['miss', 'true_damage', 'reflect'],
+        },
+      },
       effects: [
         { kind: 'DISPEL', target: 'TARGET', mode: 'BUFF', max: 1 },
-        { kind: 'DIRECT_DAMAGE', target: 'TARGET', value: 3, tags: ['true_damage', 'equip'] },
+        {
+          kind: 'DIRECT_DAMAGE',
+          target: 'TARGET',
+          value: 3,
+          tags: ['true_damage', 'equip'],
+        },
       ],
     },
   ],

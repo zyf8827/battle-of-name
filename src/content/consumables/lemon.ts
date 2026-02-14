@@ -15,11 +15,11 @@ const lemon: Consumable = {
   id: 'consumable.lemon',
   name: '柠檬 🍋',
   description: '我酸了。降低敌方力量和幸运。',
-  effects: [
-    { kind: 'APPLY_MODIFIER', target: 'TARGET', modifier: sour },
-  ],
+  effects: [{ kind: 'APPLY_MODIFIER', target: 'TARGET', modifier: sour }],
   texts: {
-    use: ['{unitName} 强行喂了 {targetName} 一颗 {itemName}，酸得对方五官扭曲 😖。'],
+    use: [
+      '{unitName} 强行喂了 {targetName} 一颗 {itemName}，酸得对方五官扭曲 😖。',
+    ],
   },
 };
 

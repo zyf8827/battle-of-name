@@ -9,7 +9,10 @@ const reverseChickenSoupSpeaker: EquipmentLike = {
   description: '每一句大道理都精准打击对方自信心。',
   priority: 0,
   tags: ['equip'],
-  stacking: { stackKey: 'equip.reverse_chicken_soup_speaker', policy: 'IGNORE' },
+  stacking: {
+    stackKey: 'equip.reverse_chicken_soup_speaker',
+    policy: 'IGNORE',
+  },
   statBonus: { STR: 2, LUK: 1 },
   triggers: [
     {

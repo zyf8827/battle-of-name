@@ -18,7 +18,8 @@ const interviewEx: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 发现面试官是前任 😱',
+        apply:
+          '{targetName} 的大脑瞬间一片空白，脚趾已经开始在鞋里抠三室一厅 😱',
       },
     },
     {
@@ -27,7 +28,7 @@ const interviewEx: EventPoolEntry = {
     },
   ],
   texts: {
-    trigger: '{actorName} 推门进面试室，面试官抬头：好久不见 👻',
+    trigger: '推开面试室的大门，那个刻在记忆深处的面孔缓缓抬起头 👻',
   },
 };
 

@@ -18,12 +18,13 @@ const recallOk: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 手速惊人，撤回成功 💨',
+        apply:
+          '{targetName} 长舒一口气，这种在社死边缘反复横跳的感觉真是太刺激了 ✨',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 发错消息，在1分59秒时成功撤回 💨',
+    trigger: '发错群的消息在最后几秒钟内，幸运地消失在了气泡中 💨',
   },
 };
 

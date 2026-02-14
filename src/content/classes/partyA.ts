@@ -26,14 +26,20 @@ const colorfulBlack: Modifier = {
             tags: ['debuff'],
             statBonus: { AGI: -2, LUK: -2 },
             duration: 2,
-            stacking: { stackKey: 'debuff.confusion_demand', policy: 'STACK', maxStacks: 3 },
+            stacking: {
+              stackKey: 'debuff.confusion_demand',
+              policy: 'STACK',
+              maxStacks: 3,
+            },
           },
         },
       ],
     },
   ],
   texts: {
-    trigger: ['{sourceName} 提出了“五彩斑斓的黑”，{targetName} 陷入了逻辑死循环 🤯。'],
+    trigger: [
+      '{sourceName} 提出了“五彩斑斓的黑”，{targetName} 陷入了逻辑死循环 🤯。',
+    ],
   },
 };
 

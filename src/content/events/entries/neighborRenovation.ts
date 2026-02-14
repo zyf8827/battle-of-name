@@ -18,12 +18,12 @@ const neighborRenovation: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 被电钻声吵得脑瓜子嗡嗡的！ 🙉',
+        apply: '{targetName} 的头皮随着震动一起颤抖，感觉整个人都要裂开了 🙉',
       },
     },
   ],
   texts: {
-    trigger: '楼上的邻居开始了神圣的装修仪式：哒哒哒哒哒！🏗️',
+    trigger: '清晨八点整，楼上准时传来了仿佛要钻穿地心的电钻轰鸣声 🚧',
   },
 };
 

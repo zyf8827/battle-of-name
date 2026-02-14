@@ -25,7 +25,7 @@ const nextTimeForSure: Modifier = {
     onPostAction: (event, { engine, owner }) => {
       // 监听针对自己的攻击
       if (event.targetId !== owner.id || event.type !== 'ATTACK') return [];
-      
+
       // 如果被闪避了 (miss)
       if (event.payload.tags.includes('miss')) {
         engine.event.emitDirectHeal(owner, owner, 10, ['heal', 'talent']);

@@ -28,7 +28,6 @@ const deliveryWarmth: EventPoolEntry = {
   texts: {
     trigger: '快递小哥给 {actorName} 打电话：你的快递到了！🚚',
   },
-
 };
 
 export default deliveryWarmth;

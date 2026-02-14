@@ -16,19 +16,29 @@ const powerOutage: EventPoolEntry = {
         tags: ['debuff', 'env', 'miss'],
         duration: 1,
         triggers: [
-           {
-             trigger: { on: 'PIPELINE_INCOMING', when: { role: 'SOURCE', eventType: 'ATTACK' } },
-             effects: [{ kind: 'MITIGATE', when: { role: 'SOURCE', eventType: 'ATTACK' }, multiplier: 0.5 }]
-           }
-        ]
+          {
+            trigger: {
+              on: 'PIPELINE_INCOMING',
+              when: { role: 'SOURCE', eventType: 'ATTACK' },
+            },
+            effects: [
+              {
+                kind: 'MITIGATE',
+                when: { role: 'SOURCE', eventType: 'ATTACK' },
+                multiplier: 0.5,
+              },
+            ],
+          },
+        ],
       },
       textOverrides: {
-        apply: '{targetName} 在黑暗中摸索，命中率大幅下降！🔦',
+        apply:
+          '{targetName} 绝望地发现还没保存的文档，在黑暗中发出了无声的哀号 🌚',
       },
     },
   ],
   texts: {
-    trigger: '随着“啪”的一声，全世界都黑了。停电了！🌚',
+    trigger: '随着一声沉闷的跳闸声，整栋大楼陷入了死寂般的黑暗 🕯️',
   },
 };
 

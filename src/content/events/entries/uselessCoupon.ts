@@ -28,7 +28,6 @@ const uselessCoupon: EventPoolEntry = {
   texts: {
     trigger: '{actorName} 抢到了一张“劳斯莱斯立减1000元”的优惠券 🤏。',
   },
-
 };
 
 export default uselessCoupon;

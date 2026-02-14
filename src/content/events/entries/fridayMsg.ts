@@ -18,14 +18,13 @@ const fridayMsg: EventPoolEntry = {
         duration: 2,
       },
       textOverrides: {
-        apply: '{targetName} 收到老板微信“在吗”，瞬间僵硬 🧊。',
+        apply: '{targetName} 盯着“在吗”两个字，感觉整个周末都在离自己而去 😱',
       },
     },
   ],
   texts: {
-    trigger: '周五临下班五分钟，{actorName} 收到了来自老板的亲切问候 👋。',
+    trigger: '离下班还有五分钟，屏幕右下角闪烁起那个令人生畏的头像 👋',
   },
-
 };
 
 export default fridayMsg;

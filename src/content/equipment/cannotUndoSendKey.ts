@@ -13,8 +13,21 @@ const cannotUndoSendKey: EquipmentLike = {
   statBonus: { STR: 3 },
   triggers: [
     {
-      trigger: { on: 'ON_HIT', when: { role: 'SOURCE', notHasTags: ['miss', 'true_damage', 'reflect'] } },
-      effects: [{ kind: 'DIRECT_DAMAGE', target: 'TARGET', value: 6, tags: ['true_damage', 'equip'] }],
+      trigger: {
+        on: 'ON_HIT',
+        when: {
+          role: 'SOURCE',
+          notHasTags: ['miss', 'true_damage', 'reflect'],
+        },
+      },
+      effects: [
+        {
+          kind: 'DIRECT_DAMAGE',
+          target: 'TARGET',
+          value: 6,
+          tags: ['true_damage', 'equip'],
+        },
+      ],
     },
   ],
   texts: {

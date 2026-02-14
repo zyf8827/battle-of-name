@@ -24,12 +24,12 @@ const bikeChain: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 的裤链被单车卡住了 🚲',
+        apply: '{targetName} 低头一看，裤脚被死死搅进了油腻的链条里 🔗',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 骑共享单车，裤链卡进车链里了 🚲',
+    trigger: '共享单车发出了哐当一声，链条由于老化突然锁死 🚲',
   },
 };
 

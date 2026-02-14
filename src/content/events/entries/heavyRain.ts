@@ -18,12 +18,13 @@ const heavyRain: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 被淋成了落汤鸡！ 💦',
+        apply:
+          '{targetName} 顶着公文包在雨中狂奔，鞋子里传来了咕唧咕唧的水声 💦',
       },
     },
   ],
   texts: {
-    trigger: '天空突然下起了倾盆大雨，而大家都没带伞 ☔。',
+    trigger: '乌云密布，毫无预兆的倾盆大雨瞬间笼罩了整个街道 🌧️',
   },
 };
 

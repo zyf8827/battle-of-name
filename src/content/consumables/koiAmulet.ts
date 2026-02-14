@@ -15,9 +15,7 @@ const koiAmulet: Consumable = {
   id: 'consumable.koi_amulet',
   name: '锦鲤护身符 🧧',
   description: '玄学道具，大幅提升幸运。',
-  effects: [
-    { kind: 'APPLY_MODIFIER', target: 'SELF', modifier: luckyKoi },
-  ],
+  effects: [{ kind: 'APPLY_MODIFIER', target: 'SELF', modifier: luckyKoi }],
   texts: {
     use: ['{unitName} 拿出了 {itemName} 拜了三拜，欧气暴涨！🙏'],
   },

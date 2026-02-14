@@ -18,12 +18,13 @@ const trafficJam: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 被堵在路上动弹不得！ 🛑',
+        apply:
+          '{targetName} 看着不断跳动的计价器和纹丝不动的窗外，心态彻底爆炸 🤬',
       },
     },
   ],
   texts: {
-    trigger: '早高峰来袭！整个城市变成了一个巨大的停车场 🅿️。',
+    trigger: '一眼望不到头的红尾灯照亮了清晨，整条马路彻底瘫痪了 🚗',
   },
 };
 

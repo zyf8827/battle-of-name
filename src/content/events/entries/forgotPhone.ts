@@ -18,14 +18,13 @@ const forgotPhone: EventPoolEntry = {
         duration: 1,
       },
       textOverrides: {
-        apply: '{targetName} 摸了摸口袋，发现手机没了！全属性大幅下降 📉！',
+        apply: '{targetName} 瞳孔地震，仿佛失去了与宇宙的所有联系 📉',
       },
     },
   ],
   texts: {
-    trigger: '{actorName} 走到楼下才发现没带手机，现代人的末日降临了 🔌。',
+    trigger: '手下意识地往口袋里一插，却摸到了一片虚无 📱',
   },
-
 };
 
 export default forgotPhone;
