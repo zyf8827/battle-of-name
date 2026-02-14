@@ -109,7 +109,7 @@ function unitAlive(unit: Unit): boolean {
 
 function calcInitialMaxHp(vit: number, hpBase: number, hpPerVit: number): number {
   const safeVit = Math.max(1, Math.floor(Number.isFinite(vit) ? vit : 1));
-  const linear = hpBase + safeVit * hpPerVit;
+  const linear = hpBase + Math.floor(safeVit * hpPerVit * 1.08);
   const survivalBonus = Math.floor(Math.sqrt(safeVit) * hpPerVit * 0.55) + Math.floor(hpBase * 0.2);
   return Math.min(NUMERIC_LIMITS.maxHp, Math.max(1, linear + survivalBonus));
 }
