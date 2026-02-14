@@ -1,26 +1,65 @@
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { getClassById } from '../content/classes';
 import { getConsumableById } from '../content/consumables';
 import { getEquipmentById } from '../content/equipment';
 import type { Modifier, Unit } from '../engine/types';
 import { Tooltip } from './Tooltip';
 
+export type FloatingText = {
+  id: string;
+  text: string;
+  type: 'damage' | 'crit' | 'heal' | 'shield' | 'miss';
+};
+
 type FighterPanelProps = {
   unit: Unit;
+  side: 'left' | 'right';
   winner?: boolean;
   totalDamage?: number;
   envModifiers?: Modifier[];
+  isAttacking?: boolean;
+  isHurt?: boolean;
+  isCrit?: boolean;
+  isMiss?: boolean;
+  isHealing?: boolean;
+  isActiveTurn?: boolean;
+  floatingTexts?: FloatingText[];
 };
 
 export function FighterPanel({
   unit,
+  side,
   winner,
   totalDamage,
   envModifiers = [],
+  isAttacking = false,
+  isHurt = false,
+  isCrit = false,
+  isMiss = false,
+  isHealing = false,
+  isActiveTurn = false,
+  floatingTexts = [],
 }: FighterPanelProps) {
+  const [prevHp, setPrevHp] = useState(unit.state.hp);
+  const [displayHp, setDisplayHp] = useState(unit.state.hp);
+  
   const hpRate = Math.max(
     0,
     Math.min(1, unit.state.hp / Math.max(1, unit.state.maxHp)),
   );
+
+  const prevHpRate = Math.max(
+    0,
+    Math.min(1, prevHp / Math.max(1, unit.state.maxHp)),
+  );
+
+  useEffect(() => {
+    if (unit.state.hp !== displayHp) {
+      setPrevHp(displayHp);
+      setDisplayHp(unit.state.hp);
+    }
+  }, [unit.state.hp, displayHp]);
 
   const equipmentModifiers = unit.modifiers.filter((m) => m.source === 'EQUIP');
 
@@ -57,10 +96,109 @@ export function FighterPanel({
     // ignore
   }
 
+  const isDead = unit.state.hp <= 0;
+
+  // 动画变体定义
+  const variants: Variants = {
+    idle: {
+      x: 0,
+      y: 0,
+      rotate: 0,
+      scale: 1,
+      filter: isDead ? 'grayscale(1) opacity(0.6)' : 'grayscale(0) opacity(1)',
+    },
+    attacking: {
+      x: side === 'left' ? 40 : -40,
+      rotate: side === 'left' ? 5 : -5,
+      transition: { duration: 0.1, type: 'spring', stiffness: 500 },
+    },
+    hurt: {
+      x: [0, -10, 10, -10, 10, 0],
+      transition: { duration: 0.4 },
+    },
+    critHurt: {
+      x: [0, -20, 20, -20, 20, 0],
+      scale: [1, 0.9, 1.1, 1],
+      transition: { duration: 0.5 },
+    },
+    miss: {
+      x: side === 'left' ? -20 : 20,
+      y: -10,
+      opacity: 0.8,
+      transition: { duration: 0.2 },
+    },
+    healing: {
+      y: [0, -10, 0],
+      transition: { duration: 0.5 },
+    }
+  };
+
+  const currentAnimation = isAttacking 
+    ? 'attacking' 
+    : isCrit && isHurt 
+      ? 'critHurt' 
+      : isHurt 
+        ? 'hurt' 
+        : isMiss 
+          ? 'miss' 
+          : isHealing 
+            ? 'healing' 
+            : 'idle';
+
   return (
-    <article
-      className={`relative rounded-xl border p-4 transition-all duration-300 ${winner ? 'border-amber-500/50 bg-amber-950/20 shadow-[0_0_30px_-10px_rgba(245,158,11,0.3)]' : 'border-slate-700 bg-slate-900/80 shadow-lg'}`}
+    <motion.article
+      animate={currentAnimation}
+      variants={variants}
+      initial="idle"
+      className={`relative rounded-xl border p-4 transition-shadow duration-300 ${
+        winner 
+          ? 'border-amber-500/50 bg-amber-950/20 shadow-[0_0_30px_-10px_rgba(245,158,11,0.3)]' 
+          : isActiveTurn
+            ? 'border-indigo-500/50 bg-slate-900/90 shadow-[0_0_20px_-5px_rgba(99,102,241,0.4)] ring-2 ring-indigo-500/20'
+            : 'border-slate-700 bg-slate-900/80 shadow-lg'
+      }`}
     >
+      {/* 飘字系统 */}
+      <div className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center overflow-visible">
+        <AnimatePresence>
+          {floatingTexts.map((ft) => (
+            <motion.div
+              key={ft.id}
+              initial={{ opacity: 0, y: 0, scale: 0.5 }}
+              animate={{ 
+                opacity: [0, 1, 1, 0], 
+                y: ft.type === 'heal' || ft.type === 'shield' ? -100 : 60,
+                scale: ft.type === 'crit' ? [0.5, 1.5, 1.2] : [0.5, 1, 1],
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1, times: [0, 0.1, 0.8, 1] }}
+              className={`absolute text-2xl font-black italic tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${
+                ft.type === 'damage' ? 'text-rose-500' :
+                ft.type === 'crit' ? 'text-yellow-400 text-3xl' :
+                ft.type === 'heal' ? 'text-emerald-400' :
+                ft.type === 'shield' ? 'text-sky-400' :
+                'text-slate-400'
+              }`}
+            >
+              {ft.text}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* 受击红光闪烁 */}
+      <AnimatePresence>
+        {isHurt && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.3, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="pointer-events-none absolute inset-0 rounded-xl bg-rose-500/30 z-10"
+          />
+        )}
+      </AnimatePresence>
+
       <header className="mb-4 flex items-start justify-between">
         <div>
           <h3 className="flex items-center gap-2 text-xl font-black tracking-wide text-slate-100">
@@ -117,13 +255,18 @@ export function FighterPanel({
         )}
       </div>
       <div className="relative mb-5 h-3 overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700/50">
+        {/* Ghost HP bar (background slow catching up) */}
         <div
-          className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-600 to-rose-400 transition-all duration-500 ease-out"
+          className="absolute left-0 top-0 h-full bg-rose-900/50 transition-all duration-1000 ease-out"
+          style={{ width: `${Math.max(hpRate, prevHpRate) * 100}%` }}
+        />
+        <div
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-600 to-rose-400 transition-all duration-500 ease-out z-10"
           style={{ width: `${hpRate * 100}%` }}
         />
         {unit.state.shield > 0 && (
           <div
-            className="absolute top-0 h-full bg-sky-400/50 mix-blend-screen transition-all duration-500"
+            className="absolute top-0 h-full bg-sky-400/50 mix-blend-screen transition-all duration-500 z-20"
             style={{
               left: 0,
               width: `${Math.min(100, ((unit.state.hp + unit.state.shield) / unit.state.maxHp) * 100)}%`,
@@ -345,6 +488,6 @@ export function FighterPanel({
           </p>
         </div>
       )}
-    </article>
+    </motion.article>
   );
 }

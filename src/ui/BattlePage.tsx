@@ -1,8 +1,25 @@
-import { useEffect } from 'react';
-
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useBattleStore } from '../store/battleStore';
 import { BattleLog } from './BattleLog';
-import { FighterPanel } from './FighterPanel';
+import { FighterPanel, type FloatingText } from './FighterPanel';
+
+type UnitAnimState = {
+  isAttacking: boolean;
+  isHurt: boolean;
+  isCrit: boolean;
+  isMiss: boolean;
+  isHealing: boolean;
+  floatingTexts: FloatingText[];
+};
+
+const initialAnimState: UnitAnimState = {
+  isAttacking: false,
+  isHurt: false,
+  isCrit: false,
+  isMiss: false,
+  isHealing: false,
+  floatingTexts: [],
+};
 
 export function BattlePage() {
   const result = useBattleStore((state) => state.result);
@@ -13,6 +30,115 @@ export function BattlePage() {
   const step = useBattleStore((state) => state.step);
   const togglePause = useBattleStore((state) => state.togglePause);
   const setSpeed = useBattleStore((state) => state.setSpeed);
+
+  const [animState1, setAnimState1] = useState<UnitAnimState>(initialAnimState);
+  const [animState2, setAnimState2] = useState<UnitAnimState>(initialAnimState);
+
+  const prevCursorRef = useRef(cursor);
+
+  const addFloatingText = useCallback((unitId: string, text: string, type: FloatingText['type']) => {
+    const id = `ft-${Date.now()}-${Math.random()}`;
+    const newText: FloatingText = { id, text, type };
+    
+    if (unitId === 'u1') {
+      setAnimState1(prev => ({ ...prev, floatingTexts: [...prev.floatingTexts, newText] }));
+      setTimeout(() => {
+        setAnimState1(prev => ({ ...prev, floatingTexts: prev.floatingTexts.filter(t => t.id !== id) }));
+      }, 1000);
+    } else if (unitId === 'u2') {
+      setAnimState2(prev => ({ ...prev, floatingTexts: [...prev.floatingTexts, newText] }));
+      setTimeout(() => {
+        setAnimState2(prev => ({ ...prev, floatingTexts: prev.floatingTexts.filter(t => t.id !== id) }));
+      }, 1000);
+    }
+  }, []);
+
+  const triggerAnim = useCallback((unitId: string, key: keyof Omit<UnitAnimState, 'floatingTexts'>, duration = 400) => {
+    const setter = unitId === 'u1' ? setAnimState1 : setAnimState2;
+    setter(prev => ({ ...prev, [key]: true }));
+    setTimeout(() => {
+      setter(prev => ({ ...prev, [key]: false }));
+    }, duration);
+  }, []);
+
+  useEffect(() => {
+    if (cursor === 0) {
+      setAnimState1(initialAnimState);
+      setAnimState2(initialAnimState);
+      prevCursorRef.current = 0;
+      return;
+    }
+
+    if (cursor > prevCursorRef.current && result) {
+      // 只有当前进时才触发动画
+      const latestLog = result.logs[cursor - 1];
+      if (latestLog) {
+        const actorId = latestLog.actorId;
+        const targetId = latestLog.targetId;
+        const tags = latestLog.tags || [];
+
+        // 攻击动作
+        if (latestLog.eventType === 'ATTACK' && actorId) {
+          triggerAnim(actorId, 'isAttacking', 200);
+        }
+
+        // 受击动作 & 飘字
+        if (targetId) {
+          const isMiss = tags.includes('miss');
+          const isCrit = tags.includes('crit');
+          
+          if (latestLog.eventType === 'ATTACK') {
+            if (isMiss) {
+              triggerAnim(targetId, 'isMiss', 400);
+              addFloatingText(targetId, 'MISS', 'miss');
+            } else {
+              if (isCrit) triggerAnim(targetId, 'isCrit', 500);
+              triggerAnim(targetId, 'isHurt', 400);
+              
+              const matchValue = latestLog.text.match(/(\d+)\s*点/);
+              const value = matchValue ? matchValue[1] : '';
+              if (value) {
+                addFloatingText(targetId, `-${value}`, isCrit ? 'crit' : 'damage');
+              }
+            }
+          } else if (latestLog.eventType === 'HEAL') {
+            triggerAnim(targetId, 'isHealing', 500);
+            const matchValue = latestLog.text.match(/(\d+)\s*点/);
+            const value = matchValue ? matchValue[1] : '';
+            if (value) {
+              addFloatingText(targetId, `+${value}`, 'heal');
+            }
+          } else if (latestLog.eventType === 'APPLY_BUFF' || latestLog.text.includes('获得新状态')) {
+            const matchName = latestLog.text.match(/：(.*?)(?:\s|✨|$)/);
+            const name = matchName ? matchName[1] : 'BUFF';
+            addFloatingText(targetId, name, 'shield'); // 使用蓝色表示状态获得
+          } else if (latestLog.eventType === 'REMOVE_BUFF' || latestLog.text.includes('状态失效')) {
+            const matchName = latestLog.text.match(/：(.*?)(?:\s|💨|$)/);
+            const name = matchName ? matchName[1] : '状态';
+            addFloatingText(targetId, `${name} OFF`, 'miss');
+          }
+        }
+
+        // 装备变更飘字
+        if (latestLog.text.includes('捡到装备') || latestLog.text.includes('替换了')) {
+          const matchName = latestLog.text.match(/装备：(.*?)(?:\s|🗡️|🔄|$)/);
+          const name = matchName ? matchName[1] : '装备';
+          if (targetId) addFloatingText(targetId, `NEW: ${name}`, 'shield');
+        }
+
+        // 护盾飘字 (比如 gainShield)
+        if (latestLog.text.includes('护盾')) {
+          const matchValue = latestLog.text.match(/(\d+)\s*点/);
+          const value = matchValue ? matchValue[1] : '';
+          if (value && targetId) {
+            addFloatingText(targetId, `+${value} 🛡️`, 'shield');
+          }
+        }
+      }
+    }
+    
+    prevCursorRef.current = cursor;
+  }, [cursor, result, triggerAnim, addFloatingText]);
 
   useEffect(() => {
     if (!result || phase !== 'running') return;
@@ -31,6 +157,9 @@ export function BattlePage() {
     result.snapshots[Math.min(cursor, result.snapshots.length - 1)] ??
     result.snapshots[0];
   const visibleLogs = result.logs.slice(0, cursor);
+
+  // 判定当前是谁的回合（简单的基于最新日志判定，或者以后从 Snapshot 获取）
+  const activeTurnId = result.logs[cursor]?.actorId || result.logs[cursor - 1]?.actorId;
 
   return (
     <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 p-4 md:p-6">
@@ -82,7 +211,10 @@ export function BattlePage() {
         <div className="sticky top-24">
           <FighterPanel
             unit={snapshot.units[0]}
+            side="left"
             envModifiers={snapshot.envModifiers}
+            isActiveTurn={activeTurnId === snapshot.units[0].id}
+            {...animState1}
           />
         </div>
 
@@ -91,7 +223,10 @@ export function BattlePage() {
         <div className="sticky top-24">
           <FighterPanel
             unit={snapshot.units[1]}
+            side="right"
             envModifiers={snapshot.envModifiers}
+            isActiveTurn={activeTurnId === snapshot.units[1].id}
+            {...animState2}
           />
         </div>
       </div>

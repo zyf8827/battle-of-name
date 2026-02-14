@@ -72,10 +72,11 @@ export function ResultPage() {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {finalSnapshot.units.map((unit) => (
+        {finalSnapshot.units.map((unit, index) => (
           <FighterPanel
             key={`result-${unit.id}`}
             unit={unit}
+            side={index === 0 ? 'left' : 'right'}
             winner={unit.id === winnerId}
             totalDamage={result.summary.totalDamageByUnit[unit.id] ?? 0}
             envModifiers={finalSnapshot.envModifiers}
