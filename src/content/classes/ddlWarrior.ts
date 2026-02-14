@@ -14,8 +14,8 @@ const adrenaline: Modifier = {
       
       // 计算已损失生命比例
       const missingRate = 1 - (owner.state.hp / owner.state.maxHp);
-      // 伤害倍率：满血 1.0 -> 空血 2.0
-      const multiplier = 1 + missingRate;
+      // 伤害倍率：满血 1.0 -> 空血 1.5
+      const multiplier = 1 + missingRate * 0.5;
       
       const newValue = Math.floor((event.payload.value ?? 0) * multiplier);
       

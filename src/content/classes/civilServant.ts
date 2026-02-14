@@ -15,7 +15,7 @@ const ironBowl: Modifier = {
         when: { role: 'TARGET', eventType: 'ATTACK' },
       },
       effects: [
-        { kind: 'MITIGATE', when: { role: 'TARGET', eventType: 'ATTACK' }, multiplier: 0.8 },
+        { kind: 'MITIGATE', when: { role: 'TARGET', eventType: 'ATTACK' }, multiplier: 0.9 },
       ],
     },
   ],

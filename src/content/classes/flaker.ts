@@ -15,7 +15,7 @@ const nextTimeForSure: Modifier = {
         {
           kind: 'SHIELD',
           target: 'SELF',
-          value: [{ type: 'FLAT', value: 3 }],
+          value: [{ type: 'FLAT', value: 5 }],
           tags: ['shield', 'talent'],
         },
       ],

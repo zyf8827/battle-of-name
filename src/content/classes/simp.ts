@@ -8,30 +8,13 @@ const selfMoved: Modifier = {
   description: '受到伤害时，有概率获得护盾。',
   priority: 0,
   tags: ['talent'],
-  triggers: [
-    {
-      trigger: {
-        on: 'ON_HURT',
-        when: { role: 'TARGET', notHasTag: 'miss' },
-      },
-      effects: [
-        {
-          kind: 'SHIELD',
-          target: 'SELF',
-          value: [{ type: 'SCALE', stat: 'VIT', ratio: 0.5 }],
-          tags: ['shield'],
-        },
-      ],
-      // 30% 概率触发，需要在 engine 支持 condition 或使用 hook，这里暂时用 hook 实现概率
-    },
-  ],
   hooks: {
     onPostAction: (event, { engine, owner }) => {
       // 只有自己是被打的目标才触发
       if (event.targetId !== owner.id || event.type !== 'ATTACK') return [];
       
-      // 30% 概率
-      if (!engine.rng.bool(0.3, { domain: 'COMBAT', luk: owner.stats.LUK })) return [];
+      // 20% 概率
+      if (!engine.rng.bool(0.2, { domain: 'COMBAT', luk: owner.stats.LUK })) return [];
 
       return [
         engine.event.make({
@@ -47,7 +30,7 @@ const selfMoved: Modifier = {
               description: '我对你这么好...',
               tags: ['buff', 'shield'],
               duration: 1,
-              statBonus: { VIT: 5 }, // 增加体质
+              statBonus: { VIT: 2 }, // 增加体质
             },
             tags: ['buff'],
           },

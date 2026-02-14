@@ -26,7 +26,7 @@ const emotionalDamage: Modifier = {
             tags: ['debuff'],
             statBonus: { AGI: -1, STR: -1 },
             duration: 3,
-            stacking: { stackKey: 'debuff.stress', policy: 'STACK', maxStacks: 5 },
+            stacking: { stackKey: 'debuff.stress', policy: 'STACK', maxStacks: 3 },
           },
         },
       ],
@@ -41,7 +41,7 @@ const drivingInstructor: CharacterClass = {
   id: 'class.driving_instructor',
   name: '驾校教练 🚗',
   description: '拥有独特的语言天赋，能让最自信的人怀疑人生。',
-  baseStats: { STR: 12, AGI: 8, VIT: 12, LUK: 6 },
+  baseStats: { STR: 11, AGI: 8, VIT: 11, LUK: 6 },
   talents: [emotionalDamage],
   texts: {
     intro: ['{unitName} 点了一根烟，斜眼看着对手。'],

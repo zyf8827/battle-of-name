@@ -8,30 +8,6 @@ const toiletSanctuary: Modifier = {
   description: '躲进厕所，获得闪避与回复。',
   priority: 0,
   tags: ['talent'],
-  triggers: [
-    {
-      trigger: { on: 'ROUND_START' },
-      effects: [
-        {
-          kind: 'APPLY_MODIFIER',
-          target: 'SELF',
-          duration: 1,
-          modifier: {
-            id: 'buff.toilet_hide',
-            source: 'TALENT',
-            name: '厕所庇护',
-            description: '没有人能在这里找到我',
-            tags: ['buff'],
-            statBonus: { AGI: 999 }, // 极高敏捷模拟闪避，或者直接配合闪避公式
-            // 引擎目前没有直接 Set Evasion，靠 AGI 差值提升闪避
-            // 或者我们可以用 Hook 强制 Miss，这里先用 High AGI + Heal
-          },
-          // 20% 概率触发
-          condition: { type: 'CHANCE', value: 0.2 },
-        } as any, // 暂时 bypass 类型检查，因为 DSL 标准里 condition 还没完全合并到 EffectSpec，用 Hook 实现更稳
-      ],
-    },
-  ],
   // 使用 Hook 实现概率触发更稳
   hooks: {
     onRoundStart: ({ engine, owner }) => {

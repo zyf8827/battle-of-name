@@ -15,7 +15,7 @@ const autoLift: Modifier = {
       // 排除自己反弹的伤害 (reflect 标签)
       if (event.payload.tags.includes('reflect')) return [];
 
-      const damage = Math.floor((event.payload.value ?? 0) * 0.3); // 反弹 30%
+      const damage = Math.floor((event.payload.value ?? 0) * 0.15); // 反弹 15%
       if (damage <= 0) return [];
 
       return [

@@ -8,27 +8,18 @@ const dimensionStrike: Modifier = {
   description: '用精美的胶片掩盖空洞的内容，造成魔法伤害。',
   priority: 0,
   tags: ['talent', 'magic'],
-  triggers: [
-    {
-      trigger: {
-        on: 'PIPELINE_OUTGOING',
-        when: { role: 'SOURCE', eventType: 'ATTACK' },
-      },
-      effects: [
-        // 转换物理为魔法伤害，并增加伤害
-        { kind: 'MITIGATE', when: { role: 'SOURCE', eventType: 'ATTACK' }, multiplier: 1.5 }, // 借用 mitigate 增加伤害 (multiplier > 1)
-      ],
-    },
-  ],
   hooks: {
     onOutgoing: (event) => {
       if (event.type === 'ATTACK') {
-        // 强制转换为魔法伤害
+        // 强制转换为魔法伤害，并增加 50% 伤害
         const newTags = event.payload.tags.filter(t => t !== 'physical').concat('magic');
+        const newValue = Math.floor((event.payload.value ?? 0) * 1.5);
+        
         return {
           ...event,
           payload: {
             ...event.payload,
+            value: newValue,
             tags: newTags
           }
         };

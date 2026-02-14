@@ -15,29 +15,9 @@ const disassemble: Modifier = {
         {
           kind: 'SHIELD',
           target: 'SELF',
-          value: [{ type: 'FLAT', value: 4 }],
+          value: [{ type: 'FLAT', value: 6 }],
           tags: ['shield', 'talent'],
         },
-      ],
-    },
-    {
-      trigger: {
-        on: 'ON_HIT',
-        when: { role: 'SOURCE', notHasTag: 'miss' },
-      },
-      effects: [
-        // 10% 概率拆装备
-        {
-          kind: 'LOSE_RANDOM_EQUIPMENT',
-          target: 'TARGET',
-          condition: { type: 'CHANCE', value: 0.1 },
-        } as any,
-        // 10% 概率偷吃零食 (消耗品)
-        {
-          kind: 'LOSE_RANDOM_CONSUMABLE',
-          target: 'TARGET',
-          condition: { type: 'CHANCE', value: 0.1 },
-        } as any,
       ],
     },
   ],

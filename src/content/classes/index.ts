@@ -2,7 +2,6 @@ import type { CharacterClass } from '../base/characterClass';
 export { DEFAULT_CLASS_WEIGHT } from '../base/characterClass';
 
 import brawler from './brawler';
-import sustainer from './sustainer';
 import partyA from './partyA';
 import slackingMaster from './slackingMaster';
 import pptArchitect from './pptArchitect';
@@ -22,7 +21,6 @@ import flaker from './flaker';
 
 export const classList: CharacterClass[] = [
   brawler,
-  sustainer,
   partyA,
   slackingMaster,
   pptArchitect,

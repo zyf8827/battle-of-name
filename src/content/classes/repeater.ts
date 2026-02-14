@@ -12,8 +12,8 @@ const repeatMachine: Modifier = {
     onPostAction: (event, { engine, owner }) => {
       if (event.sourceId !== owner.id || event.type !== 'ATTACK' || event.depth > 0) return [];
       
-      // 25% 概率
-      if (!engine.rng.bool(0.25, { domain: 'COMBAT', luk: owner.stats.LUK })) return [];
+      // 20% 概率
+      if (!engine.rng.bool(0.2, { domain: 'COMBAT', luk: owner.stats.LUK })) return [];
 
       return [
         engine.event.make({

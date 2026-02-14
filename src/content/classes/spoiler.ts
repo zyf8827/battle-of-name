@@ -8,27 +8,6 @@ const finalSpoiler: Modifier = {
   description: '第一回合全属性大幅提升，之后变为白板。',
   priority: 0,
   tags: ['talent'],
-  triggers: [
-    {
-      trigger: { on: 'ROUND_START' },
-      effects: [
-        {
-          kind: 'APPLY_MODIFIER',
-          target: 'SELF',
-          modifier: {
-            id: 'buff.spoiler_burst',
-            source: 'TALENT',
-            name: '剧透一时爽',
-            description: '全家...全属性提升',
-            tags: ['buff'],
-            statBonus: { STR: 15, AGI: 15 },
-            duration: 1,
-          },
-          // 仅第一回合触发，这里依然需要 Hook 来判断 round
-        } as any,
-      ],
-    },
-  ],
   hooks: {
     onRoundStart: ({ engine, owner }) => {
       engine.state.applyModifierEffect(owner, owner, {
@@ -39,10 +18,10 @@ const finalSpoiler: Modifier = {
           name: '剧透一时爽',
           description: '我知道结局！',
           tags: ['buff'],
-          statBonus: { STR: 12, AGI: 12 },
+          statBonus: { STR: 25, AGI: 25 },
           duration: 1,
         },
-      });
+  });
       
       // 移除这个天赋本身，确保只触发一次 (变为白板)
       engine.state.removeModifiersByMatcher(owner, (m) => m.id === 'class.spoiler.final_spoiler');
