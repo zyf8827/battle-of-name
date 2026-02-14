@@ -196,8 +196,9 @@ export type TargetSelector = 'SELF' | 'SOURCE' | 'TARGET';
  *
  * 继承 TargetSelector，并支持：
  * - ALL: 场上所有单位
+ * - ENV: 环境（全局效果）
  */
-export type EventEffectTarget = TargetSelector | 'ALL';
+export type EventEffectTarget = TargetSelector | 'ALL' | 'ENV';
 
 /**
  * 触发器条件匹配规则

@@ -35,7 +35,7 @@ export function FighterPanel({
         const existing = acc.get(modifier.id);
         if (existing) {
           // 相同 ID 的修饰器，合并层数和持续时间
-          const stacks = (existing.stacks ?? 1) + 1;
+          const stacks = (existing.stacks ?? 1) + (modifier.stacks ?? 1);
           const duration = modifier.duration ?? existing.duration;
           acc.set(modifier.id, {
             ...existing,

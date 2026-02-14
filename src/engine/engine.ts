@@ -439,7 +439,7 @@ export function runBattle(
   };
 
   const applyModifier = (targetId: string, modifier: Modifier): void => {
-    if (modifier.source === 'ENV' || targetId === 'ENV') {
+    if (targetId === 'ENV') {
       applyModifierToArray(envModifiers, modifier);
       return;
     }
@@ -502,10 +502,13 @@ export function runBattle(
 
   function resolveEffectTargets(
     owner: Unit,
-    selector: 'SELF' | 'SOURCE' | 'TARGET' | 'ALL',
+    selector: 'SELF' | 'SOURCE' | 'TARGET' | 'ALL' | 'ENV',
   ): Unit[] {
     if (selector === 'ALL') {
       return units.filter(unitAlive);
+    }
+    if (selector === 'ENV') {
+      return [envUnit];
     }
     if (selector === 'SELF' || selector === 'SOURCE') {
       if (owner.id === 'ENV') {
