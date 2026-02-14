@@ -1,4 +1,5 @@
 import type { CharacterClass } from '../base/characterClass';
+export { DEFAULT_CLASS_WEIGHT } from '../base/characterClass';
 
 import brawler from './brawler';
 import sustainer from './sustainer';

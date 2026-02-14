@@ -75,6 +75,7 @@ type BattleStore = {
   // === 播放控制 ===
   cursor: number;              // 当前播放位置（logs 数组索引）
   speed: 1 | 2;              // 播放速度（1=正常, 2=倍速）
+  stepInterval: number;       // 单步播放间隔（毫秒，默认 800ms）
   phase: BattlePhase;          // 当前阶段
 
   // === 操作方法 ===
@@ -84,6 +85,7 @@ type BattleStore = {
   togglePause: () => void;                       // 切换暂停/播放
   step: () => void;                               // 单步前进
   setSpeed: (speed: 1 | 2) => void;            // 设置播放速度
+  setStepInterval: (interval: number) => void;  // 设置播放间隔
   reset: () => void;                              // 重置战斗
 };
 
@@ -216,6 +218,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
   result: null,
   cursor: 0,
   speed: 1,
+  stepInterval: 800,
   phase: 'idle',
 
   // === 操作方法实现 ===
@@ -324,6 +327,13 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
    * @param speed - 新速度（1=正常, 2=倍速）
    */
   setSpeed: (speed) => set({ speed }),
+
+  /**
+   * 设置播放间隔
+   *
+   * @param interval - 新的播放间隔（毫秒）
+   */
+  setStepInterval: (interval) => set({ stepInterval: interval }),
 
   /**
    * 重置战斗

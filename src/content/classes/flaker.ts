@@ -8,6 +8,19 @@ const nextTimeForSure: Modifier = {
   description: '成功闪避后，回复生命值。',
   priority: 0,
   tags: ['talent', 'heal'],
+  triggers: [
+    {
+      trigger: { on: 'TURN_START' },
+      effects: [
+        {
+          kind: 'SHIELD',
+          target: 'SELF',
+          value: [{ type: 'FLAT', value: 3 }],
+          tags: ['shield', 'talent'],
+        },
+      ],
+    },
+  ],
   hooks: {
     onPostAction: (event, { engine, owner }) => {
       // 监听针对自己的攻击

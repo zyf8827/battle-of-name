@@ -1,4 +1,5 @@
 import type { Consumable } from '../base/consumable';
+export { DEFAULT_CONSUMABLE_WEIGHT } from '../base/consumable';
 
 import adrenalineShot from './adrenalineShot';
 import cola from './cola';

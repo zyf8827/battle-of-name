@@ -27,9 +27,9 @@ import type { BaseStats, Unit } from '../engine/types';
 import seedrandom from 'seedrandom';
 
 import type { TextTemplate } from './base/text';
-import { classList } from './classes';
-import { getConsumableById, consumableIds } from './consumables';
-import { cloneEquipment, equipmentIds, getEquipmentById } from './equipment';
+import { DEFAULT_CLASS_WEIGHT, classList } from './classes';
+import { DEFAULT_CONSUMABLE_WEIGHT, getConsumableById, consumableIds } from './consumables';
+import { DEFAULT_EQUIPMENT_WEIGHT, cloneEquipment, equipmentIds, getEquipmentById } from './equipment';
 import { defaultTurnActionExecutor } from './effects/defaultTurnAction';
 import { defaultControlSourceResolver } from './effects/defaultControlResolver';
 import { defaultTurnConsumableExecutor } from './effects/defaultTurnConsumable';
@@ -38,6 +38,8 @@ import { eventPools, getEventEntryById } from './events';
 import { createModifierById } from './modifiers';
 import { createNarrationResolver } from './narration';
 import { renderTextTemplate } from './base/text';
+import { CURRENT_WEIGHT_PROFILE, resolveWeight } from './balance/weightProfile';
+import { DEFAULT_EVENT_POOL_ENTRY_WEIGHT } from '../engine/types';
 
 /**
  * 文本模板标准化
@@ -87,6 +89,41 @@ function chooseOne<T>(rng: seedrandom.PRNG, values: T[]): T {
   return values[index];
 }
 
+function chooseOneWeighted<T>(rng: seedrandom.PRNG, values: T[], getWeight: (value: T) => number): T | undefined {
+  if (values.length === 0) return undefined;
+  let total = 0;
+  const weights = values.map((value) => {
+    const weight = Math.max(0, getWeight(value));
+    total += weight;
+    return weight;
+  });
+  if (total <= 0) return chooseOne(rng, values);
+  const pick = rng() * total;
+  let cumulative = 0;
+  for (let index = 0; index < values.length; index += 1) {
+    cumulative += weights[index];
+    if (pick <= cumulative) return values[index];
+  }
+  return values[values.length - 1];
+}
+
+function sanitizeBuiltinWeight(value: number | undefined, fallback: number): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return fallback;
+  return Math.min(3, Math.max(0.2, value));
+}
+
+function resolveProfileOrBuiltinWeight(
+  weights: Partial<Record<string, number>>,
+  id: string,
+  builtinWeight: number | undefined,
+  defaultWeight: number,
+): number {
+  if (typeof weights[id] === 'number' && Number.isFinite(weights[id])) {
+    return resolveWeight(weights, id);
+  }
+  return sanitizeBuiltinWeight(builtinWeight, defaultWeight);
+}
+
 function uniquePush(target: string[], value: string): void {
   if (!target.includes(value)) {
     target.push(value);
@@ -97,7 +134,14 @@ function uniquePush(target: string[], value: string): void {
 // 保证同一个名字总是同一个职业
 function buildIdentityFromName(name: string): Pick<Loadout, 'classId'> {
   const rng = seedrandom(`identity::${name}`);
-  const classId = rng() < 0.85 && classList.length > 0 ? chooseOne(rng, classList).id : undefined;
+  const classId =
+    rng() < CURRENT_WEIGHT_PROFILE.classPickChance && classList.length > 0
+      ? chooseOneWeighted(
+          rng,
+          classList,
+          (item) => resolveProfileOrBuiltinWeight(CURRENT_WEIGHT_PROFILE.classWeights, item.id, item.weight, DEFAULT_CLASS_WEIGHT),
+        )?.id
+      : undefined;
 
   return { classId };
 }
@@ -109,27 +153,69 @@ function buildGearFromNameAndSeed(name: string, seed: string): Pick<Loadout, 'eq
   const equipmentBySlot = new Map<string, string>();
   const items: string[] = [];
 
-  for (const equipId of equipmentIds) {
-    if (rng() < 0.5) {
-      const equip = getEquipmentById(equipId);
-      if (!equip) continue;
-      if (!equipmentBySlot.has(equip.slot)) {
-        equipmentBySlot.set(equip.slot, equipId);
-      }
+  const allEquipments = equipmentIds
+    .map((id) => getEquipmentById(id))
+    .filter((item): item is NonNullable<ReturnType<typeof getEquipmentById>> => !!item);
+  const bySlot: Record<'WEAPON' | 'ARMOR' | 'ACCESSORY', NonNullable<ReturnType<typeof getEquipmentById>>[]> = {
+    WEAPON: [],
+    ARMOR: [],
+    ACCESSORY: [],
+  };
+  for (const equipment of allEquipments) {
+    bySlot[equipment.slot].push(equipment);
+  }
+
+  for (const slot of ['WEAPON', 'ARMOR', 'ACCESSORY'] as const) {
+    const chance = CURRENT_WEIGHT_PROFILE.initialEquipmentSlotChance[slot];
+    if (rng() >= chance) continue;
+    const picked = chooseOneWeighted(
+      rng,
+      bySlot[slot],
+      (equipment) =>
+        resolveProfileOrBuiltinWeight(
+          CURRENT_WEIGHT_PROFILE.equipmentWeights,
+          equipment.id,
+          equipment.weight,
+          DEFAULT_EQUIPMENT_WEIGHT,
+        ),
+    );
+    if (picked) {
+      equipmentBySlot.set(slot, picked.id);
     }
   }
 
   // 保底机制：如果随机没随到装备，有一定概率给一件
-  if (equipmentBySlot.size === 0 && rng() < 0.35 && equipmentIds.length > 0) {
-    const fallback = getEquipmentById(chooseOne(rng, equipmentIds));
+  if (equipmentBySlot.size === 0 && rng() < CURRENT_WEIGHT_PROFILE.equipmentFallbackChance && allEquipments.length > 0) {
+    const fallback = chooseOneWeighted(
+      rng,
+      allEquipments,
+      (equipment) =>
+        resolveProfileOrBuiltinWeight(
+          CURRENT_WEIGHT_PROFILE.equipmentWeights,
+          equipment.id,
+          equipment.weight,
+          DEFAULT_EQUIPMENT_WEIGHT,
+        ),
+    );
     if (fallback) {
       equipmentBySlot.set(fallback.slot, fallback.id);
     }
   }
 
   // 随机初始道具
-  if (rng() < 0.3 && consumableIds.length > 0) {
-    uniquePush(items, chooseOne(rng, consumableIds));
+  if (rng() < CURRENT_WEIGHT_PROFILE.initialConsumableChance && consumableIds.length > 0) {
+    const picked = chooseOneWeighted(rng, consumableIds, (id) => {
+      const consumable = getConsumableById(id);
+      return resolveProfileOrBuiltinWeight(
+        CURRENT_WEIGHT_PROFILE.consumableWeights,
+        id,
+        consumable?.weight,
+        DEFAULT_CONSUMABLE_WEIGHT,
+      );
+    });
+    if (picked) {
+      uniquePush(items, picked);
+    }
   }
 
   return {
@@ -363,16 +449,71 @@ export const defaultBattleContentAdapter: BattleContentAdapter = {
       },
     });
 
+    const weightedEventPools = Object.fromEntries(
+      Object.entries(eventPools).map(([poolId, pool]) => [
+        poolId,
+        {
+          ...pool,
+          entries: pool.entries.map((entry) => ({
+            ...entry,
+            weight: Math.max(
+              1,
+              Math.round(
+                resolveProfileOrBuiltinWeight(
+                  CURRENT_WEIGHT_PROFILE.eventWeights,
+                  entry.id,
+                  entry.weight,
+                  DEFAULT_EVENT_POOL_ENTRY_WEIGHT,
+                ),
+              ),
+            ),
+          })),
+        },
+      ]),
+    );
+
+    const weightedConsumablePoolIds = consumableIds.flatMap((id) => {
+      const consumable = getConsumableById(id);
+      const weight = resolveProfileOrBuiltinWeight(
+        CURRENT_WEIGHT_PROFILE.consumableWeights,
+        id,
+        consumable?.weight,
+        DEFAULT_CONSUMABLE_WEIGHT,
+      );
+      const copies = Math.max(1, Math.min(6, Math.round(weight * 2)));
+      return Array.from({ length: copies }, () => id);
+    });
+
+    const weightedEquipmentPoolIds = equipmentIds.flatMap((id) => {
+      const equipment = getEquipmentById(id);
+      const weight = resolveProfileOrBuiltinWeight(
+        CURRENT_WEIGHT_PROFILE.equipmentWeights,
+        id,
+        equipment?.weight,
+        DEFAULT_EQUIPMENT_WEIGHT,
+      );
+      const copies = Math.max(1, Math.min(6, Math.round(weight * 2)));
+      return Array.from({ length: copies }, () => id);
+    });
+
     return {
       units,
       envModifiers: [],
-      eventPools,
-      consumablePoolIds: consumableIds,
-      equipmentPoolIds: equipmentIds,
+      eventPools: weightedEventPools,
+      consumablePoolIds: weightedConsumablePoolIds,
+      equipmentPoolIds: weightedEquipmentPoolIds,
       scheduleRules: [
-        { window: 'RoundStart', poolId: 'pool.round.global', chance: 0.28 },
+        {
+          window: 'RoundStart',
+          poolId: 'pool.round.global',
+          chance: 0.28 * resolveWeight(CURRENT_WEIGHT_PROFILE.scheduleChanceMultiplier, 'pool.round.global@RoundStart'),
+        },
         { window: 'RoundEnd', poolId: 'pool.round.global', chance: 0 },
-        { window: 'TurnStart', poolId: 'pool.turn.personal', chance: 0.16 },
+        {
+          window: 'TurnStart',
+          poolId: 'pool.turn.personal',
+          chance: 0.16 * resolveWeight(CURRENT_WEIGHT_PROFILE.scheduleChanceMultiplier, 'pool.turn.personal@TurnStart'),
+        },
         { window: 'TurnEnd', poolId: 'pool.turn.personal', chance: 0 },
       ],
       narrate,

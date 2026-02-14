@@ -10,6 +10,17 @@ const disassemble: Modifier = {
   tags: ['talent'],
   triggers: [
     {
+      trigger: { on: 'TURN_START' },
+      effects: [
+        {
+          kind: 'SHIELD',
+          target: 'SELF',
+          value: [{ type: 'FLAT', value: 4 }],
+          tags: ['shield', 'talent'],
+        },
+      ],
+    },
+    {
       trigger: {
         on: 'ON_HIT',
         when: { role: 'SOURCE', notHasTag: 'miss' },
@@ -45,7 +56,7 @@ const disassemble: Modifier = {
     }
   },
   texts: {
-    trigger: ['{targetName} 发现自己的东西被 {sourceName} 弄坏了！ 😭'],
+    trigger: ['{targetName} 发现自己的东西被 {sourceName} 弄坏了！ 😭', '{sourceName} 的家长说：他还只是个孩子，又不是故意的。'],
   },
 };
 

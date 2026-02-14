@@ -9,6 +9,7 @@ export function BattlePage() {
   const phase = useBattleStore((state) => state.phase);
   const cursor = useBattleStore((state) => state.cursor);
   const speed = useBattleStore((state) => state.speed);
+  const stepInterval = useBattleStore((state) => state.stepInterval);
   const step = useBattleStore((state) => state.step);
   const togglePause = useBattleStore((state) => state.togglePause);
   const setSpeed = useBattleStore((state) => state.setSpeed);
@@ -17,9 +18,9 @@ export function BattlePage() {
     if (!result || phase !== 'running') return;
     const timer = window.setInterval(() => {
       step();
-    }, speed === 2 ? 250 : 500);
+    }, speed === 2 ? stepInterval / 2 : stepInterval);
     return () => window.clearInterval(timer);
-  }, [phase, result, speed, step]);
+  }, [phase, result, speed, stepInterval, step]);
 
   if (!result) return null;
 
