@@ -26,12 +26,68 @@ const disassemble: Modifier = {
     onPostAction: (event, { engine, owner, target }) => {
       if (event.sourceId !== owner.id || event.type !== 'ATTACK') return [];
 
+      // 尝试弄坏装备
       if (engine.rng.bool(0.1, { domain: 'COMBAT', luk: owner.stats.LUK })) {
-        engine.state.loseRandomEquipment(target);
+        const equipments = target.modifiers.filter((m) => m.source === 'EQUIP');
+        if (equipments.length > 0) {
+          const dropped =
+            equipments[Math.floor(engine.rng.next() * equipments.length)];
+          if (dropped) {
+            // 记录触发日志
+            engine.log.system({
+              key: 'bratDisassembleEquipment',
+              variables: {
+                sourceName: owner.name,
+                sourceId: owner.id,
+                targetName: target.name,
+                targetId: target.id,
+                equipmentName: dropped.name,
+                equipmentId: dropped.id,
+              },
+              tags: ['talent', 'equip'],
+              actor: owner,
+              target,
+            });
+            // 移除装备（直接调用state的removeModifier，不会重复记录日志）
+            target.modifiers = target.modifiers.filter(
+              (m) =>
+                !(
+                  m.id === dropped.id &&
+                  m.source === 'EQUIP' &&
+                  m.stacking?.stackKey === dropped.stacking?.stackKey
+                ),
+            );
+          }
+        }
       }
+
+      // 尝试弄坏消耗品
       if (engine.rng.bool(0.1, { domain: 'COMBAT', luk: owner.stats.LUK })) {
-        engine.state.loseRandomConsumable(target);
+        const consumables = target.state.consumables ?? [];
+        if (consumables.length > 0) {
+          const dropped =
+            consumables[Math.floor(engine.rng.next() * consumables.length)];
+          if (dropped) {
+            // 记录触发日志
+            engine.log.system({
+              key: 'bratDisassembleConsumable',
+              variables: {
+                sourceName: owner.name,
+                sourceId: owner.id,
+                targetName: target.name,
+                targetId: target.id,
+                itemId: dropped,
+              },
+              tags: ['talent', 'consumable'],
+              actor: owner,
+              target,
+            });
+            // 移除消耗品
+            target.state.consumables = consumables.filter((id) => id !== dropped);
+          }
+        }
       }
+
       return [];
     },
   },

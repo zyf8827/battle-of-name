@@ -480,6 +480,31 @@ function renderSystemLog(
     }
   }
 
+  // Handle brat's disassemble talent logs
+  if (key === 'bratDisassembleEquipment' || key === 'bratDisassembleConsumable') {
+    const sourceId = String(variables.sourceId ?? '');
+    const sourceUnit = sourceId ? unitMap?.get(sourceId) : undefined;
+    if (sourceUnit) {
+      // Find the brat's disassemble talent
+      const disassembleTalent = sourceUnit.modifiers.find(
+        (m) => m.id === 'class.brat.disassemble',
+      );
+      if (disassembleTalent?.texts?.trigger) {
+        return renderTextTemplate(
+          disassembleTalent.texts.trigger,
+          variables,
+          rngValue,
+        );
+      }
+    }
+    // Fallback text if the talent is not found
+    return renderTextTemplate(
+      '{targetName} 发现自己的东西被 {sourceName} 弄坏了！ 😭',
+      variables,
+      rngValue,
+    );
+  }
+
   if (key === 'pickupConsumable' || key === 'dropConsumable') {
     const itemId = String(variables.itemId ?? '');
     if (itemId) {
