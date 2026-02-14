@@ -640,6 +640,12 @@ export type LogEntry = {
   actorName?: string; // 行动者名称
   targetId?: string; // 目标 ID
   targetName?: string; // 目标名称
+  value?: number; // 数值 (伤害/治疗等)
+  modifierId?: string; // 相关的修饰器 ID
+  modifierName?: string; // 相关的修饰器名称
+  isCrit?: boolean; // 是否暴击
+  isMiss?: boolean; // 是否未命中
+  sourceType?: string; // 来源类型 (如 'event', 'consumable')
 };
 
 /**

@@ -84,8 +84,9 @@ export function BattlePage() {
 
         // 受击动作 & 飘字
         if (targetId) {
-          const isMiss = tags.includes('miss');
-          const isCrit = tags.includes('crit');
+          const isMiss = latestLog.isMiss || tags.includes('miss');
+          const isCrit = latestLog.isCrit || tags.includes('crit');
+          const value = latestLog.value;
           
           if (latestLog.eventType === 'ATTACK') {
             if (isMiss) {
@@ -94,43 +95,33 @@ export function BattlePage() {
             } else {
               if (isCrit) triggerAnim(targetId, 'isCrit', 500);
               triggerAnim(targetId, 'isHurt', 400);
-              
-              const matchValue = latestLog.text.match(/(\d+)\s*点/);
-              const value = matchValue ? matchValue[1] : '';
-              if (value) {
+              if (value !== undefined) {
                 addFloatingText(targetId, `-${value}`, isCrit ? 'crit' : 'damage');
               }
             }
           } else if (latestLog.eventType === 'HEAL') {
             triggerAnim(targetId, 'isHealing', 500);
-            const matchValue = latestLog.text.match(/(\d+)\s*点/);
-            const value = matchValue ? matchValue[1] : '';
-            if (value) {
+            if (value !== undefined) {
               addFloatingText(targetId, `+${value}`, 'heal');
             }
           } else if (latestLog.eventType === 'APPLY_BUFF' || latestLog.text.includes('获得新状态')) {
-            const matchName = latestLog.text.match(/：(.*?)(?:\s|✨|$)/);
-            const name = matchName ? matchName[1] : 'BUFF';
+            const name = latestLog.modifierName || 'BUFF';
             addFloatingText(targetId, name, 'shield'); // 使用蓝色表示状态获得
           } else if (latestLog.eventType === 'REMOVE_BUFF' || latestLog.text.includes('状态失效')) {
-            const matchName = latestLog.text.match(/：(.*?)(?:\s|💨|$)/);
-            const name = matchName ? matchName[1] : '状态';
+            const name = latestLog.modifierName || '状态';
             addFloatingText(targetId, `${name} OFF`, 'miss');
           }
         }
 
-        // 装备变更飘字
+        // 额外系统日志处理 (装备变更、护盾等)
         if (latestLog.text.includes('捡到装备') || latestLog.text.includes('替换了')) {
-          const matchName = latestLog.text.match(/装备：(.*?)(?:\s|🗡️|🔄|$)/);
-          const name = matchName ? matchName[1] : '装备';
+          const name = latestLog.modifierName || '装备';
           if (targetId) addFloatingText(targetId, `NEW: ${name}`, 'shield');
         }
 
-        // 护盾飘字 (比如 gainShield)
         if (latestLog.text.includes('护盾')) {
-          const matchValue = latestLog.text.match(/(\d+)\s*点/);
-          const value = matchValue ? matchValue[1] : '';
-          if (value && targetId) {
+          const value = latestLog.value;
+          if (value !== undefined && targetId) {
             addFloatingText(targetId, `+${value} 🛡️`, 'shield');
           }
         }

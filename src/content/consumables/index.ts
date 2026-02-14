@@ -18,7 +18,6 @@ import lego from './lego';
 import friendZoneCard from './friendZoneCard';
 import lemon from './lemon';
 import essentialBalm from './essentialBalm';
-import regretPill from './regretPill';
 import leaveRequest from './leaveRequest';
 import moneyPower from './moneyPower';
 import schrodingerFood from './schrodingerFood';
@@ -43,7 +42,6 @@ export const consumables: Consumable[] = [
   friendZoneCard,
   lemon,
   essentialBalm,
-  regretPill,
   leaveRequest,
   moneyPower,
   schrodingerFood,

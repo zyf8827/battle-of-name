@@ -612,6 +612,9 @@ export function runBattle(
         actorName: actor.name,
         targetId: target.id,
         targetName: target.name,
+        modifierId: (variables.modifierId || variables.equipmentId || variables.itemId) as string | undefined,
+        modifierName: (variables.modifierName || variables.equipmentName || variables.itemName) as string | undefined,
+        value: typeof variables.amount === 'number' ? variables.amount : (typeof variables.value === 'number' ? variables.value : undefined),
       });
     },
   };
@@ -657,6 +660,8 @@ export function runBattle(
           actorName: owner.name,
           targetId: target.id,
           targetName: target.name,
+          value: amount,
+          sourceType: 'event',
         });
       },
       emitDirectHeal: (owner, target, value, tags, depth, parentId) => {
@@ -743,6 +748,9 @@ export function runBattle(
           actorName: actor?.name,
           targetId: target?.id,
           targetName: target?.name,
+          value: typeof variables.amount === 'number' ? variables.amount : (typeof variables.value === 'number' ? variables.value : undefined),
+          modifierId: variables.modifierId as string | undefined,
+          modifierName: variables.modifierName as string | undefined,
         });
       },
     },
@@ -809,6 +817,8 @@ export function runBattle(
       actorName: target.name,
       targetId: target.id,
       targetName: target.name,
+      modifierId: modifier.id,
+      modifierName: modifier.name,
     });
   }
 
@@ -1118,6 +1128,9 @@ export function runBattle(
         targetId: target.id,
         targetName: target.name,
         seq: event.meta.seq,
+        value: value,
+        isCrit: event.payload.isCrit,
+        isMiss: event.payload.isMiss,
       });
 
       if (target.state.hp <= 0) {
@@ -1177,6 +1190,7 @@ export function runBattle(
         targetId: target.id,
         targetName: target.name,
         seq: event.meta.seq,
+        value: amount,
       });
       return;
     }
@@ -1209,6 +1223,8 @@ export function runBattle(
         targetId: target.id,
         targetName: target.name,
         seq: event.meta.seq,
+        modifierId: event.payload.modifier.id,
+        modifierName: event.payload.modifier.name,
       });
       return;
     }
@@ -1246,6 +1262,8 @@ export function runBattle(
         targetId: target.id,
         targetName: target.name,
         seq: event.meta.seq,
+        modifierId: event.payload.modifier.id,
+        modifierName: event.payload.modifier.name,
       });
       return;
     }
@@ -1331,8 +1349,8 @@ export function runBattle(
       return;
     }
 
-    // 2. 事件去重，防止完全相同的事件被重复处理
-    const dedupKey = `${event.parentId ?? event.id}:${event.type}:${event.sourceId}:${event.targetId}:${event.payload.tags.join('|')}:${event.payload.value ?? ''}`;
+    // 2. 事件去重 (放宽限制，允许相同深度的并发衍生事件)
+    const dedupKey = `${event.parentId ?? event.id}:${event.type}:${event.sourceId}:${event.targetId}:${event.payload.tags.join('|')}:${event.payload.value ?? ''}:${event.depth}:${event.meta.seq}`;
     if (dedup.has(dedupKey)) {
       diagnostics.eventsSkipped.dedup += 1;
       debugLog('event.skipped.dedup', {
@@ -1525,7 +1543,6 @@ export function runBattle(
     roundEventCount = 0;
     triggerCount.clear(); // 清空每回合的触发计数器
     dedup.clear(); // 清空事件去重缓存
-    snapshots.push(createSnapshot());
 
     // 1. 回合开始 (RoundStart)
     triggerRoundStart();
@@ -1606,6 +1623,9 @@ export function runBattle(
           tags: ['control'],
           actorId: acting.id,
           actorName: acting.name,
+          modifierId: controlSource.id,
+          modifierName: controlSource.name,
+          sourceType: controlSource.source === 'ENV' ? 'event' : 'talent',
         });
       } else {
         // 执行核心行动 (Attack / Skill)
