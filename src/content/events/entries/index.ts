@@ -6,6 +6,11 @@ import heavyRain from './heavyRain';
 import neighborRenovation from './neighborRenovation';
 import heatAllowance from './heatAllowance';
 import powerOutage from './powerOutage';
+import acBreak from './acBreak';
+import annivRed from './annivRed';
+import trafficRed from './trafficRed';
+import snackParty from './snackParty';
+import forcedCheckup from './forcedCheckup';
 
 // Personal (Turn)
 import mondayMorning from './mondayMorning';
@@ -33,6 +38,29 @@ import uselessCoupon from './uselessCoupon';
 import cameraAccident from './cameraAccident';
 import deliveryWarmth from './deliveryWarmth';
 import greenTea from './greenTea';
+import toiletBoss from './toiletBoss';
+import momentLike from './momentLike';
+import workWrongMsg from './workWrongMsg';
+import elevatorFart from './elevatorFart';
+import wechatSport from './wechatSport';
+import interviewEx from './interviewEx';
+import bikeChain from './bikeChain';
+import otFriday from './otFriday';
+import redPenny from './redPenny';
+import hairFood from './hairFood';
+import cameraOn from './cameraOn';
+import misIdol from './misIdol';
+import toiletPaper from './toiletPaper';
+import eggScan from './eggScan';
+import dupGacha from './dupGacha';
+import soupSpill from './soupSpill';
+import groupIgnored from './groupIgnored';
+import recallOk from './recallOk';
+import riderGift from './riderGift';
+import viralSelf from './viralSelf';
+import gymOnce from './gymOnce';
+import hiddenGacha from './hiddenGacha';
+import refundCoupon from './refundCoupon';
 
 export const roundEventEntries: EventPoolEntry[] = [
   trafficJam,
@@ -40,6 +68,11 @@ export const roundEventEntries: EventPoolEntry[] = [
   neighborRenovation,
   heatAllowance,
   powerOutage,
+  acBreak,
+  annivRed,
+  trafficRed,
+  snackParty,
+  forcedCheckup,
 ];
 
 export const turnEventEntries: EventPoolEntry[] = [
@@ -68,6 +101,29 @@ export const turnEventEntries: EventPoolEntry[] = [
   cameraAccident,
   deliveryWarmth,
   greenTea,
+  toiletBoss,
+  momentLike,
+  workWrongMsg,
+  elevatorFart,
+  wechatSport,
+  interviewEx,
+  bikeChain,
+  otFriday,
+  redPenny,
+  hairFood,
+  cameraOn,
+  misIdol,
+  toiletPaper,
+  eggScan,
+  dupGacha,
+  soupSpill,
+  groupIgnored,
+  recallOk,
+  riderGift,
+  viralSelf,
+  gymOnce,
+  hiddenGacha,
+  refundCoupon,
 ];
 
 export const eventEntries: EventPoolEntry[] = [...roundEventEntries, ...turnEventEntries];
