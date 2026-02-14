@@ -16,7 +16,7 @@ const thorns: EquipmentLike = {
     triggerByTag: {
       reflect: [
         '{sourceName} 的 {modifierName} 生效，{targetName} 被反弹 {value} 点伤害 💢。',
-        '{sourceName} 身上的 {modifierName} 触发，{targetName} 反吃 {value} 点伤害 🤡。',
+        '{sourceName} 身上的 {modifierName} 触发，{targetName} 反受 {value} 点伤害 🤡。',
       ],
     },
   },
