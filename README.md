@@ -6,6 +6,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)
 ![React](https://img.shields.io/badge/React-19.2-blue)
 ![Vite](https://img.shields.io/badge/Vite-7.3-646CFF)
+[![Demo](https://img.shields.io/badge/demo-live_success-green)](https://zyf8827.github.io/battle-of-name/)
 
 **⚠️ 本项目为纯 AI AGENT 自动生成，主要用于测试 AI Agent 的代码生成、架构设计和工程化能力**
 
@@ -70,6 +71,14 @@
 - **平衡仿真工具** - 内置批量仿真脚本，验证战斗时长分布和平衡性
 - **调试模式** - 浏览器控制台实时查看战斗引擎内部状态
 - **类型安全** - 全面的 TypeScript 类型定义
+
+---
+
+## 🎮 在线演示
+
+不想本地安装？直接体验在线版本：
+
+**[👉 点击这里体验 GitHub Pages 在线演示](https://zyf8827.github.io/battle-of-name/)**
 
 ---
 
