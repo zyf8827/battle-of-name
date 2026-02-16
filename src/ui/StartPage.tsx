@@ -107,8 +107,16 @@ export function StartPage() {
         </div>
       </div>
 
-      <footer className="mt-8 text-xs text-slate-600">
-        v0.1.0 · Battle of Name
+      <footer className="mt-8 flex flex-col items-center gap-2 text-xs text-slate-600">
+        <p>v0.1.0 · Battle of Name</p>
+        <a
+          href="https://github.com/zyf8827/battle-of-name"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-slate-400 transition-colors"
+        >
+          源代码
+        </a>
       </footer>
     </section>
   );
