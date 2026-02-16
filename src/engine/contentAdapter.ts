@@ -49,6 +49,16 @@ export type BattleLogTextResolver = (
   rngValue: number,
 ) => string;
 
+export type BattleLogTextResolveContext = {
+  key: BattleSystemLogKey;
+  variables: Record<string, string | number | undefined>;
+  rngValue: number;
+  round: number;
+  turn: number;
+};
+
+export type BattleLogContextResolver = (ctx: BattleLogTextResolveContext) => string;
+
 export type EffectHandlerContext<K extends string = string> = {
   owner: Unit;
   effect: EffectSpec<K>;
@@ -107,6 +117,7 @@ export type BattleBootstrapResult = {
   scheduleRules: SchedulerRule[];
   narrate: BattleNarrationResolver;
   logText: BattleLogTextResolver;
+  resolveLogText?: BattleLogContextResolver;
   createModifierById: (id: string, duration?: number) => Modifier;
   getEquipmentById?: (id: string) => Modifier | undefined;
   getConsumableById: (

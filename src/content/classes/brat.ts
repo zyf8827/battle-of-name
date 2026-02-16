@@ -1,11 +1,11 @@
 import type { CharacterClass } from '../base/characterClass';
 import type { Modifier } from '../../engine/types';
 
-const disassemble: Modifier = {
-  id: 'class.brat.disassemble',
+const underageProtectionLaw: Modifier = {
+  id: 'class.brat.underage_protection_law',
   source: 'TALENT',
-  name: '拆家 🧸',
-  description: '熊孩子所过之处寸草不生，有概率弄坏对手装备。',
+  name: '未成年人保护法 🛡️',
+  description: '回合开始时自动获得护盾，规则会替他兜底。',
   priority: 0,
   tags: ['talent'],
   triggers: [
@@ -21,6 +21,15 @@ const disassemble: Modifier = {
       ],
     },
   ],
+};
+
+const disassemble: Modifier = {
+  id: 'class.brat.disassemble',
+  source: 'TALENT',
+  name: '拆家 🧸',
+  description: '熊孩子所过之处寸草不生，有概率弄坏对手装备。',
+  priority: 0,
+  tags: ['talent'],
   // 使用 Hook 实现概率触发
   hooks: {
     onPostAction: (event, { engine, owner, target }) => {
@@ -100,7 +109,7 @@ const brat: CharacterClass = {
   name: '熊孩子 👶',
   description: '无法无天，甚至能把规则本身拆掉。',
   baseStats: { STR: 6, AGI: 12, VIT: 6, LUK: 15 }, // 高运高敏，脆皮
-  talents: [disassemble],
+  talents: [underageProtectionLaw, disassemble],
   texts: {
     intro: ['{unitName} 尖叫着跑来跑去，手里好像拿着什么东西。'],
   },

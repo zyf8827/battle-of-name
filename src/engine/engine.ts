@@ -195,6 +195,7 @@ export function runBattle(
   const scheduler = new EventScheduler(eventPools, bootstrap.scheduleRules);
   const narrate = bootstrap.narrate;
   const logText = bootstrap.logText;
+  const resolveLogText = bootstrap.resolveLogText;
   const createModifierById = bootstrap.createModifierById;
   const getConsumableById = bootstrap.getConsumableById;
   const getEquipmentById = bootstrap.getEquipmentById ?? (() => undefined);
@@ -375,16 +376,24 @@ export function runBattle(
   const resolveSystemLog = (
     key: BattleSystemLogKey,
     variables: Record<string, string | number | undefined>,
-  ): string =>
-    logText(
-      key,
-      {
+  ): string => {
+    const mergedVariables = {
+      round,
+      turn,
+      ...variables,
+    };
+    const rngValue = rng.next(`log.system.${key}`);
+    if (resolveLogText) {
+      return resolveLogText({
+        key,
+        variables: mergedVariables,
+        rngValue,
         round,
         turn,
-        ...variables,
-      },
-      rng.next(`log.system.${key}`),
-    );
+      });
+    }
+    return logText(key, mergedVariables, rngValue);
+  };
 
   // Modifier 堆叠逻辑处理
   // 处理 Buffer/Debuff 的叠加规则：

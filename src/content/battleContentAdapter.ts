@@ -21,7 +21,10 @@
  * - 不同种子下可以有不同开局
  */
 
-import type { BattleContentAdapter } from '../engine/contentAdapter';
+import type {
+  BattleContentAdapter,
+  BattleLogTextResolveContext,
+} from '../engine/contentAdapter';
 import { deepCloneKeepFns } from '../engine/clone';
 import type { BaseStats, Unit } from '../engine/types';
 import seedrandom from 'seedrandom';
@@ -395,159 +398,183 @@ const systemTextFallback: Record<string, TextTemplate> = {
   controlSkip: ['{unitName} 被控到发呆，本回合只能看戏 😵。'],
 };
 
+type SystemLogResolverContext = {
+  key: string;
+  variables: Record<string, string | number | undefined>;
+  rngValue: number;
+  unitMap?: Map<string, Unit>;
+};
+
+type SystemLogResolver = (ctx: SystemLogResolverContext) => string | undefined;
+
+const resolveRewindLog: SystemLogResolver = ({ key, variables, rngValue }) => {
+  if (key !== 'rewind') return undefined;
+  const sourceType = String(variables.sourceType ?? '');
+  const sourceId = String(variables.sourceId ?? '');
+  if (sourceType === 'consumable' && sourceId) {
+    const consumable = getConsumableById(sourceId);
+    if (consumable?.texts?.use) {
+      return renderTextTemplate(consumable.texts.use, variables, rngValue);
+    }
+  }
+  if (sourceType === 'event' && sourceId) {
+    const eventEntry = getEventEntryById(sourceId);
+    if (eventEntry?.texts?.trigger) {
+      return renderTextTemplate(eventEntry.texts.trigger, variables, rngValue);
+    }
+  }
+  return undefined;
+};
+
+const resolveUseConsumableLog: SystemLogResolver = ({ key, variables, rngValue }) => {
+  if (key !== 'useConsumable') return undefined;
+  const sourceId = String(variables.sourceId ?? variables.unitId ?? '');
+  if (!sourceId) return undefined;
+  const consumable = getConsumableById(sourceId);
+  if (consumable?.texts?.use) {
+    return renderTextTemplate(
+      consumable.texts.use,
+      {
+        ...variables,
+        itemName: consumable.name,
+      },
+      rngValue,
+    );
+  }
+  if (consumable) {
+    return renderTextTemplate(
+      systemTextFallback.useConsumable,
+      {
+        ...variables,
+        itemName: consumable.name,
+      },
+      rngValue,
+    );
+  }
+  return undefined;
+};
+
+const resolveEventTriggeredLog: SystemLogResolver = ({ key, variables, rngValue }) => {
+  if (key !== 'envEventTriggered') return undefined;
+  const eventId = String(variables.eventId ?? '');
+  if (!eventId) return undefined;
+  const eventEntry = getEventEntryById(eventId);
+  if (eventEntry?.texts?.trigger) {
+    return renderTextTemplate(eventEntry.texts.trigger, variables, rngValue);
+  }
+  return undefined;
+};
+
+const resolveDispelLog: SystemLogResolver = ({ key, variables, rngValue }) => {
+  if (key !== 'dispel') return undefined;
+  const sourceType = String(variables.sourceType ?? '');
+  const sourceId = String(variables.sourceId ?? '');
+  if (sourceType !== 'equip' || !sourceId) return undefined;
+  const equipment = getEquipmentById(sourceId);
+  if (!equipment?.texts?.equip) return undefined;
+  return renderTextTemplate(
+    equipment.texts.equip,
+    {
+      ...variables,
+      unitName: String(
+        variables.unitName ?? variables.ownerName ?? variables.sourceName ?? variables.actorName ?? '',
+      ),
+      equipmentName: equipment.name,
+    },
+    rngValue,
+  );
+};
+
+const resolveConsumableInventoryLog: SystemLogResolver = ({ key, variables, rngValue }) => {
+  if (key !== 'pickupConsumable' && key !== 'dropConsumable') return undefined;
+  const itemId = String(variables.itemId ?? '');
+  if (!itemId) return undefined;
+  const item = getConsumableById(itemId);
+  if (!item) return undefined;
+  return renderTextTemplate(
+    systemTextFallback[key] ?? '{targetName} 处理了一个道具。',
+    {
+      ...variables,
+      itemName: item.name,
+    },
+    rngValue,
+  );
+};
+
+const resolveEquipmentInventoryLog: SystemLogResolver = ({ key, variables, rngValue }) => {
+  if (key !== 'pickupEquipment' && key !== 'replaceEquipment') return undefined;
+  const equipmentId = String(variables.equipmentId ?? '');
+  const oldEquipmentId = String(variables.oldEquipmentId ?? '');
+  const equipment = equipmentId ? getEquipmentById(equipmentId) : undefined;
+  const oldEquipment = oldEquipmentId ? getEquipmentById(oldEquipmentId) : undefined;
+  return renderTextTemplate(
+    systemTextFallback[key] ?? '{targetName} 调整了装备。',
+    {
+      ...variables,
+      equipmentName: equipment?.name ?? String(variables.equipmentName ?? equipmentId),
+      oldEquipmentName: oldEquipment?.name ?? String(variables.oldEquipmentName ?? oldEquipmentId),
+    },
+    rngValue,
+  );
+};
+
+const resolveHealLog: SystemLogResolver = ({ key, variables, rngValue, unitMap }) => {
+  if (key !== 'heal') return undefined;
+  const sourceId = String(variables.sourceId ?? '');
+  const sourceUnit = sourceId ? unitMap?.get(sourceId) : undefined;
+  if (!sourceUnit) return undefined;
+  for (const modifier of sourceUnit.modifiers) {
+    const byTag = modifier.texts?.triggerByTag?.heal;
+    if (byTag) {
+      return renderTextTemplate(
+        byTag,
+        {
+          ...variables,
+          modifierId: modifier.id,
+          modifierName: modifier.name,
+        },
+        rngValue,
+      );
+    }
+  }
+  return undefined;
+};
+
+const systemLogResolverChain: Partial<Record<string, SystemLogResolver[]>> = {
+  rewind: [resolveRewindLog],
+  useConsumable: [resolveUseConsumableLog],
+  envEventTriggered: [resolveEventTriggeredLog],
+  dispel: [resolveDispelLog],
+  pickupConsumable: [resolveConsumableInventoryLog],
+  dropConsumable: [resolveConsumableInventoryLog],
+  pickupEquipment: [resolveEquipmentInventoryLog],
+  replaceEquipment: [resolveEquipmentInventoryLog],
+  heal: [resolveHealLog],
+};
+
 function renderSystemLog(
   key: string,
   variables: Record<string, string | number | undefined>,
   rngValue: number,
   unitMap?: Map<string, Unit>,
 ): string {
-  if (key === 'rewind') {
-    const sourceType = String(variables.sourceType ?? '');
-    const sourceId = String(variables.sourceId ?? '');
-    if (sourceType === 'consumable' && sourceId) {
-      const consumable = getConsumableById(sourceId);
-      if (consumable?.texts?.use) {
-        return renderTextTemplate(consumable.texts.use, variables, rngValue);
-      }
-    }
-    if (sourceType === 'event' && sourceId) {
-      const eventEntry = getEventEntryById(sourceId);
-      if (eventEntry?.texts?.trigger) {
-        return renderTextTemplate(eventEntry.texts.trigger, variables, rngValue);
-      }
-    }
-  }
-
-  if (key === 'useConsumable') {
-    const sourceId = String(variables.sourceId ?? variables.unitId ?? '');
-    if (sourceId) {
-      const consumable = getConsumableById(sourceId);
-      if (consumable?.texts?.use) {
-        return renderTextTemplate(
-          consumable.texts.use,
-          {
-            ...variables,
-            itemName: consumable.name,
-          },
-          rngValue,
-        );
-      }
-      if (consumable) {
-        return renderTextTemplate(
-          systemTextFallback.useConsumable,
-          {
-            ...variables,
-            itemName: consumable.name,
-          },
-          rngValue,
-        );
-      }
-    }
-  }
-
-  if (key === 'envEventTriggered') {
-    const eventId = String(variables.eventId ?? '');
-    if (eventId) {
-      const eventEntry = getEventEntryById(eventId);
-      if (eventEntry?.texts?.trigger) {
-        return renderTextTemplate(eventEntry.texts.trigger, variables, rngValue);
-      }
-    }
-  }
-
-  if (key === 'dispel') {
-    const sourceType = String(variables.sourceType ?? '');
-    const sourceId = String(variables.sourceId ?? '');
-    if (sourceType === 'equip' && sourceId) {
-      const equipment = getEquipmentById(sourceId);
-      if (equipment?.texts?.equip) {
-        return renderTextTemplate(
-          equipment.texts.equip,
-          {
-            ...variables,
-            unitName: String(
-              variables.unitName ??
-                variables.ownerName ??
-                variables.sourceName ??
-                variables.actorName ??
-                '',
-            ),
-            equipmentName: equipment.name,
-          },
-          rngValue,
-        );
-      }
-    }
-  }
-
-  if (key === 'pickupConsumable' || key === 'dropConsumable') {
-    const itemId = String(variables.itemId ?? '');
-    if (itemId) {
-      const item = getConsumableById(itemId);
-      if (item) {
-        return renderTextTemplate(
-          systemTextFallback[key] ?? '{targetName} 处理了一个道具。',
-          {
-            ...variables,
-            itemName: item.name,
-          },
-          rngValue,
-        );
-      }
-    }
-  }
-
-  if (key === 'pickupEquipment' || key === 'replaceEquipment') {
-    const equipmentId = String(variables.equipmentId ?? '');
-    const oldEquipmentId = String(variables.oldEquipmentId ?? '');
-    const equipment = equipmentId ? getEquipmentById(equipmentId) : undefined;
-    const oldEquipment = oldEquipmentId ? getEquipmentById(oldEquipmentId) : undefined;
-    return renderTextTemplate(
-      systemTextFallback[key] ?? '{targetName} 调整了装备。',
-      {
-        ...variables,
-        equipmentName: equipment?.name ?? String(variables.equipmentName ?? equipmentId),
-        oldEquipmentName:
-          oldEquipment?.name ?? String(variables.oldEquipmentName ?? oldEquipmentId),
-      },
-      rngValue,
-    );
-  }
-
-  if (key === 'heal') {
-    const sourceId = String(variables.sourceId ?? '');
-    const sourceUnit = sourceId ? unitMap?.get(sourceId) : undefined;
-    if (sourceUnit) {
-      for (const modifier of sourceUnit.modifiers) {
-        const byTag = modifier.texts?.triggerByTag?.heal;
-        if (byTag) {
-          return renderTextTemplate(
-            byTag,
-            {
-              ...variables,
-              modifierId: modifier.id,
-              modifierName: modifier.name,
-            },
-            rngValue,
-          );
-        }
-        if (modifier.texts?.trigger) {
-          return renderTextTemplate(
-            modifier.texts.trigger,
-            {
-              ...variables,
-              modifierId: modifier.id,
-              modifierName: modifier.name,
-            },
-            rngValue,
-          );
-        }
-      }
+  const resolvers = systemLogResolverChain[key] ?? [];
+  for (const resolver of resolvers) {
+    const resolved = resolver({ key, variables, rngValue, unitMap });
+    if (resolved) {
+      return resolved;
     }
   }
 
   const fallback = systemTextFallback[key] ?? '{unitName} 做出了行动。';
   return renderTextTemplate(fallback, variables, rngValue);
+}
+
+function renderSystemLogFromContext(
+  ctx: BattleLogTextResolveContext,
+  unitMap?: Map<string, Unit>,
+): string {
+  return renderSystemLog(ctx.key, ctx.variables, ctx.rngValue, unitMap);
 }
 
 export const defaultBattleContentAdapter: BattleContentAdapter = {
@@ -661,6 +688,7 @@ export const defaultBattleContentAdapter: BattleContentAdapter = {
       ],
       narrate,
       logText: (key, variables, rngValue) => renderSystemLog(key, variables, rngValue, unitMap),
+      resolveLogText: (ctx) => renderSystemLogFromContext(ctx, unitMap),
       createModifierById,
       getEquipmentById: (id: string) => {
         const equipment = getEquipmentById(id);

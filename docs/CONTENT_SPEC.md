@@ -85,7 +85,8 @@ src/content/
   - `eventPools`
   - `scheduleRules`
   - `narrate`
-  - `logText`
+  - `logText`（兼容入口）
+  - `resolveLogText`（可选，推荐）
   - `createModifierById`
 
 这样可替换为任意实现（MVP 内容包、活动内容包、测试 mock 内容包），无需修改引擎核心。
@@ -95,12 +96,32 @@ src/content/
 `engine` 只负责“何时记日志、记录哪些结构化字段（round/turn/actor/eventType）”，不负责具体中文文本。
 
 - 攻击类战报：由 `narrate` 负责（含同义句池/风格）
-- 系统类战报通过 `logText(key, variables, rngValue)` 渲染：
+- 系统类战报：优先走 `resolveLogText(ctx)`，未提供时回退 `logText(key, variables, rngValue)`
   - `engine` 负责传递 key 与结构化变量（source/target/modifier/event）
   - `content` 决定具体文本模板（固定或候选池）
   - 可按 sourceId/sourceType 回溯到具体内容对象（如 Consumable/Event/Modifier）
 
-这样同一机制可以在不同 content 包里使用不同文案风格，而无需改引擎流程代码。
+推荐在内容层实现“按 key 的解析链（resolver chain）”：
+
+1. **业务覆盖层（override）**：按 key + sourceType/sourceId/tag 命中具体内容文案
+2. **系统模板层（default templates）**：按 key 使用标准模板
+3. **兜底层（hard fallback）**：未知 key 使用通用模板（例如 `{unitName} 做出了行动。`）
+
+这样可保证同一机制在不同 content 包里复用，同时做到“可覆盖、可回退、可扩展”。
+
+### 3.4 日志覆盖优先级（强约束）
+
+为避免日志串台与误覆盖，系统日志必须遵循以下优先级：
+
+1. `resolveLogText(ctx)` 中 **当前 key 对应 resolver** 的命中结果
+2. `systemTextFallback[key]`（同 key 默认模板）
+3. 全局兜底模板
+
+约束：
+
+- 禁止跨 key 复用覆盖（例如用 `heal` 的覆盖规则去处理 `eventHeal`）
+- `heal` 系统日志只允许读取 `triggerByTag.heal` 的覆盖，不应回退到通用 `trigger`
+- resolver 仅负责“选模板/补变量”，不应直接改写战斗状态
 
 ### 3.2 默认装配策略（可复现随机）
 
@@ -331,10 +352,15 @@ type EventPoolSpec = {
 
 模板引擎统一支持 `{变量名}` 占位符；当变量不存在时会渲染为空字符串。
 
-#### A 通用参数（`logText` 默认都会注入）
+#### A 通用参数（系统日志默认注入）
 
 - `round`：当前回合
 - `turn`：当前回合内行动序号
+
+补充：
+
+- 使用 `resolveLogText(ctx)` 时，`ctx` 中固定包含：`key`、`variables`、`rngValue`、`round`、`turn`
+- 使用 `logText(key, variables, rngValue)` 时，`round/turn` 已由 `engine` 合并到 `variables`
 
 #### B `narrate`（攻击战报）可用参数
 
@@ -413,6 +439,14 @@ type EventPoolSpec = {
 - 数值类统一使用：`amount` / `damage` / `healValue` / `shieldGained`
 - 需要可回放上下文时再用：`round`、`turn`、`eventId`
 - 保持模板对缺省字段容错：某些 key 不会提供全部变量
+
+#### G 系统日志实现建议
+
+- 每个系统 key 维护独立 resolver（函数或规则对象均可）
+- 通过 resolver chain 顺序执行，首个命中即返回
+- 同一 key 内允许“具体内容覆盖 -> 通用模板”的二级回退
+- 对于 Inventory / Event / Heal 等高频 key，优先使用结构化变量，不拼接硬编码字符串
+- 任何 resolver 未命中时必须回退到默认模板，保证日志永不缺失
 
 ---
 
@@ -553,7 +587,7 @@ export default talentLifeSteal30;
 ### 6.2 新增一个事件条目并加入事件池
 
 
-说明：`triggerByTag.heal` 会优先用于治疗类系统日志（`logText('heal')`），若未定义则回退到 `trigger`，再回退到全局默认文本。
+说明：`triggerByTag.heal` 会优先用于治疗类系统日志（`logText('heal')` / `resolveLogText`）。若未定义，直接回退到系统默认 `heal` 文本（不回退到通用 `trigger`）。
 1) 新建条目文件 `src/content/events/entries/midnight.ts`
 
 ```ts
