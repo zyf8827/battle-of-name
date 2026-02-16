@@ -19,3 +19,22 @@ body {
   background: rgb(2 6 23);
   color: rgb(226 232 240);
 }
+
+/* 移动端触摸优化 */
+* {
+  /* 防止双击缩放 */
+  touch-action: manipulation;
+}
+
+/* 移动端滚动优化 */
+.scrollable-container {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* 横屏模式特定样式 */
+@media (orientation: landscape) and (max-height: 600px) {
+  .battle-log-container {
+    height: 55vh;
+  }
+}

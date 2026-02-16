@@ -153,12 +153,12 @@ export function BattlePage() {
   const activeTurnId = result.logs[cursor]?.actorId || result.logs[cursor - 1]?.actorId;
 
   return (
-    <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 p-4 md:p-6">
-      <header className="sticky top-4 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/80 p-4 backdrop-blur shadow-xl">
+    <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 p-4 md:p-6 max-md:gap-3 max-md:p-2 landscape:p-3 max-md:landscape:p-2 max-md:landscape:gap-2">
+      <header className="sticky top-4 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/80 p-4 backdrop-blur shadow-xl max-md:top-2 max-md:gap-2 max-md:rounded-xl max-md:p-2">
         <div className="flex items-center gap-2">
           <button
             onClick={togglePause}
-            className={`rounded-lg px-4 py-2 text-sm font-bold shadow-sm transition-all active:scale-95 ${
+            className={`rounded-lg px-4 py-2 text-sm font-bold shadow-sm transition-all active:scale-95 max-md:px-3 max-md:py-1.5 max-md:text-xs ${
               phase === 'running'
                 ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 ring-1 ring-amber-500/50'
                 : 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 ring-1 ring-emerald-500/50'
@@ -169,37 +169,37 @@ export function BattlePage() {
 
           <button
             onClick={step}
-            className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300 shadow-sm ring-1 ring-slate-700 transition-all hover:bg-slate-700 active:scale-95 disabled:opacity-50"
+            className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300 shadow-sm ring-1 ring-slate-700 transition-all hover:bg-slate-700 active:scale-95 disabled:opacity-50 max-md:px-3 max-md:py-1.5 max-md:text-xs"
             disabled={phase === 'running'}
           >
             ⏯ 单步
           </button>
         </div>
 
-        <div className="h-6 w-px bg-slate-700/50"></div>
+        <div className="h-6 w-px bg-slate-700/50 max-md:h-5"></div>
 
         <button
           onClick={() => setSpeed(speed === 1 ? 2 : 1)}
-          className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300 shadow-sm ring-1 ring-slate-700 transition-all hover:bg-slate-700 active:scale-95"
+          className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300 shadow-sm ring-1 ring-slate-700 transition-all hover:bg-slate-700 active:scale-95 max-md:gap-1.5 max-md:px-3 max-md:py-1.5 max-md:text-xs"
         >
           <span>速度</span>
           <span
-            className={`rounded px-1.5 py-0.5 text-xs font-bold ${speed === 2 ? 'bg-indigo-500 text-white' : 'bg-slate-700 text-slate-400'}`}
+            className={`rounded px-1.5 py-0.5 text-xs font-bold max-md:text-[10px] ${speed === 2 ? 'bg-indigo-500 text-white' : 'bg-slate-700 text-slate-400'}`}
           >
             x{speed}
           </span>
         </button>
 
-        <div className="ml-auto flex items-center gap-2 rounded-lg bg-slate-950/50 px-3 py-1.5 ring-1 ring-slate-800">
-          <span className="text-xs text-slate-500">种子</span>
-          <code className="font-mono text-sm font-bold text-slate-300">
+        <div className="ml-auto flex items-center gap-2 rounded-lg bg-slate-950/50 px-3 py-1.5 ring-1 ring-slate-800 max-md:gap-1.5 max-md:px-2 max-md:py-1">
+          <span className="text-xs text-slate-500 max-md:text-[10px]">种子</span>
+          <code className="font-mono text-sm font-bold text-slate-300 max-md:text-xs">
             {result.seed}
           </code>
         </div>
       </header>
 
-      <div className="grid flex-1 gap-6 lg:grid-cols-[1fr_1.4fr_1fr] items-start">
-        <div className="sticky top-24">
+      <div className="grid flex-1 gap-4 md:gap-6 landscape:gap-3 lg:grid-cols-[1fr_1.4fr_1fr] landscape:grid-cols-[1fr_1.2fr_1fr] md:grid-cols-1 items-start max-md:gap-2 max-md:landscape:gap-2">
+        <div className="lg:sticky lg:top-24 md:static max-md:landscape:max-h-[calc(100dvh-8.5rem)] max-md:landscape:overflow-y-auto max-md:landscape:pr-1">
           <FighterPanel
             unit={snapshot.units[0]}
             side="left"
@@ -211,7 +211,7 @@ export function BattlePage() {
 
         <BattleLog logs={visibleLogs} title="⚔️ 实时战报" />
 
-        <div className="sticky top-24">
+        <div className="lg:sticky lg:top-24 md:static max-md:landscape:max-h-[calc(100dvh-8.5rem)] max-md:landscape:overflow-y-auto max-md:landscape:pl-1">
           <FighterPanel
             unit={snapshot.units[1]}
             side="right"

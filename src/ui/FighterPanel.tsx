@@ -150,7 +150,7 @@ export function FighterPanel({
       animate={currentAnimation}
       variants={variants}
       initial="idle"
-      className={`relative rounded-xl border p-4 transition-shadow duration-300 ${
+      className={`relative rounded-xl border p-3 transition-shadow duration-300 sm:p-4 ${
         winner 
           ? 'border-amber-500/50 bg-amber-950/20 shadow-[0_0_30px_-10px_rgba(245,158,11,0.3)]' 
           : isActiveTurn
@@ -172,9 +172,9 @@ export function FighterPanel({
               }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1, times: [0, 0.1, 0.8, 1] }}
-              className={`absolute text-2xl font-black italic tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${
+              className={`absolute text-xl font-black italic tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] sm:text-2xl ${
                 ft.type === 'damage' ? 'text-rose-500' :
-                ft.type === 'crit' ? 'text-yellow-400 text-3xl' :
+                ft.type === 'crit' ? 'text-yellow-400 text-2xl sm:text-3xl' :
                 ft.type === 'heal' ? 'text-emerald-400' :
                 ft.type === 'shield' ? 'text-sky-400' :
                 'text-slate-400'
@@ -199,9 +199,9 @@ export function FighterPanel({
         )}
       </AnimatePresence>
 
-      <header className="mb-4 flex items-start justify-between">
+      <header className="mb-3 flex items-start justify-between sm:mb-4">
         <div>
-          <h3 className="flex items-center gap-2 text-xl font-black tracking-wide text-slate-100">
+          <h3 className="flex items-center gap-1.5 text-lg font-black tracking-wide text-slate-100 sm:gap-2 sm:text-xl">
             {unit.name}
             {winner && <span className="text-xl">👑</span>}
           </h3>
@@ -229,7 +229,7 @@ export function FighterPanel({
               )
             }
           >
-            <p className="cursor-help text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors">
+            <p className="cursor-help text-[11px] font-medium text-slate-400 hover:text-slate-200 transition-colors sm:text-xs">
               <span className="mr-1 inline-block h-2 w-2 rounded-full bg-indigo-500"></span>
               {unit.className ?? '无名之辈'}
             </p>
@@ -244,17 +244,17 @@ export function FighterPanel({
 
       {/* HP Bar */}
       <div className="mb-1 flex items-center justify-between text-xs font-semibold text-slate-300">
-        <span className="flex items-center gap-1 text-rose-400">
+        <span className="flex items-center gap-1 text-[11px] text-rose-400 sm:text-xs">
           <span className="text-[10px]">❤️</span> {unit.state.hp}{' '}
           <span className="text-slate-500">/ {unit.state.maxHp}</span>
         </span>
         {unit.state.shield > 0 && (
-          <span className="flex items-center gap-1 rounded bg-sky-500/20 px-2 py-0.5 text-xs font-bold text-sky-300 ring-1 ring-sky-500/40">
+          <span className="flex items-center gap-1 rounded bg-sky-500/20 px-1.5 py-0.5 text-[11px] font-bold text-sky-300 ring-1 ring-sky-500/40 sm:px-2 sm:text-xs">
             🛡️ {unit.state.shield}
           </span>
         )}
       </div>
-      <div className="relative mb-5 h-3 overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700/50">
+      <div className="relative mb-3.5 h-2.5 overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700/50 sm:mb-5 sm:h-3">
         {/* Ghost HP bar (background slow catching up) */}
         <div
           className="absolute left-0 top-0 h-full bg-rose-900/50 transition-all duration-1000 ease-out"
@@ -276,54 +276,54 @@ export function FighterPanel({
       </div>
 
       {/* Stats Grid */}
-      <div className="mb-5 grid grid-cols-2 gap-3 rounded-lg bg-slate-950/30 p-3">
+      <div className="mb-3.5 grid grid-cols-2 gap-2 rounded-lg bg-slate-950/30 p-2.5 sm:mb-5 sm:gap-3 sm:p-3">
         <Tooltip content="决定物理攻击伤害 (STR)">
-          <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-rose-500/10 text-lg">
+          <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1 max-md:gap-1.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded bg-rose-500/10 text-base sm:h-8 sm:w-8 sm:text-lg">
               💪
             </div>
             <div>
               <div className="text-[10px] text-slate-500">力量 (STR)</div>
-              <div className="font-mono text-sm font-bold text-slate-200">
+              <div className="font-mono text-xs font-bold text-slate-200 sm:text-sm">
                 {unit.stats.STR}
               </div>
             </div>
           </div>
         </Tooltip>
         <Tooltip content="决定出手速度和闪避率 (AGI)">
-          <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-emerald-500/10 text-lg">
+          <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1 max-md:gap-1.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded bg-emerald-500/10 text-base sm:h-8 sm:w-8 sm:text-lg">
               🦶
             </div>
             <div>
               <div className="text-[10px] text-slate-500">敏捷 (AGI)</div>
-              <div className="font-mono text-sm font-bold text-slate-200">
+              <div className="font-mono text-xs font-bold text-slate-200 sm:text-sm">
                 {unit.stats.AGI}
               </div>
             </div>
           </div>
         </Tooltip>
         <Tooltip content="决定最大生命值 (VIT)">
-          <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-amber-500/10 text-lg">
+          <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1 max-md:gap-1.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded bg-amber-500/10 text-base sm:h-8 sm:w-8 sm:text-lg">
               ❤️
             </div>
             <div>
               <div className="text-[10px] text-slate-500">体质 (VIT)</div>
-              <div className="font-mono text-sm font-bold text-slate-200">
+              <div className="font-mono text-xs font-bold text-slate-200 sm:text-sm">
                 {unit.stats.VIT}
               </div>
             </div>
           </div>
         </Tooltip>
         <Tooltip content="决定暴击率和随机事件好运度 (LUK)">
-          <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-purple-500/10 text-lg">
+          <div className="flex cursor-help items-center gap-2 hover:bg-slate-800/50 rounded transition-colors p-1 max-md:gap-1.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded bg-purple-500/10 text-base sm:h-8 sm:w-8 sm:text-lg">
               🍀
             </div>
             <div>
               <div className="text-[10px] text-slate-500">幸运 (LUK)</div>
-              <div className="font-mono text-sm font-bold text-slate-200">
+              <div className="font-mono text-xs font-bold text-slate-200 sm:text-sm">
                 {unit.stats.LUK}
               </div>
             </div>
@@ -331,16 +331,16 @@ export function FighterPanel({
         </Tooltip>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-2.5 sm:space-y-4">
         {/* Equipment */}
         <div>
-          <p className="mb-2 flex items-center gap-1 text-xs font-semibold text-slate-400">
+          <p className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold text-slate-400 sm:mb-2 sm:text-xs">
             <span className="inline-block h-1 w-1 rounded-full bg-slate-500"></span>{' '}
             装备
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 max-md:gap-1">
             {equipmentModifiers.length === 0 ? (
-              <span className="text-xs italic text-slate-600">无</span>
+              <span className="text-[11px] italic text-slate-600 sm:text-xs">无</span>
             ) : null}
             {equipmentModifiers.map((modifier) => {
               const equipDef = getEquipmentById(modifier.id);
@@ -378,7 +378,7 @@ export function FighterPanel({
                     </div>
                   }
                 >
-                  <span className="inline-flex cursor-help items-center gap-1 rounded border border-amber-500/20 bg-amber-500/10 px-2 py-1 text-xs text-amber-300 transition hover:bg-amber-500/20 hover:text-amber-200">
+                  <span className="inline-flex cursor-help items-center gap-1 rounded border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[11px] text-amber-300 transition hover:bg-amber-500/20 hover:text-amber-200 sm:px-2 sm:py-1 sm:text-xs">
                     {modifier.name}
                   </span>
                 </Tooltip>
@@ -389,13 +389,13 @@ export function FighterPanel({
 
         {/* Status Effects */}
         <div>
-          <p className="mb-2 flex items-center gap-1 text-xs font-semibold text-slate-400">
+          <p className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold text-slate-400 sm:mb-2 sm:text-xs">
             <span className="inline-block h-1 w-1 rounded-full bg-slate-500"></span>{' '}
             状态效果
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 max-md:gap-1">
             {otherModifiers.length === 0 ? (
-              <span className="text-xs italic text-slate-600">无</span>
+              <span className="text-[11px] italic text-slate-600 sm:text-xs">无</span>
             ) : null}
             {otherModifiers.map((modifier) => (
               <Tooltip
@@ -417,7 +417,7 @@ export function FighterPanel({
                   </div>
                 }
               >
-                <span className="inline-flex cursor-help items-center gap-1 rounded border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-xs text-indigo-300 transition hover:bg-indigo-500/20 hover:text-indigo-200">
+                <span className="inline-flex cursor-help items-center gap-1 rounded border border-indigo-500/20 bg-indigo-500/10 px-1.5 py-0.5 text-[11px] text-indigo-300 transition hover:bg-indigo-500/20 hover:text-indigo-200 sm:px-2 sm:text-xs">
                   {modifier.name}
                   {(modifier.stacks ?? 1) > 1 && (
                     <span className="rounded bg-indigo-500/20 px-1 text-[10px] text-indigo-200">
@@ -438,13 +438,13 @@ export function FighterPanel({
 
         {/* Consumables */}
         <div>
-          <p className="mb-2 flex items-center gap-1 text-xs font-semibold text-slate-400">
+          <p className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold text-slate-400 sm:mb-2 sm:text-xs">
             <span className="inline-block h-1 w-1 rounded-full bg-slate-500"></span>{' '}
             持有物品
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 max-md:gap-1">
             {(unit.state.consumables ?? []).length === 0 ? (
-              <span className="text-xs italic text-slate-600">无</span>
+              <span className="text-[11px] italic text-slate-600 sm:text-xs">无</span>
             ) : null}
             {(unit.state.consumables ?? []).map((itemId, idx) => {
               const itemDef = getConsumableById(itemId);
@@ -468,7 +468,7 @@ export function FighterPanel({
                     )
                   }
                 >
-                  <span className="cursor-help rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-300 transition hover:bg-emerald-500/20 hover:text-emerald-200">
+                  <span className="cursor-help rounded border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[11px] text-emerald-300 transition hover:bg-emerald-500/20 hover:text-emerald-200 sm:px-2 sm:text-xs">
                     {itemDef?.name ?? itemId}
                   </span>
                 </Tooltip>
@@ -479,10 +479,10 @@ export function FighterPanel({
       </div>
 
       {typeof totalDamage === 'number' && (
-        <div className="mt-4 border-t border-slate-700/50 pt-3 text-center">
-          <p className="text-xs text-slate-400">
+        <div className="mt-3 border-t border-slate-700/50 pt-2 text-center sm:mt-4 sm:pt-3">
+          <p className="text-[11px] text-slate-400 sm:text-xs">
             本场总输出{' '}
-            <span className="font-mono text-sm font-bold text-rose-400">
+            <span className="font-mono text-xs font-bold text-rose-400 sm:text-sm">
               {totalDamage}
             </span>
           </p>
